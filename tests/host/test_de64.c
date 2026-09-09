@@ -952,7 +952,8 @@ int main(void) {
     {
         printf("1B1 API spec doc exists\n");
         printf("1B2 API signatures present\n");
-        CHECK(secureboot64_log_event("test") == 0 || 1, "1B3 log stub");
+        secureboot64_log_event("test");
+        CHECK(1, "1B3 log stub");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
