@@ -1,0 +1,368 @@
+CHAROS Tam Teşekküllü OS Yol Haritası
+Hedef: 2 GB RAM / 512 MB VRAM / 4 çekirdek CPU
+DE: XFCE tarzı hafif, tek DE
+Oyun motoru: Windows API reimplementasyonu Wine benzeri
+Paketleme: Kendi .char paket yöneticisi + kernel düzeyinde Flatpak sandbox
+Boyut hedefi: Kurulu 3.5-5.5 GB, Live ISO 1.5-2.2 GB
+
+=== 31x Long Mode Geçiş ===
+31A : boot64.s 64-bit entry stub + GDT64 kurulum
+31B : UEFI 64-bit PE loader PE32+ ELF yükleyici
+31C : paging64 4-level PML4/PDP/PD/PT kurulumu
+31D : CR0/CR4/EFER LME/LMA geçiş ve long mode aktif
+31E : 64-bit kernel_main prototipi
+31F : 64-bit IDT gate + syscall MSR_STAR
+31G : 64-bit GDT TSS kurulumu
+31H : 64-bit APIC init ve SMP hazırlık
+31I : 64-bit stack canary ve relocator
+31J : 64-bit smoke test QEMU OVMF
+
+=== 32x Bellek Modeli ===
+32A : PMM 64-bit 2GB cap bitmap
+32B : Slab allocator kmalloc64
+32C : Demand paging + page fault handler
+32D : Copy-on-Write fork
+32E : KASLR kernel rastgeleleme
+32F : Per-CPU page tables
+32G : Huge pages 2MiB
+32H : Swap backend arayüzü
+32I : Swap partition desteği
+32J : Memory pressure test
+
+=== 33x SMP ===
+33A : INIT-SIPI-SIPI 64-bit
+33B : AP trampoline 64-bit
+33C : LAPIC timer kalibrasyon
+33D : TLB shootdown IPI
+33E : Workqueue per CPU
+33F : Scheduler affinity
+33G : NUMA topology saptama
+33H : RCU skeleton
+33I : Lock-free kalloc
+33J : 4 CPU boot test
+
+=== 34x UEFI 64-bit ===
+34A : UEFI 64-bit PE loader
+34B : Boot services cleanup
+34C : ACPI 64-bit protokolleri
+34D : GOP 64-bit framebuffer mapping
+34E : NVRAM boot entry
+34F : Secure Boot shim
+34G : Runtime services wrapper
+34H : 64-bit ISO UEFI boot
+34I : Firmware variable okuma
+34J : UEFI 64-bit test
+
+=== 35x PMM & Swap ===
+35A : PMM zone management
+35B : Buddy allocator
+35C : Swap LRU reclaim
+35D : OOM killer
+35E : Memory pressure notifier
+35F : Balloon driver
+35G : KSM skeleton
+35H : Huge page swap
+35I : Memtest 64-bit
+35J : Swap stress test
+
+=== 36x KHeap ===
+36A : kmalloc cache color
+36B : Slab shrinker
+36C : Malloc profiling
+36D : Leak detector
+36E : KASAN-lite
+36F : Guard pages
+36G : Alignment 16-byte
+36H : Arena per cpu
+36I : Jemalloc port
+36J : Heap stress test
+
+=== 37x Güvenlik ===
+37A : ASLR userspace
+37B : NX bit zorunlu
+37C : Stack canary kernel
+37D : seccomp filtre
+37E : Capabilities audit
+37F : SELinux profil skeleton
+37G : AppArmor profil
+37H : User namespace
+37I : Kernel module signing
+37J : Pen test
+
+=== 38x Yetki ===
+38A : passwd/shadow
+38B : PAM skeleton
+38C : sudo syscall
+38D : Capabilities v3
+38E : Audit log
+38F : Group policy
+38G : SELinux context
+38H : PAM module API
+38I : Privilege drop
+38J : Auth test
+
+=== 39x VFS ===
+39A : VFS inode ops
+39B : Dentry cache
+39C : Mount namespace
+39D : Symlink/hardlink
+39E : fcntl lock
+39F : inotify skeleton
+39G : poll/epoll
+39H : VFS ioctl
+39I : tmpfs
+39J : VFS test
+
+=== 40x DiskFS ===
+40A : Ext2 driver
+40B : Journal write-ahead
+40C : fsync guarantee
+40D : Extended attributes
+40E : POSIX ACL
+40F : Quota
+40G : FSCK
+40H : CoW snapshot
+40I : FUSE interface
+40J : FS benchmark
+
+=== 41x Paket Yöneticisi ===
+41A : .char paket formatı
+41B : Repo index
+41C : Dependency resolver
+41D : Signature verify
+41E : Transaction rollback
+41F : Atomic upgrade
+41G : Repo mirror
+41H : Flatpak runtime parser
+41I : Flatpak manifest import
+41J : Paket test
+
+=== 42x Init Sistemi ===
+42A : Init systemd-like
+42B : Service unit parser
+42C : Socket activation
+42D : Journald
+42E : Loginctl
+42F : Cgroups v2
+42G : Timer units
+42H : Boot target
+42I : Rescue mode
+42J : Init test
+
+=== 43x Ağ ===
+43A : IPv4/IPv6 stack
+43B : ARP/NDP
+43C : TCP CUBIC
+43D : UDP socket
+43E : DHCP client
+43F : DNS resolver
+43G : TLS 1.3
+43H : IPv6 SLAAC
+43I : netfilter
+43J : iperf test
+
+=== 44x WiFi ===
+44A : RTL8821CE probe
+44B : Firmware yükleme
+44C : mac80211 skeleton
+44D : WPA3 handshake
+44E : Scan/roam
+44F : Power save
+44G : AP mode
+44H : Mesh skeleton
+44I : Driver test
+44J : WiFi test
+
+=== 45x USB ===
+45A : Mass storage UASP
+45B : USB audio
+45C : USB video
+45D : Hub power mgmt
+45E : xHCI MSI
+45F : USB/IP
+45G : HID report parser
+45H : Virtual HID
+45I : USB devfs
+45J : USB test
+
+=== 46x Ses ===
+46A : HD Audio codec init
+46B : ALSA PCM
+46C : Mixer controls
+46D : PulseAudio server
+46E : JACK skeleton
+46F : Bluetooth audio
+46G : Sample rate conv
+46H : Low latency
+46I : Sound test
+46J : Media player
+
+=== 47x GPU ===
+47A : Mesa Gallium low profile
+47B : Mode setting KMS
+47C : Vulkan 1.0 low
+47D : OpenGL ES 3.2
+47E : VRAM 512MB optimizasyon
+47F : 3D compositor GL
+47G : GPU scheduler
+47H : Compute shaders
+47I : Video decode VA-API
+47J : Graphics test
+
+=== 48x Güç ACPI ===
+48A : ACPI parse
+48B : S3 sleep
+48C : S4 hibernate
+48D : CPU freq scaling
+48E : cpuidle governor
+48F : Power button
+48G : Battery driver
+48H : Thermal trip
+48I : Wake on LAN
+48J : Power test
+
+=== 49x Sensör ===
+49A : hwmon core
+49B : CPU temp
+49C : Fan control
+49D : Battery status
+49E : System monitor
+49F : Prometheus exporter
+49G : SMART monitoring
+49H : Logrotate
+49I : Health test
+49J : Sensor test
+
+=== 50x FS Gelişmiş ===
+50A : Btrfs skeleton
+50B : ZFS FUSE
+50C : FUSE sshfs
+50D : NFS client
+50E : NFS server
+50F : SMB/CIFS client
+50G : LUKS
+50H : OverlayFS
+50I : Encrypted FS
+50J : FS benchmark
+
+=== 51x libc ===
+51A : musl port 64-bit
+51B : pthreads NPTL
+51C : DNS resolver
+51D : stdio buffering
+51E : locale
+51F : time zone
+51G : iconv
+51H : regex
+51I : math lib
+51J : libc test
+
+=== 52x ELF ===
+52A : ELF64 parser
+52B : Program headers
+52C : Dynamic linker
+52D : .so load
+52E : ASLR userspace
+52F : RPATH/RUNPATH
+52G : Delay load
+52H : Symbol versioning
+52I : dlopen/dlsym
+52J : ELF test
+
+=== 53x Bağlantı ===
+53A : Prelink
+53B : LD_LIBRARY_PATH
+53C : NSS libraries
+53D : Iconv provider
+53E : Crypto provider
+53F : Plugin API
+53G : Module hotplug
+53H : Self-test
+53I : Link test
+53J : Dynamic test
+
+=== 54x Kabuk ===
+54A : bash port
+54B : coreutils 100+
+54C : busybox
+54D : find/grep/sed/awk
+54E : ssh client
+54F : git client
+54G : make
+54H : python3 runtime
+54I : node.js
+54J : Userspace test
+
+=== 55x Window Server ===
+55A : Minimal Wayland compositor
+55B : X11 compat layer
+55C : Input v2
+55D : Output v2
+55E : Virtual keyboard
+55F : Screen sharing
+55G : Remote desktop
+55H : Security context
+55I : Low latency path
+55J : Compositor test
+
+=== 56x XFCE Tarzı DE ===
+56A : Panel core
+56B : Pencere yöneticisi
+56C : Ayar yöneticisi
+56D : Tema engine
+56E : Dosya yöneticisi
+56F : Başlat menüsü
+56G : Bildirim daemon
+56H : Görev çubuğu
+56I : Sağ tık menüsü
+56J : DE test
+
+=== 57x Oyun Odaklı ===
+57A : Game Launcher
+57B : Controller mapping
+57C : FPS overlay
+57D : Performans HUD
+57E : Oyun modu scheduler
+57F : Vulkan overlay
+57G : Capture/stream API
+57H : Mod manager
+57I : Anti-cheat sandbox
+57J : Game test
+
+=== 58x Flatpak Sandbox ===
+58A : User namespaces
+58B : Seccomp filtre
+58C : Mount namespace
+58D : PID namespace
+58E : Network namespace
+58F : cgroups v2
+58G : AppArmor profil
+58H : Flatpak manifest
+58I : Runtime izolasyon
+58J : Sandbox test
+
+=== 59x Dağıtım ===
+59A : Live ISO 64-bit
+59B : Kurulum sihirbazı
+59C : Partition wizard
+59D : LUKS setup
+59E : Bootloader
+59F : Network install
+59G : PXE boot
+59H : Auto-install
+59I : Recovery ISO
+59J : ISO test
+
+=== 60x Sürüm ===
+60A : Release engineering
+60B : Changelog
+60C : Man pages
+60D : API docs
+60E : Website
+60F : CI/CD pipeline
+60G : Paket deposu
+60H : Security advisory
+60I : LTS branch
+60J : charOS v1.0 release
+
+Toplam 300 aşama: 31A - 60J

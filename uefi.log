@@ -1,0 +1,499 @@
+[2J[001;001H[=3h[2J[001;001H[2J[001;001H[8;056;240t[2J[001;001H[2J[001;001H[=3h[2J[001;001H[2J[001;001H[8;042;160t[2J[001;001HBdsDxe: loading Boot0002 "UEFI QEMU DVD-ROM QM00003 " from PciRoot(0x0)/Pci(0x1,0x1)/Ata(Secondary,Master,0x0)
+BdsDxe: starting Boot0002 "UEFI QEMU DVD-ROM QM00003 " from PciRoot(0x0)/Pci(0x1,0x1)/Ata(Secondary,Master,0x0)
+charOS UEFI loader [26A]
+GOP fb=0x0000000080000000 1024x768 pitch=4096
+kernel.bin ok=443848B
+ELF yerlesti entry=0x0000000000100048
+tramp kopya size=248
+mbi hazir size=1232
+tramp=0x00000000060cf000 mbi=0x00000000060c3000 kentry=0x0000000000100048
+kernel'e geciliyor...
+K[26A] mb2->mb1 ok flags=1043 mem_upper=18DD4 mmap=30 fb=1
+========================================
+       charOS - 32-bit x86 Kernel       
+========================================
+Booted successfully!
+Multiboot magic: 0x36D76289
+Multiboot info ptr: 0x1A2480
+[1B] IDT initializing...
+[1B] IDT loaded
+[1B] PIC remapping...
+[1B] PIC remapped
+[3A] Paging init...
+[3A] Paging enabled CR3=0x17D000
+[3A] Paging OK
+[3B] PMM init...
+[3B] PMM init mboot_ptr=0x1A2480
+[3B] Parsing mmap len=480 addr=0x1A2000
+  mmap base=0x0 len=0x87000 type=1
+  mmap base=0x87000 len=0x1000 type=2
+  mmap base=0x88000 len=0x18000 type=1
+  mmap base=0x100000 len=0x105000 type=2
+  mmap base=0x205000 len=0x5FB000 type=1
+  mmap base=0x800000 len=0x8000 type=2
+  mmap base=0x808000 len=0x3000 type=1
+  mmap base=0x80B000 len=0x1000 type=2
+  mmap base=0x80C000 len=0x6000 type=1
+  mmap base=0x812000 len=0x1000 type=2
+  mmap base=0x813000 len=0x1000 type=1
+  mmap base=0x814000 len=0xEC000 type=2
+  mmap base=0x900000 len=0xE80000 type=2
+  mmap base=0x1780000 len=0x27DC000 type=1
+  mmap base=0x3F5C000 len=0x20000 type=2
+  mmap base=0x3F7C000 len=0x2145000 type=1
+  mmap base=0x60C1000 len=0x4000 type=2
+  mmap base=0x60C5000 len=0x5000 type=2
+  mmap base=0x60CA000 len=0x4000 type=2
+  mmap base=0x60CE000 len=0x1000 type=1
+  mmap base=0x60CF000 len=0x2000 type=2
+  mmap base=0x60D1000 len=0x3A3000 type=2
+  mmap base=0x6474000 len=0x1000 type=1
+  mmap base=0x6475000 len=0xE0000 type=2
+  mmap base=0x6555000 len=0x150000 type=2
+  mmap base=0x66A5000 len=0x27000 type=2
+  mmap base=0x66CC000 len=0x154000 type=2
+  mmap base=0x6820000 len=0x7B000 type=2
+  mmap base=0x689B000 len=0xE000 type=2
+  mmap base=0x68A9000 len=0xF000 type=2
+  mmap base=0x68B8000 len=0x16000 type=2
+  mmap base=0x68CE000 len=0xA000 type=2
+  mmap base=0x68D8000 len=0x4000 type=2
+  mmap base=0x68DC000 len=0x7000 type=2
+  mmap base=0x68E3000 len=0x19000 type=2
+  mmap base=0x68FC000 len=0x2000 type=2
+  mmap base=0x68FE000 len=0x50000 type=2
+  mmap base=0x694E000 len=0x27000 type=2
+  mmap base=0x6975000 len=0x11000 type=2
+  mmap base=0x6986000 len=0x12000 type=2
+  mmap base=0x6998000 len=0x19000 type=2
+  mmap base=0x69B1000 len=0x7000 type=2
+  mmap base=0x69B8000 len=0x2F000 type=2
+  mmap base=0x69E7000 len=0x1000 type=2
+  mmap base=0x69E8000 len=0x1C000 type=2
+  mmap base=0x6A04000 len=0xB000 type=2
+  mmap base=0x6A0F000 len=0x9000 type=2
+  mmap base=0x6A18000 len=0x4000 type=2
+[3B] Reserving kernel size 105000
+[3B] Reserving kheap 0x205000-0x800000
+[3B] PMM free 49CC frames
+[3B] PMM test
+ f1=0x808000 f2=0x809000
+[3C] KHeap init...
+[3C] KHeap init start=0x205000 size 100000
+[3C] KHeap test
+ a=0x205014
+[3C] test done
+[18B] Framebuffer init...
+[18B] fb 400x300x20 lfb=0x80000000 pitch=1000
+[18B] vblank synced
+[18B] framebuffer flip/readback [PASS]
+[18B] done
+[18C] gfx2d init...
+[18C] gfx2d line/rect/circle/blit/font [PASS]
+[18C] done
+[18D] compositor init...
+[18D] compositor hazır
+[18D] compositor z/damage/move [PASS]
+[18D] done
+[18E] wm init...
+[18E] window manager hazır
+[18E] wm focus/drag/resize/minimize [PASS]
+[18E] done
+[18F] wserver init...
+[18F] wserver pipes hazır
+[18F] wserver create/move/query [PASS]
+[18F] done
+[18G] widget init...
+[18G] widget toolkit [PASS]
+[18G] done
+[18H] shell init...
+[18H] shell initialized
+[18H] shell taskbar/icons/clock [PASS]
+[18H] done
+[18I] menu init...
+[18I] menu initialized
+[18I] menu/launcher desktop-lite [PASS]
+[18I] done
+[18J] terminal init...
+[18J] terminal emulator started (PTY)
+[18J] terminal/PTY [PASS]
+[18J] done
+[1B] Interrupts enabled
+[1B] Testing breakpoint...
+[1B] Breakpoint OK!
+[2A] PIT init...
+[HB] t=64 c=457276816 l=0
+[2A] Slept 64 ticks
+[2A] OK
+[2B] Keyboard init...
+[2B] Keyboard init (IRQ1) done
+[2B] Keyboard ready.
+[18A] Input hub init...
+[18A] input hub hazır
+[18A] input hub inject/drain [PASS]
+[18A] done
+[5A] RTC init...
+[5A] RTC init
+[5A] RTC 7EA
+[6A] Syscall init...
+[6A] Syscall init
+[6A] Syscall OK
+[4A] Task init...
+[4A] Task create pid 2 esp=0x2E45D0
+[4A] Task init main=1 idle=2
+[4A] Task create pid 3 esp=0x2E6B60
+[4A] Task create pid 4 esp=0x2E90F0
+[4A] User shell is default console
+[4A] Task create pid 5 esp=0x2EB680
+[18F] wserver task started
+[4A] Task create pid 6 esp=0x2EDC10
+[18J] termpty task started
+[8A] SMP/APIC init...
+[11A] LAPIC MMIO address: 0xFEE00000
+[21B] x2APIC check...
+[21B] x2APIC enabled (MSR-based LAPIC) [PASS]
+[11C] TLB shootdown vector 0x50 registered
+[11A] LAPIC on cpu_init SVR=1FF
+[11E] LAPIC timer vector 0x40 registered
+[11E] LAPIC timer on CPU 0 vector=0x40 count=0x989680
+[8A] SMP init...
+[8A] SMP cores: 2
+[11D] trampoline copied (size=0x1000) to 0x8000
+[11D] INIT-SIPI-SIPI to APIC-id=1 bsp=0
+[11A] LAPIC on cpu_init SVR=1FF
+[11D] CPU 1 online (AP)!
+[11E] LAPIC timer on CPU 1 vector=0x40 count=0x989680
+[8A] SMP OK
+[8A] SMP OK
+[7A] chFS init...
+[7A] chFS init
+[12C] exec_test created sz=D0
+[12H] sh created sz=7488
+[14C] init created sz=194
+[14C] getty created sz=3AC
+[19A] echo created sz=154
+[19C] cat created sz=228
+[15A] libmath created sz=450
+[15C] libtls created sz=698
+[15D] liba created sz=56C
+[15D] libb created sz=5E0
+[15D] libe created sz=4F4
+[15G] libg created sz=690
+[15H] libpie created sz=658
+[16C] libn1 created sz=3DC
+[16C] libn2 created sz=3DC
+[16D] libla created sz=4F8
+[16E] libk created sz=3DC
+[16E] libj created sz=50C
+[16F] libg1 created sz=3DC
+[16F] libg2 created sz=3DC
+[16F] libg3 created sz=4F4
+[7A] chFS OK
+[18K] file manager init...
+[18K] file manager started
+[18K] file manager/list/dnd/move [PASS]
+[18K] done
+[18L] animation init...
+[HB] t=C8 c=4E751BBD7 l=5A
+[18L] fade/slide animasyon [PASS]
+[18L] done
+[18M] input routing init...
+[18M] input router hazır
+[HB] t=12C c=57782D3DE l=BE
+[11E] LAPIC timer CPU 0 tick=C8
+[11E] LAPIC timer CPU 1 tick=C8
+[18M] input routing/focus/drag/keys [PASS]
+[4A] Task create pid 7 esp=0x2F01A0
+[18M] inrouter task started
+[18M] done
+[18N] per-window surfaces init...
+[HB] t=190 c=67B0DD95 l=122
+[18N] per-window frame/client surfaces [PASS]
+[18N] done
+[18O] font init...
+[18O] font utf8/vector-lite [PASS]
+[18O] done
+[18P] clipboard init...
+[18P] clipboard hazır
+[18P] clipboard/dnd/copy-paste [PASS]
+[18P] done
+[18Q] vt init...
+[18Q] sanal terminaller hazır
+[HB] t=1F4 c=697E20335 l=186
+[11E] LAPIC timer CPU 0 tick=190
+[11E] LAPIC timer CPU 1 tick=190
+[HB] t=258 c=728103C32 l=1EA
+[HB] t=2BC c=7B83FB726 l=24E
+[11E] LAPIC timer CPU 0 tick=258
+[11E] LAPIC timer CPU 1 tick=258
+[HB] t=320 c=8486E6280 l=2B2
+[HB] t=384 c=8D89E7C9F l=315
+[11E] LAPIC timer CPU 0 tick=320
+[11E] LAPIC timer CPU 1 tick=320
+[HB] t=3E8 c=968CF29D1 l=379
+[HB] t=44C c=9F901DAD1 l=3DD
+[11E] LAPIC timer CPU 0 tick=3E8
+[11E] LAPIC timer CPU 1 tick=3E8
+[HB] t=4B0 c=A892FD05D l=441
+[HB] t=514 c=B195D06C0 l=4A5
+[11E] LAPIC timer CPU 0 tick=4B0
+[11E] LAPIC timer CPU 1 tick=4B0
+[HB] t=578 c=BA98BD8AA l=509
+[HB] t=5DC c=C39BB94E8 l=56D
+[11E] LAPIC timer CPU 0 tick=578
+[11E] LAPIC timer CPU 1 tick=578
+[HB] t=640 c=CC9EA5C74 l=5D1
+[HB] t=6A4 c=D5A1BF352 l=635
+[11E] LAPIC timer CPU 0 tick=640
+[11E] LAPIC timer CPU 1 tick=640
+[HB] t=708 c=DEA4E7C6C l=699
+[HB] t=76C c=E7A7A3C18 l=6FD
+[11E] LAPIC timer CPU 0 tick=708
+[11E] LAPIC timer CPU 1 tick=708
+[HB] t=7D0 c=FAA91778 l=761
+[HB] t=834 c=F9ADB4C13 l=7C5
+[11E] LAPIC timer CPU 0 tick=7D0
+[11E] LAPIC timer CPU 1 tick=7D0
+[HB] t=898 c=102B0B18F3 l=829
+[HB] t=8FC c=10BB3838B4 l=88D
+[11E] LAPIC timer CPU 0 tick=898
+[11E] LAPIC timer CPU 1 tick=898
+[HB] t=960 c=114B66D15A l=8F1
+[HB] t=9C4 c=11DB966713 l=955
+[11E] LAPIC timer CPU 0 tick=960
+[11E] LAPIC timer CPU 1 tick=960
+[HB] t=A28 c=126BC71C09 l=9B9
+[HB] t=A8C c=12FBF6D33B l=A1D
+[11E] LAPIC timer CPU 0 tick=A28
+[11E] LAPIC timer CPU 1 tick=A28
+[HB] t=AF0 c=138C2421DB l=A81
+[HB] t=B54 c=141C566AA5 l=AE5
+[11E] LAPIC timer CPU 0 tick=AF0
+[11E] LAPIC timer CPU 1 tick=AF0
+[HB] t=BB8 c=14AC85CD71 l=B49
+[HB] t=C1C c=153CB33330 l=BAD
+[11E] LAPIC timer CPU 0 tick=BB8
+[11E] LAPIC timer CPU 1 tick=BB8
+[HB] t=C80 c=15CCE245E6 l=C11
+[HB] t=CE4 c=165D11ED8E l=C75
+[11E] LAPIC timer CPU 0 tick=C80
+[11E] LAPIC timer CPU 1 tick=C80
+[HB] t=D48 c=16ED416A69 l=CD9
+[HB] t=DAC c=177D720870 l=D3D
+[11E] LAPIC timer CPU 0 tick=D48
+[11E] LAPIC timer CPU 1 tick=D48
+[HB] t=E10 c=18DA12774 l=DA1
+[HB] t=E74 c=189DCFC71D l=E05
+[11E] LAPIC timer CPU 0 tick=E10
+[11E] LAPIC timer CPU 1 tick=E10
+[HB] t=ED8 c=192DFFF2EE l=E69
+[HB] t=F3C c=19BE2FE4BC l=ECD
+[11E] LAPIC timer CPU 0 tick=ED8
+[11E] LAPIC timer CPU 1 tick=ED8
+[HB] t=FA0 c=1A4E5E326E l=F31
+[HB] t=1004 c=1ADE8D8271 l=F95
+[11E] LAPIC timer CPU 0 tick=FA0
+[11E] LAPIC timer CPU 1 tick=FA0
+[HB] t=1068 c=1B6EBF4307 l=FF9
+[HB] t=10CC c=1BFEEFF96A l=105D
+[11E] LAPIC timer CPU 0 tick=1068
+[11E] LAPIC timer CPU 1 tick=1068
+[HB] t=1130 c=1C8F1D65FD l=10C1
+[HB] t=1194 c=1D1F4CAE0E l=1125
+[11E] LAPIC timer CPU 0 tick=1130
+[11E] LAPIC timer CPU 1 tick=1130
+[HB] t=11F8 c=1DAF7D4987 l=1189
+[HB] t=125C c=1E3FAC49A7 l=11ED
+[11E] LAPIC timer CPU 0 tick=11F8
+[11E] LAPIC timer CPU 1 tick=11F8
+[18Q] multi-VT switch/isolate/input [PASS]
+[4A] Task create pid 8 esp=0x2F2730
+[18Q] vtsh task started
+[18Q] done
+[18R] theme init...
+[HB] t=12C0 c=1ECFDAF8D1 l=1251
+[18R] tema hazır (dark)
+[HB] t=1324 c=1F600A930C l=12B5
+[11E] LAPIC timer CPU 0 tick=12C0
+[11E] LAPIC timer CPU 1 tick=12C0
+[18R] tema dark/light/hidpi [PASS]
+[18R] done
+[18S] apps init...
+[HB] t=1388 c=1FF03E197D l=1319
+[18S] ornek uygulamalar hazır
+[HB] t=13EC c=20806BA44B l=137D
+[11E] LAPIC timer CPU 0 tick=1388
+[11E] LAPIC timer CPU 1 tick=1388
+[HB] t=1450 c=211099286E l=13E1
+[HB] t=14B4 c=21A0CD5A34 l=1445
+[11E] LAPIC timer CPU 0 tick=1450
+[11E] LAPIC timer CPU 1 tick=1450
+[HB] t=1518 c=2230F99A37 l=14A9
+[18S] apps editor/viewer/settings/launcher [PASS]
+[18S] done
+[18T] de init...
+[HB] t=157C c=22C12B92AC l=150D
+[11E] LAPIC timer CPU 0 tick=1518
+[11E] LAPIC timer CPU 1 tick=1518
+[HB] t=15E0 c=23515E4981 l=1571
+[18T] perf/integration/vsync/autostart [PASS]
+[PIPE] nonblock api [PASS]
+[18T] done
+[MOUSE] mouse init...
+[MOUSE] ps/2 fare hazır (irq12)
+[MOUSE] ps/2 packet/routing [PASS]
+[MOUSE] done
+[14H] gui-lite check...
+[14H] gui-lite fb/mouse/draw [PASS]
+[14H] done
+[14I] tcp init...
+[14I] dbg hs=1
+[14I] dbg tx=5 want=5 una=19E8 nxt=19ED
+[14I] dbg fast=1
+[14I] dbg rto=1
+[14I] dbg win=1
+[14I] tcp rto/window/cksum [PASS]
+[14I] done
+[14J] devfs init...
+[14J] devfs hazır (null, zero, kbd)
+[14J] devfs null/zero/kbd/register [PASS]
+[14J] done
+[15A] libmath check...
+[15A] libmath present [PASS]
+[15A] done
+[14A] brk init...
+[14A] brk installed [PASS]
+[14A] done
+[14B] pty init...
+[14B] pty ldisc/echo/onlcr [PASS]
+[14B] done
+[14D] futex init...
+[14D] futex fastpath [PASS]
+[14D] done
+[14E] perm matrix...
+[14E] perm matrix [PASS]
+[14E] done
+[14C] init/getty check...
+[14C] init/getty present [PASS]
+[14C] done
+[14F] syslog/proc/uptime...
+[14F] syslog ring [PASS]
+[14F] syslog/proc/uptime [PASS]
+[14F] done
+[14G] acpi/hpet/rtc-alarm...
+[14G] RSDP yok
+[14G] acpi [FAIL]
+[14G] done
+[13G] PCI/virtio-blk init...
+[13G] PCI scan bus 0:
+  dev 0.0 vend=8086 dev=1237 class=600
+  dev 1.0 vend=8086 dev=7000 class=601
+  dev 1.1 vend=8086 dev=7010 class=101
+  dev 1.3 vend=8086 dev=7113 class=680
+  dev 2.0 vend=1234 dev=1111 class=300
+  dev 3.0 vend=8086 dev=100E class=200
+  dev 4.0 vend=8086 dev=100E class=200
+  dev 5.0 vend=1AF4 dev=1001 class=100
+[13G] PCI devices=8
+[13G] virtio-blk @ 5.0
+[13G] PCI cmd=0x7
+[13G] virtio-blk iobase=0xC000
+[13G] queue max=100
+[13G] vring=0x1B3000 pfn=0x1B3
+[13G] capacity=10000 sectors
+[13G] virtio-blk hazır
+[13G] virtio-blk sector RW [PASS]
+[13G] done
+[13H] diskfs init...
+[13H] diskfs mounted (kalıcı veri korundu)
+diskfs files:
+  t13h size=12
+  u13h size=10
+  /docs size=0
+  /etc size=0
+  /docs/a.txt size=B
+  /etc/conf.ini size=9
+  /cmds size=0
+  ./a size=0
+  /tr17 size=2328
+  b17 size=2
+  /f17f size=A
+  /cmds/c size=0
+[13H] diskfs persist [PASS]
+[13H] done
+[8B] Network init...
+[8B] Network init...
+[21A] e1000 MAC=52:54:0:12:34:56 link=1 bar=0x81060000
+[8B] Network OK
+[8B] Network OK
+[HB] t=1644 c=23E187261C l=15D5
+[11E] LAPIC timer CPU 0 tick=15E0
+[11E] LAPIC timer CPU 1 tick=15E0
+[21A] ARP resolve [FAIL]
+[21A] UDP TX [FAIL]
+[21A] net real [FAIL]
+[10A] TCP init...
+[10A] TCP server start
+[10A] TCP OK
+[9A] Signal init...
+[9A] Signal init
+[9A] /proc init
+[9A] Gelişmiş sistem OK
+[6B] Loading user program
+[6B] Loading userprog 1E1B8 bytes
+[12A] AS create cr3=0x1A7B000
+[6B] User task create pid 9 name userprog
+[12A] userprog isolated cr3=0x1A7B000
+[4A] Scheduler enabled
+[4A] Starting scheduler
+[13D] sched cpu=0 cur=1(3) next=3(2/0) tick=1687
+[task_a] tick 1687
+[13D] sched cpu=0 cur=3(3) next=4(2/0) tick=1691
+[task_b] tick 1691
+[13D] sched cpu=0 cur=4(3) next=5(2/0) tick=169B
+[13D] sched cpu=0 cur=5(2) next=6(2/0) tick=169B
+[13D] sched cpu=0 cur=6(2) next=7(2/0) tick=169B
+[13D] sched cpu=0 cur=7(2) next=8(2/0) tick=169B
+[13D] sched cpu=0 cur=8(2) next=9(2/0) tick=169B
+Hello from Ring 3! pid=9
+chFS test done
+[12A] isolated AS test: my pid=9
+[12A] AS create cr3=0x1AA1000
+[12B] Fork pid=A child_cr3=0x1AA1000 parent=9
+[13B] CoW va=0x1403000 old=1AA0000 new=1AA5000
+[13B] CoW va=0x1402000 old=1A9F000 new=1AA6000
+[13B] CoW va=0x1401000 old=1A9E000 new=1AA7000
+  [12B] parent: fork==10 x still 42
+[13D] sched cpu=0 cur=9(2) next=A(2/0) tick=169D
+[12B] child finalize pid=A eip=0x1000238 esp=0x1401EF4
+
+[PAGE FAULT] fault=0x1401EEC eip=0x12021B err=0x3 pid=A W
+[11E] LAPIC timer CPU 1 tick=16A8
+[11E] LAPIC timer CPU 1 tick=1770
+[11E] LAPIC timer CPU 1 tick=1838
+[11E] LAPIC timer CPU 1 tick=1900
+[11E] LAPIC timer CPU 1 tick=19C8
+[11E] LAPIC timer CPU 1 tick=1A90
+[11E] LAPIC timer CPU 1 tick=1B58
+[11E] LAPIC timer CPU 1 tick=1C20
+[11E] LAPIC timer CPU 1 tick=1CE8
+[11E] LAPIC timer CPU 1 tick=1DB0
+[11E] LAPIC timer CPU 1 tick=1E78
+[11E] LAPIC timer CPU 1 tick=1F40
+[11E] LAPIC timer CPU 1 tick=2008
+[11E] LAPIC timer CPU 1 tick=20D0
+[11E] LAPIC timer CPU 1 tick=2198
+[11E] LAPIC timer CPU 1 tick=2260
+[11E] LAPIC timer CPU 1 tick=2328
+[11E] LAPIC timer CPU 1 tick=23F0
+[11E] LAPIC timer CPU 1 tick=24B8
+[11E] LAPIC timer CPU 1 tick=2580
+[11E] LAPIC timer CPU 1 tick=2648
+[11E] LAPIC timer CPU 1 tick=2710
+[11E] LAPIC timer CPU 1 tick=27D8
+[11E] LAPIC timer CPU 1 tick=28A0
+[11E] LAPIC timer CPU 1 tick=2968
+[11E] LAPIC timer CPU 1 tick=2A30
+[11E] LAPIC timer CPU 1 tick=2AF8
+[11E] LAPIC timer CPU 1 tick=2BC0
+

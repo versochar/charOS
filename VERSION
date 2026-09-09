@@ -1,0 +1,16 @@
+charOS v0.1.1
+Release date: 2026-09-08
+
+Features completed (Series 26-30):
+- 26A-26F: UEFI boot, xHCI USB, USB HID, USB hub, GOP framebuffer, input integration
+- 27A-27F: NVMe driver, NVMe I/O, GPT scanning, diskfs NVMe, blk abstraction, fsck + journal recovery
+- 28A-28F: TSC calibration, HPET timer, ACPI S3/reboot, CPU feature detection, HD Audio skeleton, thermal/power
+- 29A-29F: Desktop v2 (1920x1080, HiDPI-lite), dual-GPU skeleton, app platform, file manager, package manager, system monitor
+- 30A-30C: Boot flow, hardware integration test, panic/watchdog
+
+Target hardware: Intel 11th Gen i5-1135G7 (Tiger Lake-UP3)
+Storage: Micron 2210 NVMe 512GB
+Notes:
+- QEMU test environment (OVMF UEFI + nvme.img with GPT charOS partition)
+- BIOS regression preserved (SeaBIOS / legacy boot)
+- Full suite: PASS 64 / FAIL 0 (verified)

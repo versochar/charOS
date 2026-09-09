@@ -1,0 +1,107 @@
+========================================
+       charOS - 32-bit x86 Kernel       
+========================================
+Booted successfully!
+Multiboot magic: 0x2BADB002
+Multiboot info ptr: 0x10000
+[1B] IDT initializing...
+[1B] IDT loaded
+[1B] PIC remapping...
+[1B] PIC remapped
+[3A] Paging init...
+[3A] Paging enabled CR3=0x112000
+[3A] Paging OK
+[3B] PMM init...
+[3B] PMM init mboot_ptr=0x10000
+[3B] Parsing mmap len=90 addr=0x1009C
+  mmap base=0x0 len=0x9FC00 type=1
+  mmap base=0x9FC00 len=0x400 type=2
+  mmap base=0xF0000 len=0x10000 type=2
+  mmap base=0x100000 len=0x7EE0000 type=1
+  mmap base=0x7FE0000 len=0x20000 type=2
+  mmap base=0xFFFC0000 len=0x40000 type=2
+[3B] Reserving kernel size 20000
+[3B] PMM free 7F5F frames
+[3B] PMM test
+ f1=0x1000 f2=0x2000
+[3C] KHeap init...
+[3C] KHeap init start=0x120000 size 100000
+[3C] KHeap test
+ a=0x120014
+[3C] test done
+[1B] Interrupts enabled
+[1B] Testing breakpoint...
+
+[EXCEPTION] Breakpoint int=3 err=0x0 eip=0x1005A5
+[1B] Breakpoint OK!
+[2A] PIT init...
+[2A] Slept 64 ticks
+[2A] OK
+[2B] Keyboard init...
+[2B] Keyboard init (IRQ1) done
+[2B] Keyboard ready.
+[5A] RTC init...
+[5A] RTC init
+[5A] RTC 7EA
+[6A] Syscall init...
+[6A] Syscall init
+[DEBUG] open handler ptr=101230
+[DEBUG] table[10]=101230
+[6A] Syscall OK
+[4A] Task init...
+[4A] Task create pid 2 esp=0x1220E4
+[4A] Task init main=1 idle=2
+[4A] Task create pid 3 esp=0x12416C
+[4A] Task create pid 4 esp=0x1261F4
+[4A] Task create pid 5 esp=0x12827C
+[4A] Created shell pid 5
+[8A] SMP/APIC init...
+[8A] APIC init...
+[8A] CPU cores: 3
+[8A] APIC OK
+[8A] SMP init
+[8A] SMP cores: 3
+[8A] SMP OK
+[7A] chFS init...
+[7A] chFS init
+[7A] chFS OK
+[8B] Network init...
+[8B] Network init...
+[8B] e1000 init...
+[8B] e1000 OK (minimal)
+[8B] Network OK
+[8B] Network OK
+[6B] Loading user program
+[6B] Loading userprog 300 bytes
+[6B] User task create pid 6 name userprog
+[4A] Scheduler enabled
+[4A] Starting scheduler
+[sched] tick 6B cur=1 next=2
+[sched] tick 6C cur=2 next=3
+[task_a] tick 6C
+[sched] tick 6D cur=3 next=4
+[task_b] tick 6D
+[sched] tick 6E cur=4 next=5
+
+charOS shell ready. Type 'help' for commands.
+charos> [sched] tick 6F cur=5 next=6
+Hello from Ring 3! pid=6
+chFS test done
+[SYSCALL] exit 0
+[4A] Task exit pid 6
+[sched] tick 6F cur=6 next=1
+[sched] tick 70 cur=1 next=2
+[sched] tick 71 cur=2 next=3
+[sched] tick 72 cur=3 next=4
+[sched] tick 73 cur=4 next=5
+[4A] Returned to main
+[task_a] tick 9E
+[task_b] tick B3
+[task_a] tick D0
+[task_b] tick F9
+[task_a] done
+[4A] Task exit pid 3
+[task_b] done
+[4A] Task exit pid 4
+[idle] tick 30C
+
