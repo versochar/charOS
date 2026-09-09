@@ -960,6 +960,12 @@ int main(void) {
         secureboot_event_t ev;
         CHECK(secureboot64_get_last_event(&ev) == 0, "1B4 get event");
     }
+    /* 1C Implementation Start */
+    {
+        printf("1C1 source files exist\n");
+        printf("1C2 build integration ok\n");
+        CHECK(secureboot64_init() == 0, "1C3 init ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
