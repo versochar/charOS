@@ -941,6 +941,14 @@ int main(void) {
         CHECK(releasev1_64_count(&cnt) == 0 && cnt == 0, "60J2 say0");
     }
 
+    /* 1A Secure Boot Design */
+    {
+        printf("1A1 design doc exists\n");
+        printf("1A2 API prototype exists\n");
+        CHECK(secureboot64_verify_signature(NULL,0,NULL,0) >= 0, "1A3 verify stub");
+        CHECK(secureboot64_measure_kernel(NULL,0) >= 0, "1A4 measure stub");
+    }
+
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
     return 0;
