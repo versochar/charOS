@@ -945,8 +945,11 @@ int main(void) {
     {
         printf("1A1 design doc exists\n");
         printf("1A2 API prototype exists\n");
-        CHECK(secureboot64_verify_signature(NULL,0,NULL,0) >= 0, "1A3 verify stub");
-        CHECK(secureboot64_measure_kernel(NULL,0) >= 0, "1A4 measure stub");
+        u8 data[4] = {1,2,3,4};
+        u8 sig[512] = {0};
+        sig[0] = 1^2^3^4;
+        CHECK(secureboot64_verify_signature(data,4,sig,512) == 0, "1A3 verify positive");
+        CHECK(secureboot64_measure_kernel(data,4) == 0, "1A4 measure");
     }
     /* 1B Secure Boot API Spec */
     {
