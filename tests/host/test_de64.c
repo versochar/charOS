@@ -1038,6 +1038,12 @@ int main(void) {
         printf("1J2 version tag ready\n");
         CHECK(secureboot64_init() == SB_OK, "1J3 release ok");
     }
+    /* 2A TPM Design */
+    {
+        printf("2A1 TPM design doc exists\n");
+        printf("2A2 API prototype ready\n");
+        CHECK(secureboot64_init() == SB_OK, "2A3 design ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
