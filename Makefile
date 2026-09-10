@@ -116,6 +116,7 @@ KERNEL_SRCS = $(KERNEL_DIR)/kernel.c \
                $(KERNEL_DIR)/process/cap.c \
                $(KERNEL_DIR)/process/sandbox.c \
                $(KERNEL_DIR)/core/verify.c \
+               $(KERNEL_DIR)/core/trace.c \
                $(KERNEL_DIR)/process/signal.c \
               $(KERNEL_DIR)/fs/proc.c \
               $(KERNEL_DIR)/fs/diskfs.c
@@ -1090,6 +1091,11 @@ test-verify24:
 	$(CC) -iquote include kernel/core/verify.c kernel/process/cap.c kernel/process/sandbox.c tests/host/test_verify24.c -o /tmp/test_verify24
 	/tmp/test_verify24
 
+# 25.5: gercek trace.c host testi (stub yok)
+test-trace25:
+	$(CC) -iquote include kernel/core/trace.c tests/host/test_trace25.c -o /tmp/test_trace25
+	/tmp/test_trace25
+
 # 56J: host DE testi
 test-de64:
 	$(CC) -iquote include $(K64_DIR)/panel64.c $(K64_DIR)/wmde64.c \
@@ -1100,4 +1106,4 @@ test-de64:
 	/tmp/test_de64
 
 # Phony targets
-.PHONY: all clean rebuild run-iso run-iso-headless run-kernel debug check64 test-mem64 test-smp64 test-uefi64 iso64-check test-swap64 test-heap64 test-sec64 test-auth64 test-vfs64 test-fs64 test-pkg64 test-init64 test-net64 test-wifi64 test-usb64 test-audio64 test-gpu64 test-power64 test-sensor64 test-fsadv64 test-libc64 test-elf64 test-link64 test-user64 test-wserver64 test-de64 test-cap22 test-sandbox23 test-verify24
+.PHONY: all clean rebuild run-iso run-iso-headless run-kernel debug check64 test-mem64 test-smp64 test-uefi64 iso64-check test-swap64 test-heap64 test-sec64 test-auth64 test-vfs64 test-fs64 test-pkg64 test-init64 test-net64 test-wifi64 test-usb64 test-audio64 test-gpu64 test-power64 test-sensor64 test-fsadv64 test-libc64 test-elf64 test-link64 test-user64 test-wserver64 test-de64 test-cap22 test-sandbox23 test-verify24 test-trace25

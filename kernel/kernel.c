@@ -16,6 +16,7 @@
 #include <drivers/rtc.h>
 #include <core/syscall.h>
 #include <core/verify.h>
+#include <core/trace.h>
 #include <core/apic.h>
 #include <fs/chfs.h>
 #include <process/signal.h>
@@ -93,10 +94,15 @@ static void task_b(void) {
     }
     serial_puts("[task_b] done\n");
 }
-/* 24.4: sözleşme ihlalleri syslog + serial'e düşer */
+/* 25.4: trace arka ucu syslog'a yazar */
+static void trace_kbackend(uint32_t level, const char* tag, const char* msg) {
+    (void)level; (void)tag;
+    syslog_puts(msg);
+}
+/* 24.4 + 25.4: sözleşme ihlalleri trace (WARN) + serial'e düşer */
 static void verify_khook(uint32_t code, const char* file, uint32_t line) {
     (void)file; (void)line;
-    syslog_puts("[VERIFY] contract ihlali");
+    trace_event(TRACE_WARN, "verify", "[VERIFY] contract ihlali");
     serial_puts("[VERIFY] ihlal kod "); serial_puthex(code); serial_puts("\n");
 }
 void kernel_main(uint32_t magic, uint32_t mboot_ptr)
@@ -634,10 +640,12 @@ void kernel_main(uint32_t magic, uint32_t mboot_ptr)
     }
     vga_puts("[14F] done\n"); serial_puts("[14F] done\n");
 
-    /* 24.4: sözleşme katmanı — kanca syslog'a, öztest açılışta */
+    /* 24.4 + 25.4: trace arka ucu önce kurulur (verify kancası ona yazar) */
     vga_puts("[24] verify...\n"); serial_puts("[24] verify...\n");
     {
         int ok = 1;
+        trace_init();
+        trace_set_backend(trace_kbackend);
         verify_set_hook(verify_khook);
         if (verify_selftest() != 0) ok = 0;
         if (ok) {
