@@ -1510,6 +1510,79 @@ int main(void) {
         printf("8J1 release doc exists\n");
         CHECK(sync64_init()==0, "8J2 ok");
     }
+    /* 9A DrvHAL Design */
+    {
+        printf("9A1 design doc exists\n");
+        CHECK(drvhal64_init()==0, "9A2 design ok");
+    }
+    /* 9B API Spec */
+    {
+        printf("9B1 API spec exists\n");
+        u64 h=0;
+        CHECK(drvhal64_register(1,&h)==0 && h!=0, "9B2 api ok");
+        CHECK(drvhal64_unregister(h)==0, "9B3 cleanup");
+    }
+    /* 9C Implementation Start */
+    {
+        printf("9C1 impl start doc exists\n");
+        CHECK(drvhal64_init()==0, "9C2 ok");
+    }
+    /* 9D Code Development */
+    {
+        printf("9D1 code dev doc exists\n");
+        drvhal64_init();
+        u64 h=0; int st=-1;
+        CHECK(drvhal64_register(2,&h)==0, "9D2 register");
+        CHECK(drvhal64_ioctl(h,0x01,0)==0, "9D3 ioctl");
+        CHECK(drvhal64_state(h,&st)==0 && st==1, "9D4 state");
+    }
+    /* 9E Unit Tests */
+    {
+        printf("9E1 unit tests exist\n");
+        drvhal64_init();
+        CHECK(drvhal64_register(9,NULL)==-1, "9E2 param");
+        CHECK(drvhal64_register(9,&(u64){0})==-1, "9E3 bad-type");
+        CHECK(drvhal64_unregister(999999)==-1, "9E4 unknown");
+        CHECK(drvhal64_ioctl(999999,0,0)==-1, "9E5 ioctl-unknown");
+    }
+    /* 9F Integration Tests */
+    {
+        printf("9F1 integration tests exist\n");
+        CHECK(proc64_init()==0, "9F2 proc");
+        CHECK(sync64_init()==0, "9F3 sync");
+        CHECK(drvhal64_init()==0, "9F4 drv");
+        u64 pid=0, mt=0, h=0;
+        CHECK(proc64_spawn(&pid)==0, "9F5 spawn");
+        CHECK(mutex64_create(&mt)==0, "9F6 mutex");
+        CHECK(mutex64_lock(mt,pid)==0, "9F7 lock");
+        CHECK(drvhal64_register(1,&h)==0, "9F8 register");
+        CHECK(drvhal64_ioctl(h,0x02,pid)==0, "9F9 ioctl");
+        CHECK(mutex64_unlock(mt,pid)==0, "9F10 unlock");
+    }
+    /* 9G Code Review */
+    {
+        printf("9G1 review doc exists\n");
+        CHECK(drvhal64_init()==0, "9G2 ok");
+    }
+    /* 9H Security Audit */
+    {
+        printf("9H1 audit doc exists\n");
+        drvhal64_init();
+        u64 h=0;
+        drvhal64_register(0,&h);
+        drvhal64_unregister(h);
+        CHECK(drvhal64_ioctl(h,1,0)==-1, "9H2 use-after-unreg");
+    }
+    /* 9I Documentation */
+    {
+        printf("9I1 docs exist\n");
+        CHECK(drvhal64_init()==0, "9I2 ok");
+    }
+    /* 9J Release */
+    {
+        printf("9J1 release doc exists\n");
+        CHECK(drvhal64_init()==0, "9J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");

@@ -1764,4 +1764,11 @@ int mutex64_lock(u64 id, u64 owner);
 int mutex64_unlock(u64 id, u64 owner);
 int mutex64_destroy(u64 id);
 
+/* --- 9A: Drivers & HAL (davranis modeli) --- */
+int drvhal64_init(void);
+int drvhal64_register(int type, u64 *out_hdl);
+int drvhal64_unregister(u64 hdl);
+int drvhal64_ioctl(u64 hdl, u64 cmd, u64 arg);
+int drvhal64_state(u64 hdl, int *out_state);
+
 #endif
