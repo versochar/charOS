@@ -1711,6 +1711,12 @@ typedef enum {
 } secureboot_err_t;
 int secureboot64_init(void);
 int secureboot64_get_pcr(u8 *out, u64 len);
+
+/* --- 2A: TPM 2.0 --- */
+int tpm64_init(void);
+int tpm64_extend_pcr(u64 pcr_idx, const u8 *hash, u64 hash_len);
+int tpm64_read_pcr(u64 pcr_idx, u8 *out);
+int tpm64_quote(u8 *quote, u64 *len);
 int secureboot64_verify_signature(const u8 *data, u64 len, const u8 *sig, u64 sig_len);
 int secureboot64_measure_kernel(const void *kernel, u64 size);
 void secureboot64_log_event(const char *event);

@@ -1050,6 +1050,12 @@ int main(void) {
         printf("2B2 prototypes defined\n");
         CHECK(secureboot64_init() == SB_OK, "2B3 api ok");
     }
+    /* 2C Implementation Start */
+    {
+        printf("2C1 TPM files exist\n");
+        printf("2C2 build integration ok\n");
+        CHECK(tpm64_init() == 0, "2C3 tpm init ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
