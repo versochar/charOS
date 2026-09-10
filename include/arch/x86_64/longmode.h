@@ -1935,4 +1935,16 @@ int installfw64_finalize(void);
 int installfw64_step(int *out);
 int installfw64_partition_count(void);
 
+/* --- 46A: Partitioning Tools (GPT tablo araci) --- */
+int parttool64_init(void);
+int parttool64_gpt_init(u64 dev_id, u64 total_lba);
+int parttool64_gpt_add(u64 dev_id, const char *name, int type_code,
+                       u64 first_lba, u64 last_lba);
+int parttool64_gpt_info(u64 dev_id, int index, char *name_out, int name_max,
+                        int *type_out, u64 *first_out, u64 *last_out);
+int parttool64_gpt_delete(u64 dev_id, int index);
+int parttool64_gpt_crc(u64 dev_id);
+int parttool64_gpt_repair(u64 dev_id);
+int parttool64_gpt_count(u64 dev_id);
+
 #endif

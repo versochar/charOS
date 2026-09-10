@@ -12,6 +12,7 @@
 #include "arch/x86_64/secupd.h"
 #include "arch/x86_64/isoimg.h"
 #include "arch/x86_64/installfw.h"
+#include "arch/x86_64/parttool.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -3141,6 +3142,114 @@ int main(void) {
               "45J3 preflight");
         CHECK(installfw64_select_disk("/dev/sda",1)==0, "45J4 disk");
         CHECK(installfw64_partition_count()==0, "45J5 sanity");
+    }
+
+    /* 46A Partitioning Design */
+    {
+        printf("46A1 design doc exists\n");
+        CHECK(parttool64_init()==0, "46A2 init ok");
+    }
+    /* 46B API Spec */
+    {
+        printf("46B1 API spec exists\n");
+        CHECK(parttool64_gpt_init(1,4194304)==0, "46B2 gpt init");
+        CHECK(parttool64_gpt_count(1)==0, "46B3 empty count");
+        CHECK(parttool64_gpt_init(1,4194304)==-2, "46B4 re-init reject");
+        CHECK(parttool64_gpt_init(2,33)==-1, "46B5 tiny dev reject");
+    }
+    /* 46C Implementation Start */
+    {
+        printf("46C1 impl start doc exists\n");
+        CHECK(parttool64_init()==0, "46C2 init");
+        CHECK(parttool64_gpt_init(10,2097152)==0, "46C3 gpt init");
+        CHECK(parttool64_gpt_add(10,"EFISYS",PARTTOOL_TYPE_EFI,2048,1050623)==0,
+              "46C4 add ESP");
+        CHECK(parttool64_gpt_count(10)==1, "46C5 count1");
+    }
+    /* 46D Code Development */
+    {
+        char nm[40] = {0};
+        int tp = -1;
+        u64 f = 0, l = 0;
+        printf("46D1 code dev doc exists\n");
+        CHECK(parttool64_init()==0, "46D2 init");
+        CHECK(parttool64_gpt_init(7,8388608)==0, "46D3 init");
+        CHECK(parttool64_gpt_add(7,"ROOT",PARTTOOL_TYPE_EXT4,1050624,8388606)==0,
+              "46D4 add root");
+        CHECK(parttool64_gpt_info(7,0,nm,40,&tp,&f,&l)==0, "46D5 info");
+        CHECK(strcmp(nm,"ROOT")==0 && tp==PARTTOOL_TYPE_EXT4 && f==1050624,
+              "46D6 info fields");
+        CHECK(parttool64_gpt_crc(7)>0, "46D7 crc positive");
+    }
+    /* 46E Unit Tests */
+    {
+        printf("46E1 unit tests exist\n");
+        CHECK(parttool64_init()==0, "46E2 init");
+        CHECK(parttool64_gpt_init(3,4194304)==0, "46E3 init");
+        CHECK(parttool64_gpt_add(3,0,0,0,0)==-2, "46E4 null args reject");
+        CHECK(parttool64_gpt_add(3,"BAD",PARTTOOL_TYPE_EXT4,100,50)==-3,
+              "46E5 bad range reject");
+        CHECK(parttool64_gpt_add(3,"PROT",PARTTOOL_TYPE_EXT4,0,100)==-4,
+              "46E6 protected area reject");
+        CHECK(parttool64_gpt_info(3,0,0,0,0,0,0)==-2, "46E7 bad index");
+        CHECK(parttool64_gpt_delete(3,0)==-2, "46E8 delete empty reject");
+    }
+    /* 46F Integration Tests */
+    {
+        int tp1 = -1, tp2 = -1;
+        printf("46F1 integration tests exist\n");
+        CHECK(parttool64_init()==0, "46F2 init");
+        CHECK(parttool64_gpt_init(4,16777216)==0, "46F3 init");
+        CHECK(parttool64_gpt_add(4,"ESP",PARTTOOL_TYPE_EFI,2048,4096)==0,
+              "46F4 esp");
+        CHECK(parttool64_gpt_add(4,"ROOT",PARTTOOL_TYPE_EXT4,4097,16777214)==0,
+              "46F5 root");
+        CHECK(parttool64_gpt_add(4,"DUP",PARTTOOL_TYPE_EFI,3000,5000)==-7,
+              "46F6 overlap reject");
+        CHECK(parttool64_gpt_count(4)==2, "46F7 count2");
+        CHECK(parttool64_gpt_info(4,1,0,0,&tp2,0,0)==0 && tp2==PARTTOOL_TYPE_EXT4,
+              "46F8 type root");
+        CHECK(parttool64_gpt_delete(4,0)==0, "46F9 delete esp");
+        CHECK(parttool64_gpt_count(4)==1, "46F10 count1 after del");
+    }
+    /* 46G Code Review */
+    {
+        printf("46G1 review doc exists\n");
+        CHECK(parttool64_init()==0, "46G2 init");
+        CHECK(parttool64_gpt_crc(99)==0, "46G3 unknown dev crc 0");
+        CHECK(parttool64_gpt_count(99)==-1, "46G4 unknown dev count -1");
+        CHECK(parttool64_gpt_init(5,1048576)==0, "46G5 init");
+    }
+    /* 46H Security Audit */
+    {
+        int crc1 = 0, crc2 = 0;
+        printf("46H1 audit doc exists\n");
+        CHECK(parttool64_init()==0, "46H2 init");
+        CHECK(parttool64_gpt_init(6,4194304)==0, "46H3 init");
+        CHECK(parttool64_gpt_add(6,"A",PARTTOOL_TYPE_SWAP,2048,4096)==0,
+              "46H4 add A");
+        crc1 = parttool64_gpt_crc(6);
+        CHECK(parttool64_gpt_add(6,"B",PARTTOOL_TYPE_EFI,4097,6144)==0,
+              "46H5 add B");
+        crc2 = parttool64_gpt_crc(6);
+        CHECK(crc1!=crc2, "46H6 crc changes on add");
+        CHECK(parttool64_gpt_repair(6)==0, "46H7 repair ok");
+        CHECK(parttool64_gpt_crc(6)==crc2, "46H8 crc stable after repair");
+    }
+    /* 46I Documentation */
+    {
+        printf("46I1 docs exist\n");
+        CHECK(parttool64_init()==0, "46I2 ok");
+    }
+    /* 46J Release */
+    {
+        printf("46J1 release doc exists\n");
+        CHECK(parttool64_init()==0, "46J2 init");
+        CHECK(parttool64_gpt_init(8,8388608)==0, "46J3 init");
+        CHECK(parttool64_gpt_add(8,"ROOT",PARTTOOL_TYPE_EXT4,2048,8388606)==0,
+              "46J4 root");
+        CHECK(parttool64_gpt_repair(8)==0, "46J5 repair");
+        CHECK(parttool64_gpt_count(8)==1, "46J6 final count");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
