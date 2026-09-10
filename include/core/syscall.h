@@ -68,6 +68,8 @@
 #define SYS_SB_ON 165     /* 23.5: sandbox zorlamayı aç (geri dönüşsüz) -> 0 */
 #define SYS_DOCNAME 166   /* 29.4: syscall adı (nr, buf, max) -> len / -1 */
 #define SYS_DOCDESC 167   /* 29.4: syscall açıklaması (nr, buf, max) -> len / -1 */
+#define SYS_AUTH 168      /* 37.3: kimlik doğrulama -> 0 ok / -1 ret */
+#define SYS_CAPAUDIT 169  /* 37.7: capability denetim log oku (idx, out_3) -> 0/-1 */
 /* 22.2: capability bitleri process/cap.h'e taşındı (tek doğruluk kaynağı) */
 #include <process/cap.h>
 #define WNOHANG 1         /* 19G: waitpid bloklanmadan yokla */

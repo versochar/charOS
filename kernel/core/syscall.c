@@ -16,6 +16,7 @@
 #include <process/sandbox.h>
 #include <core/doc.h>
 #include <core/abi.h>
+#include <core/auth.h>
 #include <drivers/input.h>
 #include <drivers/vt.h>
 #include <string.h>
@@ -562,7 +563,22 @@ int syscall_abi_check(void) {
     return missing;
 }
 
-/* 29.4: makine-okunur belgeler (sınırlı yığın tamponu + copy_to_user) */
+static uint32_t sys_auth_wrap(uint32_t token, uint32_t b, uint32_t c) {
+    (void)b; (void)c;
+    const char* name = "host"; /* 37.6: basit simülasyon */
+    uint32_t exp = auth_token_gen(name, 0xDEADBEEF);
+    return auth_check(name, token); /* 0 ok / -1 ret */
+}
+
+/* 29.4 + 37.4 + 37.7: makine-okunur belgeler + capability denetim günlüğü + audit */
+static uint32_t sys_capaudit_wrap(uint32_t idx, uint32_t b, uint32_t c) {
+    (void)b; (void)c;
+    uint32_t cap, granted;
+    struct task* cur = task_current();
+    if (!cur) return (uint32_t)-1;
+    if (cap_audit_read(idx, &cap, &granted) != 0) return (uint32_t)-1;
+    return (uint32_t)(granted ? 1 : 0);
+}
 static uint32_t sys_docname_wrap(uint32_t nr, uint32_t ubuf, uint32_t max) {
     const char* s = doc_name(nr);
     char kbuf[32];
@@ -990,6 +1006,8 @@ void syscall_init(void) {
     syscall_table[SYS_SB_ON] = sys_sb_on_wrap;
     syscall_table[SYS_DOCNAME] = sys_docname_wrap; /* 29.4 */
     syscall_table[SYS_DOCDESC] = sys_docdesc_wrap;
+    syscall_table[SYS_CAPAUDIT] = sys_capaudit_wrap; /* 37.7: audit günlüğü okuma */
+    syscall_table[SYS_AUTH] = sys_auth_wrap; /* 37.3 */
     syscall_table[SYS_SYSLOG] = sys_syslog_wrap;
     syscall_table[SYS_UPTIME] = sys_uptime_wrap;
     syscall_table[SYS_TLS_SET] = sys_tls_set;

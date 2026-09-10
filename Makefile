@@ -1142,6 +1142,45 @@ test-power31:
 	$(CC) -iquote include kernel/core/verify.c kernel/core/power.c tests/host/test_power31.c -o /tmp/test_power31
 	/tmp/test_power31
 
+/* 36-40 serisi: gerçek çekirdek kodları (gerçek kernel/arch/x86_64/*.c,
+ * kernel/drivers/*.c; QEMU açılış regresyonu farklı soruna bağlı) */
+# 32.5: gercek thermal.c host testi (donanim stub, mantik gercek)
+test-thermal32:
+	$(CC) -iquote include kernel/core/verify.c kernel/core/power.c kernel/drivers/thermal.c tests/host/test_thermal32.c -o /tmp/test_thermal32
+	/tmp/test_thermal32
+
+# 33.5: gercek usbdesc.c host testi (dusman tanimlayicilar dahil)
+test-usbdesc33:
+	$(CC) -iquote include kernel/core/verify.c kernel/drivers/usbdesc.c tests/host/test_usbdesc33.c -o /tmp/test_usbdesc33
+	/tmp/test_usbdesc33
+
+# 34.5: gercek pcibar.c host testi (stub yok)
+test-pcibar34:
+	$(CC) -iquote include kernel/core/verify.c kernel/drivers/pcibar.c tests/host/test_pcibar34.c -o /tmp/test_pcibar34
+	/tmp/test_pcibar34
+
+# 35.5: gercek raster.c host testi (dusman girdiler dahil)
+test-raster35:
+	$(CC) -iquote include kernel/core/verify.c kernel/drivers/raster.c tests/host/test_raster35.c -o /tmp/test_raster35
+	/tmp/test_raster35
+
+/* 36 serisi: gerçek kernel/arch/x86_64/*.c (host test kendi hedefine bağlı) */
+# 36.5: gercek pcm.c + hdaverb.c host testi (stub yok)
+test-audio36:
+	$(CC) -iquote include kernel/core/verify.c kernel/drivers/pcm.c kernel/drivers/hdaverb.c tests/host/test_audio36.c -o /tmp/test_audio36
+	/tmp/test_audio36
+
+/* 37 serisi: gerçek çekirdek kodu */
+# 37.5: gercek auth.c host testi (stub yok; 37.6: QEMU dahil değil)
+test-auth37:
+	$(CC) -iquote include kernel/core/verify.c kernel/core/auth.c tests/host/test_auth37.c -o /tmp/test_auth37
+	/tmp/test_auth37
+
+# 31.5: gercek power.c host testi (stub yok)
+test-power31:
+	$(CC) -iquote include kernel/core/verify.c kernel/core/power.c tests/host/test_power31.c -o /tmp/test_power31
+	/tmp/test_power31
+
 # 33.5: gercek usbdesc.c host testi (dusman tanimlayicilar dahil)
 test-usbdesc33:
 	$(CC) -iquote include kernel/core/verify.c kernel/drivers/usbdesc.c tests/host/test_usbdesc33.c -o /tmp/test_usbdesc33
@@ -1162,6 +1201,11 @@ test-audio36:
 	$(CC) -iquote include kernel/core/verify.c kernel/drivers/pcm.c kernel/drivers/hdaverb.c tests/host/test_audio36.c -o /tmp/test_audio36
 	/tmp/test_audio36
 
+# 37.5: gercek auth.c host testi (stub yok; 37.6: QEMU dahil değil)
+test-auth37:
+	$(CC) -iquote include kernel/core/verify.c kernel/core/auth.c tests/host/test_auth37.c -o /tmp/test_auth37
+	/tmp/test_auth37
+
 # 32.5: gercek thermal.c host testi (donanim stub, mantik gercek)
 test-thermal32:
 	$(CC) -iquote include kernel/core/verify.c kernel/core/power.c kernel/drivers/thermal.c tests/host/test_thermal32.c -o /tmp/test_thermal32
@@ -1177,4 +1221,4 @@ test-de64:
 	/tmp/test_de64
 
 # Phony targets
-.PHONY: all clean rebuild run-iso run-iso-headless run-kernel debug check64 test-mem64 test-smp64 test-uefi64 iso64-check test-swap64 test-heap64 test-sec64 test-auth64 test-vfs64 test-fs64 test-pkg64 test-init64 test-net64 test-wifi64 test-usb64 test-audio64 test-gpu64 test-power64 test-sensor64 test-fsadv64 test-libc64 test-elf64 test-link64 test-user64 test-wserver64 test-de64 test-cap22 test-sandbox23 test-verify24 test-trace25 test-prof26 test-version27 test-selftest28 test-doc29 test-abi30 test-power31 test-thermal32 test-usbdesc33 test-pcibar34 test-raster35 test-audio36
+.PHONY: all clean rebuild run-iso run-iso-headless run-kernel debug check64 test-mem64 test-smp64 test-uefi64 iso64-check test-swap64 test-heap64 test-sec64 test-auth64 test-vfs64 test-fs64 test-pkg64 test-init64 test-net64 test-wifi64 test-usb64 test-audio64 test-gpu64 test-power64 test-sensor64 test-fsadv64 test-libc64 test-elf64 test-link64 test-user64 test-wserver64 test-de64 test-cap22 test-sandbox23 test-verify24 test-trace25 test-prof26 test-version27 test-selftest28 test-doc29 test-abi30 test-power31 test-thermal32 test-usbdesc33 test-pcibar34 test-raster35 test-audio36 test-auth37
