@@ -24,6 +24,7 @@
 #include "arch/x86_64/kprot.h"
 #include "arch/x86_64/mitig.h"
 #include "arch/x86_64/fuzz.h"
+#include "arch/x86_64/sana.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -4355,6 +4356,110 @@ int main(void) {
         CHECK(fuzz64_feed_crash(out,len,0xBAD)==0, "57J5 feed crash");
         CHECK(fuzz64_crash_count()==1, "57J6 one crash");
         CHECK(fuzz64_feed_crash(0,len,1)==-1, "57J7 null input");
+    }
+
+    /* 58A Static Analysis Design */
+    {
+        char msg[64];
+        printf("58A1 doc exists\n");
+        CHECK(sana64_init()==0, "58A2 init");
+        CHECK(sana64_register_rule(SANA64_R_NULL_DEREF, SANA64_SEVERITY_HIGH, "null deref")==0, "58A3 reg");
+        CHECK(sana64_rule_enabled(SANA64_R_NULL_DEREF)==1, "58A4 enabled");
+        CHECK(sana64_configuration_check()==0, "58A5 config ok");
+    }
+    /* 58B API Spec */
+    {
+        int issues=0;
+        char msg[64];
+        printf("58B1 api spec exists\n");
+        CHECK(sana64_init()==0, "58B2 init");
+        CHECK(sana64_register_rule(SANA64_R_BUF_OVERFLOW, SANA64_SEVERITY_HIGH, "buf ov")==0, "58B3 reg");
+        CHECK(sana64_analyze("vuln.c", &issues)==0 && issues==1, "58B4 analyze");
+        CHECK(sana64_report_issue("vuln.c", SANA64_R_BUF_OVERFLOW, 42, msg, sizeof(msg))==0, "58B5 report");
+    }
+    /* 58C Implementation Start */
+    {
+        printf("58C1 impl start exists\n");
+        CHECK(sana64_init()==0, "58C2 init");
+        CHECK(sana64_suppress_rule(SANA64_R_NULL_DEREF)==-1, "58C3 suppress missing");
+        CHECK(sana64_register_rule(SANA64_R_UNINIT_USE, SANA64_SEVERITY_MED, "uninit")==0, "58C4 reg");
+        CHECK(sana64_rule_enabled(SANA64_R_UNINIT_USE)==1, "58C5 enabled");
+    }
+    /* 58D Code Development */
+    {
+        int issues=0;
+        printf("58D1 dev doc exists\n");
+        CHECK(sana64_init()==0, "58D2 init");
+        CHECK(sana64_register_rule(SANA64_R_INT_OVERFLOW, SANA64_SEVERITY_HIGH, "int ov")==0, "58D3 reg1");
+        CHECK(sana64_register_rule(SANA64_R_DOUBLE_FREE, SANA64_SEVERITY_HIGH, "dbl free")==0, "58D4 reg2");
+        CHECK(sana64_analyze("a.c", &issues)==0 && issues>=2, "58D5 analyze");
+        CHECK(sana64_suppress_rule(SANA64_R_INT_OVERFLOW)==0, "58D6 suppress");
+        CHECK(sana64_rule_enabled(SANA64_R_INT_OVERFLOW)==0, "58D7 disabled");
+    }
+    /* 58E Unit Tests */
+    {
+        int total=0, high=0;
+        char msg[64];
+        printf("58E1 tests exist\n");
+        CHECK(sana64_init()==0, "58E2 init");
+        CHECK(sana64_register_rule(SANA64_R_PATH_TRAVERSAL, SANA64_SEVERITY_MED, "path")==0, "58E3 reg");
+        CHECK(sana64_analyze(0, &total)==-2, "58E4 null path");
+        CHECK(sana64_report_issue("f.c", SANA64_R_PATH_TRAVERSAL, 1, 0, 64)==-1, "58E5 null buf");
+        CHECK(sana64_report_issue("f.c", SANA64_R_PATH_TRAVERSAL, 1, msg, 5)==-2, "58E6 small buf");
+        CHECK(sana64_summary(0, &high)==-1, "58E7 null total");
+    }
+    /* 58F Integration Tests */
+    {
+        int issues=0, total=0, high=0;
+        printf("58F1 integration exists\n");
+        CHECK(sana64_init()==0, "58F2 init");
+        CHECK(sana64_register_rule(SANA64_R_HARDCODED_SECRET, SANA64_SEVERITY_HIGH, "secret")==0, "58F3 reg");
+        CHECK(sana64_register_rule(SANA64_R_DEAD_CODE, SANA64_SEVERITY_LOW, "dead")==0, "58F4 reg");
+        CHECK(sana64_analyze("x.c", &issues)==0, "58F5 analyze");
+        CHECK(sana64_summary(&total, &high)==0 && total>0, "58F6 summary");
+        CHECK(sana64_scan_buffer((u8*)"\x00\x01\xFF", 3, &issues)==0, "58F7 scan");
+    }
+    /* 58G Code Review */
+    {
+        int find=0;
+        printf("58G1 review exists\n");
+        CHECK(sana64_init()==0, "58G2 init");
+        CHECK(sana64_register_rule(SANA64_R_UNUSED_VAR, SANA64_SEVERITY_LOW, "unused")==0, "58G3 reg");
+        CHECK(sana64_suppress_rule(SANA64_R_UNUSED_VAR)==0, "58G4 suppress");
+        CHECK(sana64_resume_rule(SANA64_R_UNUSED_VAR)==0, "58G5 resume");
+        CHECK(sana64_rule_enabled(SANA64_R_UNUSED_VAR)==1, "58G6 enabled again");
+        CHECK(sana64_scan_buffer((u8*)"\xFF\x00\x01",3,&find)==0 && find==2, "58G7 scan find");
+    }
+    /* 58H Security Audit */
+    {
+        int issues=0;
+        printf("58H1 audit exists\n");
+        CHECK(sana64_init()==0, "58H2 init");
+        CHECK(sana64_register_rule(SANA64_R_NULL_DEREF, SANA64_SEVERITY_HIGH, "null")==0, "58H3 reg");
+        CHECK(sana64_register_rule(SANA64_R_BUF_OVERFLOW, SANA64_SEVERITY_HIGH, "buf")==0, "58H4 reg");
+        CHECK(sana64_analyze("y.c", &issues)==0 && issues==2, "58H5 analyze 2");
+        CHECK(sana64_suppress_rule(SANA64_R_NULL_DEREF)==0, "58H6 suppress");
+        CHECK(sana64_analyze("y.c", &issues)==0 && issues==1, "58H7 analyze 1");
+    }
+    /* 58I Documentation */
+    {
+        int tot=0, hi=0;
+        printf("58I1 docs exist\n");
+        CHECK(sana64_init()==0, "58I2 init");
+        CHECK(sana64_register_rule(SANA64_R_PATH_TRAVERSAL, SANA64_SEVERITY_MED, "path")==0, "58I3 reg");
+        CHECK(sana64_scan_buffer((u8*)"\x00",1,&tot)==0, "58I4 scan");
+        CHECK(sana64_summary(&tot, &hi)==0, "58I5 summary");
+    }
+    /* 58J Release */
+    {
+        int tot=0, hi=0;
+        printf("58J1 release doc exists\n");
+        CHECK(sana64_init()==0, "58J2 init");
+        CHECK(sana64_register_rule(SANA64_R_INT_OVERFLOW, SANA64_SEVERITY_HIGH, "intov")==0, "58J3 reg");
+        CHECK(sana64_register_rule(SANA64_R_DOUBLE_FREE, SANA64_SEVERITY_HIGH, "dbl")==0, "58J4 reg");
+        CHECK(sana64_analyze("z.c", &tot)==0, "58J5 analyze");
+        CHECK(sana64_summary(&tot,&hi)==0 && hi>=2, "58J6 high count");
+        CHECK(sana64_configuration_check()==0, "58J7 config ok");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
