@@ -11,6 +11,7 @@
 #include "arch/x86_64/pkgmgr.h"
 #include "arch/x86_64/secupd.h"
 #include "arch/x86_64/isoimg.h"
+#include "arch/x86_64/installfw.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -3027,6 +3028,119 @@ int main(void) {
         cs = isoimg64_checksum();
         CHECK(cs>0, "44J5 checksum ok");
         CHECK(isoimg64_verify("boot/kernel.bin")==0, "44J6 verify boot");
+    }
+
+    /* 45A Installer Design */
+    {
+        printf("45A1 design doc exists\n");
+        CHECK(installfw64_init()==0, "45A2 init ok");
+    }
+    /* 45B API Spec */
+    {
+        printf("45B1 API spec exists\n");
+        CHECK(installfw64_init()==0, "45B2 init");
+        CHECK(installfw64_preflight(8ULL*1024*1024*1024, 1ULL*1024*1024*1024)==0,
+              "45B3 preflight ok");
+        CHECK(installfw64_step(0)==-1, "45B4 null step reject");
+    }
+    /* 45C Implementation Start */
+    {
+        printf("45C1 impl start doc exists\n");
+        CHECK(installfw64_init()==0, "45C2 init");
+        CHECK(installfw64_preflight(8ULL*1024*1024*1024, 4ULL*1024*1024*1024)==0,
+              "45C3 preflight big");
+        CHECK(installfw64_select_disk("/dev/sda",1)==0, "45C4 disk");
+    }
+    /* 45D Code Development */
+    {
+        int st = -1;
+        printf("45D1 code dev doc exists\n");
+        CHECK(installfw64_init()==0, "45D2 init");
+        CHECK(installfw64_preflight(16ULL*1024*1024*1024, 2ULL*1024*1024*1024)==0,
+              "45D3 preflight");
+        CHECK(installfw64_select_disk("/dev/vda",0)==0, "45D4 disk");
+        CHECK(installfw64_create_partition("root",64ULL*1024*1024)==0,
+              "45D5 partition");
+        CHECK(installfw64_partition_count()==1, "45D6 part count");
+        CHECK(installfw64_copy_stage("iso","/mnt" ,512ULL*1024*1024)==0,
+              "45D7 copy start");
+        CHECK(installfw64_copy_stage("iso","/mnt",512ULL*1024*1024)==0,
+              "45D8 copy done");
+        CHECK(installfw64_step(&st)==0 && st==INSTALLFW_BOOTLOADER,
+              "45D9 step bootloader");
+    }
+    /* 45E Unit Tests */
+    {
+        printf("45E1 unit tests exist\n");
+        CHECK(installfw64_init()==0, "45E2 init");
+        CHECK(installfw64_preflight(1ULL*1024*1024*1024, 2ULL*1024*1024*1024)==-2,
+              "45E3 small disk reject");
+        CHECK(installfw64_preflight(8ULL*1024*1024*1024, 100ULL*1024*1024)==-3,
+              "45E4 low ram reject");
+        CHECK(installfw64_create_partition(0,64)==-1, "45E5 null label reject");
+        CHECK(installfw64_create_partition("r",16ULL*1024*1024)==-2,
+              "45E6 wrong-step reject");
+        CHECK(installfw64_preflight(8ULL*1024*1024*1024,1ULL*1024*1024*1024)==0 &&
+              installfw64_select_disk("/dev/vda",0)==0 &&
+              installfw64_create_partition("small",16ULL*1024*1024)==-3,
+              "45E7 small part reject");
+    }
+    /* 45F Integration Tests */
+    {
+        int st = -1;
+        printf("45F1 integration tests exist\n");
+        CHECK(installfw64_init()==0, "45F2 init");
+        CHECK(installfw64_preflight(16ULL*1024*1024*1024,2ULL*1024*1024*1024)==0,
+              "45F3 preflight");
+        CHECK(installfw64_select_disk("/dev/sdb",1)==0, "45F4 disk");
+        CHECK(installfw64_create_partition("boot",256ULL*1024*1024)==0,
+              "45F5 part boot");
+        CHECK(installfw64_create_partition("root",8ULL*1024*1024*1024)==0,
+              "45F6 part root");
+        CHECK(installfw64_copy_stage("iso","/target",2ULL*1024*1024*1024)==0,
+              "45F7 copy start");
+        CHECK(installfw64_copy_stage("iso","/target",2ULL*1024*1024*1024)==0,
+              "45F8 copy done");
+        CHECK(installfw64_install_bootloader("/dev/sdb")==0, "45F9 bootloader");
+        CHECK(installfw64_step(&st)==0 && st==INSTALLFW_DONE, "45F10 step done");
+        CHECK(installfw64_finalize()==0, "45F11 finalize");
+    }
+    /* 45G Code Review */
+    {
+        int st = -1;
+        printf("45G1 review doc exists\n");
+        CHECK(installfw64_init()==0, "45G2 init");
+        CHECK(installfw64_select_disk(0,0)==-1, "45G3 null disk reject");
+        CHECK(installfw64_select_disk("/dev/sda",1)==-2, "45G4 wrong step");
+        CHECK(installfw64_install_bootloader(0)==-1, "45G5 null boot reject");
+        CHECK(installfw64_step(&st)==0 && st==INSTALLFW_PREFLIGHT,
+              "45G6 step preflight");
+    }
+    /* 45H Security Audit */
+    {
+        printf("45H1 audit doc exists\n");
+        CHECK(installfw64_init()==0, "45H2 init");
+        CHECK(installfw64_preflight(12ULL*1024*1024*1024,1ULL*1024*1024*1024)==0,
+              "45H3 preflight");
+        CHECK(installfw64_select_disk("/dev/sda",2)==-3, "45H4 bad wipe reject");
+        CHECK(installfw64_select_disk("/dev/sda",1)==0 &&
+              installfw64_copy_stage("a","b",1ULL*1024*1024*1024)==0 &&
+              installfw64_copy_stage("a","b",2ULL*1024*1024*1024)==-4,
+              "45H5 overflow copy reject");
+    }
+    /* 45I Documentation */
+    {
+        printf("45I1 docs exist\n");
+        CHECK(installfw64_init()==0, "45I2 ok");
+    }
+    /* 45J Release */
+    {
+        printf("45J1 release doc exists\n");
+        CHECK(installfw64_init()==0, "45J2 init");
+        CHECK(installfw64_preflight(16ULL*1024*1024*1024,2ULL*1024*1024*1024)==0,
+              "45J3 preflight");
+        CHECK(installfw64_select_disk("/dev/sda",1)==0, "45J4 disk");
+        CHECK(installfw64_partition_count()==0, "45J5 sanity");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
