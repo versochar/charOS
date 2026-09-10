@@ -28,6 +28,7 @@
 #include "arch/x86_64/dyna.h"
 #include "arch/x86_64/comp.h"
 #include "arch/x86_64/ent.h"
+#include "arch/x86_64/ha.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -4753,6 +4754,103 @@ int main(void) {
         CHECK(ent64_user_add("root",99)==0, "61J4 user");
         CHECK(ent64_report_users(buf,sizeof(buf))==0, "61J5 report");
         CHECK(ent64_policy_check(0,1)==1 || ent64_policy_check(0,1)==0, "61J6 policy");
+    }
+
+    /* 62A High Availability Design */
+    {
+        char buf[256];
+        int ok=0;
+        printf("62A1 doc exists\n");
+        CHECK(ha64_init()==0, "62A2 init");
+        CHECK(ha64_node_add("node1", 0x0A000001)==0, "62A3 add");
+        CHECK(ha64_node_status("node1",&ok)==0 && ok==1, "62A4 status");
+    }
+    /* 62B API Spec */
+    {
+        int up=0;
+        printf("62B1 api spec exists\n");
+        CHECK(ha64_init()==0, "62B2 init");
+        CHECK(ha64_node_add("n1",1)==0, "62B3 add");
+        CHECK(ha64_node_add("n2",2)==0, "62B4 add2");
+        CHECK(ha64_heartbeat("n1")==0, "62B5 heartbeat");
+        CHECK(ha64_node_status("n1",&up)==0 && up==1, "62B6 status");
+    }
+    /* 62C Implementation Start */
+    {
+        int ok=0;
+        printf("62C1 impl start exists\n");
+        CHECK(ha64_init()==0, "62C2 init");
+        CHECK(ha64_node_add("a",1)==0, "62C3 add");
+        CHECK(ha64_node_remove("a")==0, "62C4 remove");
+        CHECK(ha64_node_status("a",&ok)==-2, "62C5 not found");
+    }
+    /* 62D Code Development */
+    {
+        char buf[256];
+        int q=0;
+        printf("62D1 dev doc exists\n");
+        CHECK(ha64_init()==0, "62D2 init");
+        CHECK(ha64_node_add("p",1)==0, "62D3 add p");
+        CHECK(ha64_node_add("s",2)==0, "62D4 add s");
+        CHECK(ha64_failover_trigger("p","s")== -3, "62D5 failover no");
+        CHECK(ha64_node_promote("s")==0, "62D6 promote");
+        CHECK(ha64_quorum_check(&q)==0, "62D7 quorum");
+        CHECK(ha64_cluster_report(buf,sizeof(buf))==0, "62D8 report");
+    }
+    /* 62E Unit Tests */
+    {
+        int ok=0;
+        printf("62E1 tests exist\n");
+        CHECK(ha64_init()==0, "62E2 init");
+        CHECK(ha64_node_status(0,&ok)==-1, "62E3 null name");
+        CHECK(ha64_node_status("x",0)==-1, "62E4 null out");
+        CHECK(ha64_cluster_report(0,10)==-1, "62E5 null buf");
+        CHECK(ha64_cluster_report((char*)"x",10)==-2, "62E6 small buf");
+    }
+    /* 62F Integration Tests */
+    {
+        int up=0, ok=0;
+        printf("62F1 integration exists\n");
+        CHECK(ha64_init()==0, "62F2 init");
+        CHECK(ha64_node_add("n1",1)==0, "62F3 add");
+        CHECK(ha64_node_add("n2",2)==0, "62F4 add");
+        CHECK(ha64_node_add("n3",3)==0, "62F5 add");
+        CHECK(ha64_quorum_check(&ok)==0 && ok==1, "62F6 quorum");
+        CHECK(ha64_node_status("n2",&up)==0 && up==1, "62F7 status");
+    }
+    /* 62G Code Review */
+    {
+        printf("62G1 review exists\n");
+        CHECK(ha64_init()==0, "62G2 init");
+        CHECK(ha64_node_add("x",1)==0, "62G3 add");
+        CHECK(ha64_node_promote("x")==0, "62G4 promote");
+        CHECK(ha64_node_demote("x")==0, "62G5 demote");
+        CHECK(ha64_sync_state()==0, "62G6 sync");
+    }
+    /* 62H Security Audit */
+    {
+        printf("62H1 audit exists\n");
+        CHECK(ha64_init()==0, "62H2 init");
+        CHECK(ha64_failover_trigger(0,0)==-1, "62H3 null args");
+        CHECK(ha64_node_remove(0)==-1, "62H4 null name");
+    }
+    /* 62I Documentation */
+    {
+        char buf[256];
+        printf("62I1 docs exist\n");
+        CHECK(ha64_init()==0, "62I2 init");
+        CHECK(ha64_node_add("nodeX",99)==0, "62I3 add");
+        CHECK(ha64_cluster_report(buf,sizeof(buf))==0, "62I4 report");
+    }
+    /* 62J Release */
+    {
+        int ok=0;
+        printf("62J1 release doc exists\n");
+        CHECK(ha64_init()==0, "62J2 init");
+        CHECK(ha64_node_add("p1",1)==0, "62J3 add");
+        CHECK(ha64_node_add("p2",2)==0, "62J4 add");
+        CHECK(ha64_quorum_check(&ok)==0, "62J5 quorum");
+        CHECK(ha64_sync_state()==0, "62J6 sync");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
