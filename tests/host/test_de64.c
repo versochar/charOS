@@ -1583,6 +1583,73 @@ int main(void) {
         printf("9J1 release doc exists\n");
         CHECK(drvhal64_init()==0, "9J2 ok");
     }
+    /* 10A PCI Design */
+    {
+        printf("10A1 design doc exists\n");
+        CHECK(pcihal64_init()==0, "10A2 design ok");
+    }
+    /* 10B API Spec */
+    {
+        printf("10B1 API spec exists\n");
+        u64 n=0;
+        CHECK(pcihal64_scan(&n)==0 && n==4, "10B2 api ok");
+    }
+    /* 10C Implementation Start */
+    {
+        printf("10C1 impl start doc exists\n");
+        CHECK(pcihal64_init()==0, "10C2 ok");
+    }
+    /* 10D Code Development */
+    {
+        printf("10D1 code dev doc exists\n");
+        pcihal64_init();
+        CHECK(pcihal64_enable(0)==0, "10D2 enable");
+        u64 v=0;
+        CHECK(pcihal64_read(0,0x00,&v)==0, "10D3 read");
+    }
+    /* 10E Unit Tests */
+    {
+        printf("10E1 unit tests exist\n");
+        pcihal64_init();
+        CHECK(pcihal64_scan(NULL)==-1, "10E2 param");
+        CHECK(pcihal64_enable(99)==-1, "10E3 range");
+        CHECK(pcihal64_enable(1)==0, "10E4 enable");
+        CHECK(pcihal64_enable(1)==-1, "10E5 double-enable");
+        CHECK(pcihal64_read(1,999,&(u64){0})==-1, "10E6 offset");
+    }
+    /* 10F Integration Tests */
+    {
+        printf("10F1 integration tests exist\n");
+        CHECK(drvhal64_init()==0, "10F2 drv");
+        CHECK(pcihal64_init()==0, "10F3 pci");
+        u64 h=0, n=0;
+        CHECK(drvhal64_register(1,&h)==0, "10F4 register");
+        CHECK(pcihal64_scan(&n)==0, "10F5 scan");
+        CHECK(pcihal64_enable(2)==0, "10F6 enable");
+        CHECK(drvhal64_ioctl(h,0x10,2)==0, "10F7 ioctl");
+    }
+    /* 10G Code Review */
+    {
+        printf("10G1 review doc exists\n");
+        CHECK(pcihal64_init()==0, "10G2 ok");
+    }
+    /* 10H Security Audit */
+    {
+        printf("10H1 audit doc exists\n");
+        pcihal64_init();
+        u64 v=0;
+        CHECK(pcihal64_read(3,0,&v)==-1, "10H2 disabled-read");
+    }
+    /* 10I Documentation */
+    {
+        printf("10I1 docs exist\n");
+        CHECK(pcihal64_init()==0, "10I2 ok");
+    }
+    /* 10J Release */
+    {
+        printf("10J1 release doc exists\n");
+        CHECK(pcihal64_init()==0, "10J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");

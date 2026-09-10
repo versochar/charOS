@@ -1771,4 +1771,11 @@ int drvhal64_unregister(u64 hdl);
 int drvhal64_ioctl(u64 hdl, u64 cmd, u64 arg);
 int drvhal64_state(u64 hdl, int *out_state);
 
+/* --- 10A: PCI HAL (davranis modeli) --- */
+int pcihal64_init(void);
+int pcihal64_scan(u64 *out_count);
+int pcihal64_info(u64 idx, u64 *out_vendor, u64 *out_device);
+int pcihal64_enable(u64 idx);
+int pcihal64_read(u64 idx, u64 offset, u64 *out_val);
+
 #endif
