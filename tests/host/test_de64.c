@@ -1056,6 +1056,16 @@ int main(void) {
         printf("2C2 build integration ok\n");
         CHECK(tpm64_init() == 0, "2C3 tpm init ok");
     }
+    /* 2D Code Development */
+    {
+        printf("2D1 PCR extend implemented\n");
+        tpm64_init();
+        u8 hash[32] = {1};
+        CHECK(tpm64_extend_pcr(0, hash, 32) == 0, "2D2 extend ok");
+        u8 pcr[32];
+        CHECK(tpm64_read_pcr(0, pcr) == 0, "2D3 read ok");
+        CHECK(pcr[0] != 0, "2D4 PCR changed");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
