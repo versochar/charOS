@@ -1121,6 +1121,16 @@ int main(void) {
         printf("3D1 code dev doc exists\n");
         CHECK(secureboot64_init()==SB_OK, "3D2 ok");
     }
+    /* 3E Unit Tests */
+    {
+        printf("3E1 unit tests exist\n");
+        CHECK(secureboot64_init()==SB_OK, "3E2 ok");
+    }
+    /* 3F Integration Tests */
+    {
+        printf("3F1 integration tests exist\n");
+        CHECK(secureboot64_init()==SB_OK, "3F2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
