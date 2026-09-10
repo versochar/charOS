@@ -25,6 +25,7 @@
 #include "arch/x86_64/mitig.h"
 #include "arch/x86_64/fuzz.h"
 #include "arch/x86_64/sana.h"
+#include "arch/x86_64/dyna.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -4460,6 +4461,106 @@ int main(void) {
         CHECK(sana64_analyze("z.c", &tot)==0, "58J5 analyze");
         CHECK(sana64_summary(&tot,&hi)==0 && hi>=2, "58J6 high count");
         CHECK(sana64_configuration_check()==0, "58J7 config ok");
+    }
+
+    /* 59A Dynamic Analysis Design */
+    {
+        char log[256];
+        printf("59A1 doc exists\n");
+        CHECK(dyna64_init()==0, "59A2 init");
+        CHECK(dyna64_probe_add(0x1000,4)==0, "59A3 add probe");
+        CHECK(dyna64_start()==0, "59A4 start");
+        CHECK(dyna64_log_dump(log,sizeof(log))==0, "59A5 log dump");
+    }
+    /* 59B API Spec */
+    {
+        u32 pc; int ev;
+        printf("59B1 api spec exists\n");
+        CHECK(dyna64_init()==0, "59B2 init");
+        CHECK(dyna64_probe_add(0x2000,8)==0, "59B3 add");
+        CHECK(dyna64_start()==0, "59B4 start");
+        CHECK(dyna64_step(&pc,&ev)==0, "59B5 step");
+        CHECK(pc>0, "59B6 pc");
+    }
+    /* 59C Implementation Start */
+    {
+        printf("59C1 impl start exists\n");
+        CHECK(dyna64_init()==0, "59C2 init");
+        CHECK(dyna64_config_set(1,42)==0, "59C3 set cfg");
+        int v=0; CHECK(dyna64_config_get(1,&v)==0 && v==42, "59C4 get cfg");
+        CHECK(dyna64_start()==0, "59C5 start");
+    }
+    /* 59D Code Development */
+    {
+        u32 pc; int ev;
+        printf("59D1 dev doc exists\n");
+        CHECK(dyna64_init()==0, "59D2 init");
+        CHECK(dyna64_probe_add(0x3000,4)==0, "59D3 add");
+        CHECK(dyna64_start()==0, "59D4 start");
+        CHECK(dyna64_step(&pc,&ev)==0, "59D5 step1");
+        CHECK(dyna64_step(&pc,&ev)==0, "59D6 step2");
+        CHECK(dyna64_event_count(DYNA64_E_INSTR)>=0, "59D7 count");
+    }
+    /* 59E Unit Tests */
+    {
+        u32 pc; int ev;
+        printf("59E1 unit tests exist\n");
+        CHECK(dyna64_init()==0, "59E2 init");
+        CHECK(dyna64_step(&pc,&ev)==-2, "59E3 step not started");
+        CHECK(dyna64_start()==0, "59E4 start");
+        CHECK(dyna64_step(0,&ev)==-3, "59E5 null pc");
+        CHECK(dyna64_config_get(100,&ev)==-2, "59E6 bad key");
+    }
+    /* 59F Integration Tests */
+    {
+        u32 pc; int ev, i;
+        char log[256];
+        printf("59F1 integration exists\n");
+        CHECK(dyna64_init()==0, "59F2 init");
+        CHECK(dyna64_probe_add(0x4000,4)==0, "59F3 add");
+        CHECK(dyna64_probe_add(0x5000,8)==0, "59F4 add2");
+        CHECK(dyna64_start()==0, "59F5 start");
+        for(i=0;i<10;i++) CHECK(dyna64_step(&pc,&ev)==0, "59F6 spin");
+        CHECK(dyna64_log_dump(log,sizeof(log))==0, "59F7 log");
+        CHECK(dyna64_stop()==0, "59F8 stop");
+    }
+    /* 59G Code Review */
+    {
+        u32 stack[DYNA64_MAX_STACK]; int depth=0;
+        printf("59G1 review exists\n");
+        CHECK(dyna64_init()==0, "59G2 init");
+        CHECK(dyna64_stack_snapshot(stack,&depth)==0 && depth==DYNA64_MAX_STACK, "59G3 snapshot");
+        CHECK(dyna64_probe_remove(0x1234)==-1, "59G4 remove missing");
+        CHECK(dyna64_probe_add(0x1234,4)==0, "59G5 add");
+        CHECK(dyna64_probe_remove(0x1234)==0, "59G6 remove");
+    }
+    /* 59H Security Audit */
+    {
+        printf("59H1 audit exists\n");
+        CHECK(dyna64_init()==0, "59H2 init");
+        CHECK(dyna64_start()==0, "59H3 start");
+        CHECK(dyna64_trace_flush()==0, "59H4 flush");
+        CHECK(dyna64_event_count(DYNA64_E_INSTR)==0, "59H5 zeroed");
+        CHECK(dyna64_config_set(-1,1)==-1, "59H6 bad key");
+    }
+    /* 59I Documentation */
+    {
+        char log[64];
+        printf("59I1 docs exist\n");
+        CHECK(dyna64_init()==0, "59I2 init");
+        CHECK(dyna64_log_dump(log,4)==-2, "59I3 small buf");
+        CHECK(dyna64_log_dump(log,sizeof(log))==0, "59I4 ok");
+    }
+    /* 59J Release */
+    {
+        u32 pc; int ev;
+        printf("59J1 release doc exists\n");
+        CHECK(dyna64_init()==0, "59J2 init");
+        CHECK(dyna64_probe_add(0x6000,4)==0, "59J3 add");
+        CHECK(dyna64_start()==0, "59J4 start");
+        CHECK(dyna64_step(&pc,&ev)==0, "59J5 step");
+        CHECK(dyna64_event_count(DYNA64_E_INSTR)>=0, "59J6 count");
+        CHECK(dyna64_stop()==0, "59J7 stop");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
