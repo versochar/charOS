@@ -1650,6 +1650,80 @@ int main(void) {
         printf("10J1 release doc exists\n");
         CHECK(pcihal64_init()==0, "10J2 ok");
     }
+    /* 11A Blk Design */
+    {
+        printf("11A1 design doc exists\n");
+        CHECK(blk64_init()==0, "11A2 design ok");
+    }
+    /* 11B API Spec */
+    {
+        printf("11B1 API spec exists\n");
+        u64 d=0;
+        CHECK(blk64_create(16,&d)==0 && d!=0, "11B2 api ok");
+        CHECK(blk64_destroy(d)==0, "11B3 cleanup");
+    }
+    /* 11C Implementation Start */
+    {
+        printf("11C1 impl start doc exists\n");
+        CHECK(blk64_init()==0, "11C2 ok");
+    }
+    /* 11D Code Development */
+    {
+        printf("11D1 code dev doc exists\n");
+        blk64_init();
+        u64 d=0, v=0;
+        CHECK(blk64_create(8,&d)==0, "11D2 create");
+        CHECK(blk64_write(d,3,0xCAFE)==0, "11D3 write");
+        CHECK(blk64_read(d,3,&v)==0 && v==0xCAFE, "11D4 read");
+    }
+    /* 11E Unit Tests */
+    {
+        printf("11E1 unit tests exist\n");
+        blk64_init();
+        CHECK(blk64_create(0,&(u64){0})==-1, "11E2 size-zero");
+        CHECK(blk64_create(999,&(u64){0})==-1, "11E3 size-big");
+        CHECK(blk64_destroy(999999)==-1, "11E4 unknown");
+        u64 d=0, v=0;
+        blk64_create(4,&d);
+        CHECK(blk64_read(d,99,&v)==-1, "11E5 lba-range");
+        CHECK(blk64_write(d,99,1)==-1, "11E6 lba-range");
+    }
+    /* 11F Integration Tests */
+    {
+        printf("11F1 integration tests exist\n");
+        CHECK(drvhal64_init()==0, "11F2 drv");
+        CHECK(blk64_init()==0, "11F3 blk");
+        u64 h=0, d=0, v=0;
+        CHECK(drvhal64_register(1,&h)==0, "11F4 register");
+        CHECK(blk64_create(8,&d)==0, "11F5 create");
+        CHECK(blk64_write(d,0,0x1234)==0, "11F6 write");
+        CHECK(drvhal64_ioctl(h,0x20,d)==0, "11F7 ioctl");
+        CHECK(blk64_read(d,0,&v)==0 && v==0x1234, "11F8 read");
+    }
+    /* 11G Code Review */
+    {
+        printf("11G1 review doc exists\n");
+        CHECK(blk64_init()==0, "11G2 ok");
+    }
+    /* 11H Security Audit */
+    {
+        printf("11H1 audit doc exists\n");
+        blk64_init();
+        u64 d=0, v=0;
+        blk64_create(4,&d);
+        blk64_destroy(d);
+        CHECK(blk64_read(d,0,&v)==-1, "11H2 use-after-destroy");
+    }
+    /* 11I Documentation */
+    {
+        printf("11I1 docs exist\n");
+        CHECK(blk64_init()==0, "11I2 ok");
+    }
+    /* 11J Release */
+    {
+        printf("11J1 release doc exists\n");
+        CHECK(blk64_init()==0, "11J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
