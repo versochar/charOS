@@ -23,6 +23,7 @@
 #include <core/abi.h>
 #include <core/power.h>
 #include <drivers/thermal.h>
+#include <drivers/usbdesc.h>
 #include <test/selftest.h>
 #include <core/apic.h>
 #include <fs/chfs.h>
@@ -819,6 +820,22 @@ void kernel_main(uint32_t magic, uint32_t mboot_ptr)
         }
     }
     vga_puts("[32] done\n"); serial_puts("[32] done\n");
+
+    /* 33.4: usb tanımlayıcı yürüyücü öztesti deftere kaydolur */
+    vga_puts("[33] usbdesc...\n"); serial_puts("[33] usbdesc...\n");
+    {
+        int fails = 0;
+        if (selftest_register("usbdesc", usbdesc_selftest) != 0) fails++;
+        if (usbdesc_selftest() != 0) fails++;
+        if (fails == 0) {
+            serial_puts("[33] usbdesc [PASS]\n");
+            vga_puts("[33] usbdesc [PASS]\n");
+        } else {
+            serial_puts("[33] usbdesc [FAIL]\n");
+            vga_puts("[33] usbdesc [FAIL]\n");
+        }
+    }
+    vga_puts("[33] done\n"); serial_puts("[33] done\n");
 
     /* 14G: ACPI + HPET + RTC alarm (güç geçişi YOK, yalnızca hazırlık) */
     vga_puts("[14G] acpi/hpet/rtc-alarm...\n"); serial_puts("[14G] acpi/hpet/rtc-alarm...\n");

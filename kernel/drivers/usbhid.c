@@ -1,4 +1,5 @@
 #include <drivers/usbhid.h>
+#include <drivers/usbdesc.h>
 #include <drivers/xhci.h>
 #include <drivers/keyboard.h>
 #include <drivers/input.h>
@@ -223,35 +224,18 @@ static int enum_device(int port, int speed) {
     }
     uint8_t cfgval = cfg[5];
 
-    /* arabirim + kesme IN uç tara */
+    /* arabirim + kesme IN uç: saf yürüyücü (33.4, usbdesc.c ile birebir) */
     int8_t iface = -1, proto = 0;
     uint8_t ep_addr = 0;
     uint16_t ep_mps = 0;
     uint8_t ep_interval = 0;
     {
-        uint32_t o = 0;
-        int8_t cur_if = -1, cur_proto = 0;
-        while (o + 2 <= total) {
-            uint8_t L = cfg[o], T = cfg[o + 1];
-            if (L < 2 || o + L > total) break;
-            if (T == 4 && L >= 9) { /* interface */
-                cur_if = (int8_t)cfg[o + 2];
-                cur_proto = 0;
-                if (cfg[o + 5] == 3 && cfg[o + 6] == 1 &&
-                    (cfg[o + 7] == 1 || cfg[o + 7] == 2))
-                    cur_proto = (int8_t)cfg[o + 7];
-            } else if (T == 5 && L >= 7) { /* endpoint */
-                uint8_t ea = cfg[o + 2], at = cfg[o + 3];
-                if (cur_proto && (at & 3u) == 3 && (ea & 0x80u)) {
-                    iface = cur_if; proto = cur_proto;
-                    ep_addr = ea;
-                    ep_mps = rd16(cfg + o + 4) & 0x7FFu;
-                    if (!ep_mps) ep_mps = 8;
-                    ep_interval = cfg[o + 6];
-                    break;
-                }
-            }
-            o += L;
+        int p = 0;
+        uint32_t mps = 0;
+        if (usbdesc_find_hid_interrupt(cfg, total, &iface, &p, &ep_addr,
+                                       &mps, &ep_interval) == 0) {
+            proto = (int8_t)p;
+            ep_mps = (uint16_t)mps;
         }
     }
     if (proto != 1 && proto != 2) {

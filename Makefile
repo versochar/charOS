@@ -79,7 +79,8 @@ KERNEL_SRCS = $(KERNEL_DIR)/kernel.c \
               $(KERNEL_DIR)/drivers/pci.c \
               $(KERNEL_DIR)/drivers/virtio_blk.c \
               $(KERNEL_DIR)/drivers/xhci.c \
-              $(KERNEL_DIR)/drivers/usbhid.c \
+               $(KERNEL_DIR)/drivers/usbhid.c \
+               $(KERNEL_DIR)/drivers/usbdesc.c \
               $(KERNEL_DIR)/drivers/nvme.c \
               $(KERNEL_DIR)/drivers/gpt.c \
               $(KERNEL_DIR)/drivers/blk.c \
@@ -1137,6 +1138,11 @@ test-power31:
 	$(CC) -iquote include kernel/core/verify.c kernel/core/power.c tests/host/test_power31.c -o /tmp/test_power31
 	/tmp/test_power31
 
+# 33.5: gercek usbdesc.c host testi (dusman tanimlayicilar dahil)
+test-usbdesc33:
+	$(CC) -iquote include kernel/core/verify.c kernel/drivers/usbdesc.c tests/host/test_usbdesc33.c -o /tmp/test_usbdesc33
+	/tmp/test_usbdesc33
+
 # 32.5: gercek thermal.c host testi (donanim stub, mantik gercek)
 test-thermal32:
 	$(CC) -iquote include kernel/core/verify.c kernel/core/power.c kernel/drivers/thermal.c tests/host/test_thermal32.c -o /tmp/test_thermal32
@@ -1152,4 +1158,4 @@ test-de64:
 	/tmp/test_de64
 
 # Phony targets
-.PHONY: all clean rebuild run-iso run-iso-headless run-kernel debug check64 test-mem64 test-smp64 test-uefi64 iso64-check test-swap64 test-heap64 test-sec64 test-auth64 test-vfs64 test-fs64 test-pkg64 test-init64 test-net64 test-wifi64 test-usb64 test-audio64 test-gpu64 test-power64 test-sensor64 test-fsadv64 test-libc64 test-elf64 test-link64 test-user64 test-wserver64 test-de64 test-cap22 test-sandbox23 test-verify24 test-trace25 test-prof26 test-version27 test-selftest28 test-doc29 test-abi30 test-power31 test-thermal32
+.PHONY: all clean rebuild run-iso run-iso-headless run-kernel debug check64 test-mem64 test-smp64 test-uefi64 iso64-check test-swap64 test-heap64 test-sec64 test-auth64 test-vfs64 test-fs64 test-pkg64 test-init64 test-net64 test-wifi64 test-usb64 test-audio64 test-gpu64 test-power64 test-sensor64 test-fsadv64 test-libc64 test-elf64 test-link64 test-user64 test-wserver64 test-de64 test-cap22 test-sandbox23 test-verify24 test-trace25 test-prof26 test-version27 test-selftest28 test-doc29 test-abi30 test-power31 test-thermal32 test-usbdesc33
