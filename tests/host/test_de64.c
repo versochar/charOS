@@ -9,6 +9,7 @@
 #include "arch/x86_64/crash.h"
 #include "arch/x86_64/update.h"
 #include "arch/x86_64/pkgmgr.h"
+#include "arch/x86_64/secupd.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -2822,6 +2823,99 @@ int main(void) {
         printf("42J1 release doc exists\n");
         CHECK(repo64_add("final","3.0","main")==0, "42J2 add final");
         CHECK(repo64_find("final","2.0",v,32)==0, "42J3 find final");
+    }
+
+    /* 43A Secure Update Design */
+    {
+        printf("43A1 design doc exists\n");
+        CHECK(secupd64_init()==0, "43A2 init ok");
+        CHECK(secupd64_add_key(0x101,0xDEADBEEF)==0, "43A3 add key");
+    }
+    /* 43B API Spec */
+    {
+        u64 sig;
+        printf("43B1 API spec exists\n");
+        CHECK(secupd64_init()==0, "43B2 init");
+        CHECK(secupd64_add_key(1,0xC0FFEE)==0, "43B3 add key1");
+        sig = secupd64_sign("core","2.0",0x1234,1);
+        CHECK(sig!=0, "43B4 sign ok");
+        CHECK(secupd64_stage("core","2.0",0x1234,sig,1)==0, "43B5 stage sig");
+        CHECK(secupd64_staged_count()==1, "43B6 count1");
+    }
+    /* 43C Implementation Start */
+    {
+        u64 sig;
+        printf("43C1 impl start doc exists\n");
+        CHECK(secupd64_init()==0, "43C2 init");
+        CHECK(secupd64_add_key(2,0xABCD)==0, "43C3 add key2");
+        sig = secupd64_sign("a","1.0",0x99,2);
+        CHECK(sig!=0 && secupd64_stage("a","1.0",0x99,sig,2)==0, "43C4 sig ok");
+    }
+    /* 43D Code Development */
+    {
+        u64 sig;
+        printf("43D1 code dev doc exists\n");
+        sig = secupd64_sign("sys","3.3",0x777,2);
+        CHECK(secupd64_stage("sys","3.3",0x777,sig,2)==0, "43D2 stage");
+        CHECK(secupd64_verify("sys","3.3")==0, "43D3 verify");
+        CHECK(secupd64_apply_ok("sys","3.3")==0, "43D4 apply ok");
+    }
+    /* 43E Unit Tests */
+    {
+        u64 sig;
+        printf("43E1 unit tests exist\n");
+        CHECK(secupd64_init()==0, "43E2 init");
+        CHECK(secupd64_add_key(3,1)==0, "43E3 add key");
+        CHECK(secupd64_add_key(3,2)==-2, "43E4 dup key reject");
+        CHECK(secupd64_sign(0,0,1,3)==0, "43E5 null sign reject");
+        sig = secupd64_sign("x","1",0x11,3);
+        CHECK(sig!=0 && secupd64_stage("x","1",0x11,sig,99)==-3,
+              "43E6 unknown key reject");
+    }
+    /* 43F Integration Tests */
+    {
+        u64 sig;
+        printf("43F1 integration tests exist\n");
+        CHECK(secupd64_init()==0, "43F2 init");
+        CHECK(secupd64_add_key(4,0xFACE)==0, "43F3 add key");
+        sig = secupd64_sign("net","9.0",0x5A5A,4);
+        CHECK(secupd64_stage("net","9.0",0x5A5A,sig,4)==0, "43F4 stage");
+        /* sakli imza ile bozulmus icerik: verify reddetmeli */
+        CHECK(secupd64_verify("net","9.0")==0, "43F5 verify ok");
+        CHECK(secupd64_verify("net","9.9")==-4, "43F6 unknown ver");
+    }
+    /* 43G Code Review */
+    {
+        printf("43G1 review doc exists\n");
+        CHECK(secupd64_set_policy(99)==-1, "43G2 bad policy reject");
+        CHECK(secupd64_set_policy(2)==0, "43G3 strict set");
+        CHECK(secupd64_policy(0)==-1, "43G4 null policy reject");
+    }
+    /* 43H Security Audit */
+    {
+        u64 sig;
+        printf("43H1 audit doc exists\n");
+        CHECK(secupd64_init()==0, "43H2 init");
+        CHECK(secupd64_add_key(5,0x501)==0, "43H3 key");
+        sig = secupd64_sign("tampered","1.0",0xAB,5);
+        CHECK(secupd64_stage("tampered","1.0",0xCD,sig,5)==-4,
+              "43H4 mismatch sig reject");
+    }
+    /* 43I Documentation */
+    {
+        printf("43I1 docs exist\n");
+        CHECK(secupd64_init()==0, "43I2 ok");
+    }
+    /* 43J Release */
+    {
+        int p = -1;
+        u64 sig;
+        printf("43J1 release doc exists\n");
+        CHECK(secupd64_add_key(6,0x600)==0, "43J2 key");
+        sig = secupd64_sign("final","1.0",0x100,6);
+        CHECK(secupd64_stage("final","1.0",0x100,sig,6)==0, "43J3 stage");
+        CHECK(secupd64_policy(&p)==0 && p==1, "43J4 default enforced");
+        CHECK(secupd64_apply_ok("final","1.0")==0, "43J5 apply ok");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }

@@ -1900,4 +1900,17 @@ int pkgmgr64_list_names(char *out[], int max);
 int pkgmgr64_installed_count(void);
 int pkgmgr64_state(int *out);
 
+/* --- 43A: Secure Update Signing (politika katmani) --- */
+int secupd64_init(void);
+int secupd64_set_policy(int policy);
+int secupd64_add_key(int id, u64 secret);
+u64 secupd64_sign(const char *name, const char *ver, u64 payload_hash,
+                  int key_id);
+int secupd64_stage(const char *name, const char *ver, u64 payload_hash,
+                   u64 sig, int key_id);
+int secupd64_verify(const char *name, const char *ver);
+int secupd64_apply_ok(const char *name, const char *ver);
+int secupd64_policy(int *out);
+int secupd64_staged_count(void);
+
 #endif
