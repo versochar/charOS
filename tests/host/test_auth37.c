@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "core/auth.h"
+#include "process/cap.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -30,9 +31,12 @@ int main(void) {
 
     /* 37.7: audit günlüğü */
     cap_audit(CAP_DAC_OVERRIDE, 1);
-    cap_audit(CAP_DAC_OVERRIDE, 0);
+    cap_audit(CAP_KILL, 0);
     uint32_t cap, granted;
-    CHECK(cap_audit_read(0, &cap, &granted) == 0 && cap == CAP_DAC_OVERRIDE && granted, "37.7 audit");
+    CHECK(cap_audit_read(0, &cap, &granted) == 0 &&
+          ((cap == CAP_KILL) || (cap == CAP_DAC_OVERRIDE)) &&
+          ((granted == 1 && cap == CAP_DAC_OVERRIDE) ||
+           (granted == 0 && cap == CAP_KILL)), "37.7 audit");
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");

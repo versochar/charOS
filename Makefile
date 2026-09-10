@@ -1142,8 +1142,10 @@ test-power31:
 	$(CC) -iquote include kernel/core/verify.c kernel/core/power.c tests/host/test_power31.c -o /tmp/test_power31
 	/tmp/test_power31
 
-/* 36-40 serisi: gerçek çekirdek kodları (gerçek kernel/arch/x86_64/*.c,
- * kernel/drivers/*.c; QEMU açılış regresyonu farklı soruna bağlı) */
+# 37.5: gercek auth.c host testi (stub yok; 37.6: QEMU dahil değil)
+test-auth37:
+	$(CC) -iquote include kernel/core/verify.c kernel/core/auth.c kernel/process/cap.c kernel/core/abi.c kernel/core/doc.c tests/host/test_auth37.c -o /tmp/test_auth37
+	/tmp/test_auth37
 # 32.5: gercek thermal.c host testi (donanim stub, mantik gercek)
 test-thermal32:
 	$(CC) -iquote include kernel/core/verify.c kernel/core/power.c kernel/drivers/thermal.c tests/host/test_thermal32.c -o /tmp/test_thermal32
@@ -1173,7 +1175,7 @@ test-audio36:
 /* 37 serisi: gerçek çekirdek kodu */
 # 37.5: gercek auth.c host testi (stub yok; 37.6: QEMU dahil değil)
 test-auth37:
-	$(CC) -iquote include kernel/core/verify.c kernel/core/auth.c tests/host/test_auth37.c -o /tmp/test_auth37
+	$(CC) -iquote include kernel/core/verify.c kernel/core/auth.c kernel/process/cap.c kernel/core/abi.c kernel/core/doc.c tests/host/test_auth37.c -o /tmp/test_auth37
 	/tmp/test_auth37
 
 # 31.5: gercek power.c host testi (stub yok)
@@ -1203,7 +1205,7 @@ test-audio36:
 
 # 37.5: gercek auth.c host testi (stub yok; 37.6: QEMU dahil değil)
 test-auth37:
-	$(CC) -iquote include kernel/core/verify.c kernel/core/auth.c tests/host/test_auth37.c -o /tmp/test_auth37
+	$(CC) -iquote include kernel/core/verify.c kernel/core/auth.c kernel/process/cap.c kernel/core/abi.c kernel/core/doc.c tests/host/test_auth37.c -o /tmp/test_auth37
 	/tmp/test_auth37
 
 # 32.5: gercek thermal.c host testi (donanim stub, mantik gercek)
@@ -1217,7 +1219,7 @@ test-de64:
 		$(K64_DIR)/settings64.c $(K64_DIR)/theme64.c \
 		$(K64_DIR)/fileman64.c $(K64_DIR)/launcher64.c \
 		$(K64_DIR)/notifyd64.c $(K64_DIR)/taskbar64.c \
-		$(K64_DIR)/ctxmenu64.c $(K64_DIR)/gamed64.c $(K64_DIR)/controller64.c $(K64_DIR)/fps64.c $(K64_DIR)/perfhud64.c $(K64_DIR)/replay64.c $(K64_DIR)/achievement64.c $(K64_DIR)/mod64.c $(K64_DIR)/cloudsave64.c $(K64_DIR)/anticheat64.c $(K64_DIR)/userns64.c $(K64_DIR)/seccomp64.c $(K64_DIR)/mountns64.c $(K64_DIR)/pidns64.c $(K64_DIR)/netns64.c $(K64_DIR)/cgroup64.c $(K64_DIR)/apparmor64.c $(K64_DIR)/flatpak64.c $(K64_DIR)/runtime64.c $(K64_DIR)/liveiso64.c $(K64_DIR)/installer64.c $(K64_DIR)/partition64.c $(K64_DIR)/luks64.c $(K64_DIR)/bootloader64.c $(K64_DIR)/netinstall64.c $(K64_DIR)/pxe64.c $(K64_DIR)/autoinstall64.c $(K64_DIR)/recovery64.c $(K64_DIR)/release64.c $(K64_DIR)/changelog64.c $(K64_DIR)/manpages64.c $(K64_DIR)/apidocs64.c $(K64_DIR)/website64.c $(K64_DIR)/cicd64.c $(K64_DIR)/paketdepo64.c $(K64_DIR)/security64.c $(K64_DIR)/lts64.c $(K64_DIR)/releasev1_64.c $(K64_DIR)/secureboot64.c $(K64_DIR)/tpm64.c $(K64_DIR)/advmem64.c $(K64_DIR)/proc64.c $(K64_DIR)/sched64.c $(K64_DIR)/ipc64.c $(K64_DIR)/sync64.c $(K64_DIR)/drvhal64.c $(K64_DIR)/pcihal64.c $(K64_DIR)/blk64.c $(K64_DIR)/part64.c $(K64_DIR)/vfs64.c $(K64_DIR)/jrnl64.c $(K64_DIR)/fscrypt64.c $(K64_DIR)/virt64.c $(K64_DIR)/net64.c $(K64_DIR)/tcp64.c $(K64_DIR)/netsec64.c $(K64_DIR)/netadv64.c $(K64_DIR)/secfw64.c tests/host/test_de64.c -o /tmp/test_de64
+		$(K64_DIR)/ctxmenu64.c $(K64_DIR)/gamed64.c $(K64_DIR)/controller64.c $(K64_DIR)/fps64.c $(K64_DIR)/perfhud64.c $(K64_DIR)/replay64.c $(K64_DIR)/achievement64.c $(K64_DIR)/mod64.c $(K64_DIR)/cloudsave64.c $(K64_DIR)/anticheat64.c $(K64_DIR)/userns64.c $(K64_DIR)/seccomp64.c $(K64_DIR)/mountns64.c $(K64_DIR)/pidns64.c $(K64_DIR)/netns64.c $(K64_DIR)/cgroup64.c $(K64_DIR)/apparmor64.c $(K64_DIR)/flatpak64.c $(K64_DIR)/runtime64.c $(K64_DIR)/liveiso64.c $(K64_DIR)/installer64.c $(K64_DIR)/partition64.c $(K64_DIR)/luks64.c $(K64_DIR)/bootloader64.c $(K64_DIR)/netinstall64.c $(K64_DIR)/pxe64.c $(K64_DIR)/autoinstall64.c $(K64_DIR)/recovery64.c $(K64_DIR)/release64.c $(K64_DIR)/changelog64.c $(K64_DIR)/manpages64.c $(K64_DIR)/apidocs64.c $(K64_DIR)/website64.c $(K64_DIR)/cicd64.c $(K64_DIR)/paketdepo64.c $(K64_DIR)/security64.c $(K64_DIR)/lts64.c $(K64_DIR)/releasev1_64.c $(K64_DIR)/secureboot64.c $(K64_DIR)/tpm64.c $(K64_DIR)/advmem64.c $(K64_DIR)/proc64.c $(K64_DIR)/sched64.c $(K64_DIR)/ipc64.c $(K64_DIR)/sync64.c $(K64_DIR)/drvhal64.c $(K64_DIR)/pcihal64.c $(K64_DIR)/blk64.c $(K64_DIR)/part64.c $(K64_DIR)/vfs64.c $(K64_DIR)/jrnl64.c $(K64_DIR)/fscrypt64.c $(K64_DIR)/virt64.c $(K64_DIR)/net64.c $(K64_DIR)/tcp64.c $(K64_DIR)/netsec64.c $(K64_DIR)/netadv64.c $(K64_DIR)/secfw64.c $(K64_DIR)/recovery64.c $(K64_DIR)/watchdog64.c tests/host/test_de64.c -o /tmp/test_de64
 	/tmp/test_de64
 
 # Phony targets

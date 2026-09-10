@@ -4,6 +4,7 @@
  */
 #include "core/auth.h"
 #include "core/verify.h"
+#include "process/cap.h"
 
 /* 37.3: derleme-zamanı kanıtı (boş değil) */
 STATIC_ASSERT(sizeof(uint32_t) == 4);
@@ -29,5 +30,6 @@ int auth_check(const char* name, uint32_t token) {
     if (REQUIRE(name != 0, 0xE903) != 0) return AUTH_FAIL; /* 37.4 */
     uint32_t exp = auth_token_gen(name, 0xDEADBEEF);
     int match = (token == exp ? 1 : 0);
+    cap_audit(CAP_SETUID, match); /* 37.7: audit günlüğü */
     return match ? AUTH_OK : AUTH_FAIL;
 }
