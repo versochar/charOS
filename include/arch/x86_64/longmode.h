@@ -1746,4 +1746,11 @@ int sched64_current(u64 *out_pid);
 int sched64_yield(void);
 int sched64_tick(void);
 
+/* --- 7A: IPC & Messaging (davranis modeli) --- */
+int ipc64_init(void);
+int ipc64_create(u64 *out_chan);
+int ipc64_destroy(u64 chan);
+int ipc64_send(u64 chan, u64 msg);
+int ipc64_recv(u64 chan, u64 *out_msg);
+
 #endif

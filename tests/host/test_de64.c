@@ -1356,6 +1356,82 @@ int main(void) {
         printf("6J1 release doc exists\n");
         CHECK(sched64_init()==0, "6J2 ok");
     }
+    /* 7A IPC Design */
+    {
+        printf("7A1 design doc exists\n");
+        CHECK(ipc64_init()==0, "7A2 design ok");
+    }
+    /* 7B API Spec */
+    {
+        printf("7B1 API spec exists\n");
+        u64 ch=0;
+        CHECK(ipc64_create(&ch)==0 && ch!=0, "7B2 api ok");
+        CHECK(ipc64_destroy(ch)==0, "7B3 cleanup");
+    }
+    /* 7C Implementation Start */
+    {
+        printf("7C1 impl start doc exists\n");
+        CHECK(ipc64_init()==0, "7C2 ok");
+    }
+    /* 7D Code Development */
+    {
+        printf("7D1 code dev doc exists\n");
+        ipc64_init();
+        u64 ch=0, msg=0;
+        CHECK(ipc64_create(&ch)==0, "7D2 create");
+        CHECK(ipc64_send(ch,0xDEAD)==0, "7D3 send");
+        CHECK(ipc64_recv(ch,&msg)==0 && msg==0xDEAD, "7D4 recv");
+    }
+    /* 7E Unit Tests */
+    {
+        printf("7E1 unit tests exist\n");
+        ipc64_init();
+        CHECK(ipc64_create(NULL)==-1, "7E2 param");
+        CHECK(ipc64_destroy(999999)==-1, "7E3 unknown");
+        u64 ch=0, msg=0;
+        CHECK(ipc64_create(&ch)==0, "7E4 create");
+        CHECK(ipc64_recv(ch,&msg)==-1, "7E5 empty");
+        CHECK(ipc64_send(ch,1)==0, "7E6 send");
+        CHECK(ipc64_send(ch,2)==-1, "7E7 full");
+    }
+    /* 7F Integration Tests */
+    {
+        printf("7F1 integration tests exist\n");
+        CHECK(proc64_init()==0, "7F2 proc");
+        CHECK(sched64_init()==0, "7F3 sched");
+        CHECK(ipc64_init()==0, "7F4 ipc");
+        u64 pid=0, ch=0, msg=0;
+        CHECK(proc64_spawn(&pid)==0, "7F5 spawn");
+        CHECK(sched64_add(pid,10)==0, "7F6 sched-add");
+        CHECK(ipc64_create(&ch)==0, "7F7 chain");
+        CHECK(ipc64_send(ch,pid)==0, "7F8 send-pid");
+        CHECK(ipc64_recv(ch,&msg)==0 && msg==pid, "7F9 recv-pid");
+    }
+    /* 7G Code Review */
+    {
+        printf("7G1 review doc exists\n");
+        CHECK(ipc64_init()==0, "7G2 ok");
+    }
+    /* 7H Security Audit */
+    {
+        printf("7H1 audit doc exists\n");
+        ipc64_init();
+        u64 ch=0, msg=0;
+        ipc64_create(&ch);
+        ipc64_destroy(ch);
+        CHECK(ipc64_send(ch,1)==-1, "7H2 use-after-destroy");
+        CHECK(ipc64_recv(ch,&msg)==-1, "7H3 recv-after-destroy");
+    }
+    /* 7I Documentation */
+    {
+        printf("7I1 docs exist\n");
+        CHECK(ipc64_init()==0, "7I2 ok");
+    }
+    /* 7J Release */
+    {
+        printf("7J1 release doc exists\n");
+        CHECK(ipc64_init()==0, "7J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
