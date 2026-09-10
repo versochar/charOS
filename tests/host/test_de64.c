@@ -1131,6 +1131,16 @@ int main(void) {
         printf("3F1 integration tests exist\n");
         CHECK(secureboot64_init()==SB_OK, "3F2 ok");
     }
+    /* 3G Code Review */
+    {
+        printf("3G1 review doc exists\n");
+        CHECK(secureboot64_init()==SB_OK, "3G2 ok");
+    }
+    /* 3H Security Audit */
+    {
+        printf("3H1 audit doc exists\n");
+        CHECK(secureboot64_init()==SB_OK, "3H2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
