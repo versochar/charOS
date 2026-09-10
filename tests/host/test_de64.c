@@ -973,6 +973,24 @@ int main(void) {
         CHECK(secureboot64_get_pcr(pcr, 32) == 0, "1D2 PCR access");
         CHECK(secureboot64_init() == 0, "1D3 init ok");
     }
+    /* 1E Unit Tests */
+    {
+        printf("1E1 init test\n");
+        CHECK(secureboot64_init() == SB_OK, "1E2 init ok");
+        u8 data[4] = {1,2,3,4};
+        u8 sig_bad[512] = {0};
+        u8 sig_good[512] = {0};
+        sig_good[0] = 1^2^3^4;
+        CHECK(secureboot64_verify_signature(NULL,4,sig_good,512) == SB_ERR_PARAM, "1E3 param error");
+        CHECK(secureboot64_verify_signature(data,4,sig_bad,512) == SB_ERR_INVALID_SIG, "1E4 bad sig");
+        CHECK(secureboot64_verify_signature(data,4,sig_good,512) == SB_OK, "1E5 good sig");
+        CHECK(secureboot64_measure_kernel(data,4) == SB_OK, "1E6 measure");
+        secureboot64_log_event("test");
+        secureboot_event_t ev;
+        CHECK(secureboot64_get_last_event(&ev) == SB_OK, "1E7 event");
+        u8 pcr2[32];
+        CHECK(secureboot64_get_pcr(pcr2,32) == SB_OK, "1E8 pcr");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
