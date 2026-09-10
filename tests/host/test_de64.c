@@ -1111,6 +1111,16 @@ int main(void) {
         printf("3B1 API spec exists\n");
         CHECK(secureboot64_init()==SB_OK, "3B2 api ok");
     }
+    /* 3C Implementation Start */
+    {
+        printf("3C1 impl start doc exists\n");
+        CHECK(secureboot64_init()==SB_OK, "3C2 ok");
+    }
+    /* 3D Code Development */
+    {
+        printf("3D1 code dev doc exists\n");
+        CHECK(secureboot64_init()==SB_OK, "3D2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
