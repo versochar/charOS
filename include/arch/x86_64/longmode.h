@@ -1792,4 +1792,13 @@ int part64_add(u64 dev, u64 start, u64 len, int type, u64 *out_part);
 int part64_del(u64 part);
 int part64_info(u64 part, u64 *out_dev, u64 *out_start, u64 *out_len);
 
+/* --- 13A: VFS Core (davranis modeli) --- */
+int vfs64_init(void);
+int vfs64_create(u64 *out_ino);
+int vfs64_unlink(u64 ino);
+int vfs64_open(u64 ino, u64 *out_fd);
+int vfs64_close(u64 fd);
+int vfs64_write(u64 fd, u64 val);
+int vfs64_read(u64 fd, u64 *out_val);
+
 #endif

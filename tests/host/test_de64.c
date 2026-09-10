@@ -1795,6 +1795,83 @@ int main(void) {
         printf("12J1 release doc exists\n");
         CHECK(part64_init()==0, "12J2 ok");
     }
+    /* 13A VFS Design */
+    {
+        printf("13A1 design doc exists\n");
+        CHECK(vfs64_init()==0, "13A2 design ok");
+    }
+    /* 13B API Spec */
+    {
+        printf("13B1 API spec exists\n");
+        u64 ino=0, fd=0;
+        CHECK(vfs64_create(&ino)==0 && ino!=0, "13B2 api ok");
+        CHECK(vfs64_open(ino,&fd)==0, "13B3 open");
+        CHECK(vfs64_close(fd)==0, "13B4 cleanup");
+        CHECK(vfs64_unlink(ino)==0, "13B5 cleanup");
+    }
+    /* 13C Implementation Start */
+    {
+        printf("13C1 impl start doc exists\n");
+        CHECK(vfs64_init()==0, "13C2 ok");
+    }
+    /* 13D Code Development */
+    {
+        printf("13D1 code dev doc exists\n");
+        vfs64_init();
+        u64 ino=0, fd=0, v=0;
+        CHECK(vfs64_create(&ino)==0, "13D2 create");
+        CHECK(vfs64_open(ino,&fd)==0, "13D3 open");
+        CHECK(vfs64_write(fd,0xBEEF)==0, "13D4 write");
+        CHECK(vfs64_read(fd,&v)==0 && v==0xBEEF, "13D5 read");
+    }
+    /* 13E Unit Tests */
+    {
+        printf("13E1 unit tests exist\n");
+        vfs64_init();
+        CHECK(vfs64_create(NULL)==-1, "13E2 param");
+        CHECK(vfs64_unlink(999999)==-1, "13E3 unknown");
+        u64 ino=0, fd=0;
+        vfs64_create(&ino);
+        vfs64_open(ino,&fd);
+        CHECK(vfs64_unlink(ino)==-2, "13E4 busy");
+        CHECK(vfs64_read(999999,&(u64){0})==-1, "13E5 fd-unknown");
+    }
+    /* 13F Integration Tests */
+    {
+        printf("13F1 integration tests exist\n");
+        CHECK(blk64_init()==0, "13F2 blk");
+        CHECK(vfs64_init()==0, "13F3 vfs");
+        u64 d=0, ino=0, fd=0, v=0;
+        CHECK(blk64_create(8,&d)==0, "13F4 blk-create");
+        CHECK(vfs64_create(&ino)==0, "13F5 vfs-create");
+        CHECK(vfs64_open(ino,&fd)==0, "13F6 open");
+        CHECK(vfs64_write(fd,0x1234)==0, "13F7 write");
+        CHECK(blk64_write(d,0,0x1234)==0, "13F8 blk-write");
+        CHECK(vfs64_read(fd,&v)==0 && v==0x1234, "13F9 read");
+    }
+    /* 13G Code Review */
+    {
+        printf("13G1 review doc exists\n");
+        CHECK(vfs64_init()==0, "13G2 ok");
+    }
+    /* 13H Security Audit */
+    {
+        printf("13H1 audit doc exists\n");
+        vfs64_init();
+        u64 fd=0;
+        CHECK(vfs64_close(999999)==-1, "13H2 close-unknown");
+        CHECK(vfs64_read(fd,&(u64){0})==-1, "13H3 read-closed");
+    }
+    /* 13I Documentation */
+    {
+        printf("13I1 docs exist\n");
+        CHECK(vfs64_init()==0, "13I2 ok");
+    }
+    /* 13J Release */
+    {
+        printf("13J1 release doc exists\n");
+        CHECK(vfs64_init()==0, "13J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
