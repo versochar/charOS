@@ -19,6 +19,7 @@
 #include <core/trace.h>
 #include <core/prof.h>
 #include <core/version.h>
+#include <core/doc.h>
 #include <test/selftest.h>
 #include <core/apic.h>
 #include <fs/chfs.h>
@@ -729,6 +730,26 @@ void kernel_main(uint32_t magic, uint32_t mboot_ptr)
         }
     }
     vga_puts("[28] done\n"); serial_puts("[28] done\n");
+
+    /* 29.4: belge tablosu öztesti + örnek kayıt (kayıt defterine eklenir) */
+    vga_puts("[29] sysdoc...\n"); serial_puts("[29] sysdoc...\n");
+    {
+        int ok = 1;
+        if (selftest_register("doc", doc_selftest) != 0) ok = 0;
+        if (doc_selftest() != 0) ok = 0;
+        serial_puts("[29] belgeli syscall "); serial_puthex(doc_count());
+        serial_puts(" ornek: 1="); serial_puts(doc_name(1) ? doc_name(1) : "?");
+        serial_puts("\n");
+        vga_puts("[29] belgeli syscall "); vga_putdec(doc_count()); vga_puts("\n");
+        if (ok) {
+            serial_puts("[29] sysdoc [PASS]\n");
+            vga_puts("[29] sysdoc [PASS]\n");
+        } else {
+            serial_puts("[29] sysdoc [FAIL]\n");
+            vga_puts("[29] sysdoc [FAIL]\n");
+        }
+    }
+    vga_puts("[29] done\n"); serial_puts("[29] done\n");
 
     /* 14G: ACPI + HPET + RTC alarm (güç geçişi YOK, yalnızca hazırlık) */
     vga_puts("[14G] acpi/hpet/rtc-alarm...\n"); serial_puts("[14G] acpi/hpet/rtc-alarm...\n");

@@ -66,6 +66,8 @@
 #define SYS_SB_ALLOW 163  /* 23.5: sandbox'ta nr serbest bırak (nr) -> 0 / -1 */
 #define SYS_SB_DENY 164   /* 23.5: sandbox'ta nr engelle (nr) -> 0 / -1 */
 #define SYS_SB_ON 165     /* 23.5: sandbox zorlamayı aç (geri dönüşsüz) -> 0 */
+#define SYS_DOCNAME 166   /* 29.4: syscall adı (nr, buf, max) -> len / -1 */
+#define SYS_DOCDESC 167   /* 29.4: syscall açıklaması (nr, buf, max) -> len / -1 */
 /* 22.2: capability bitleri process/cap.h'e taşındı (tek doğruluk kaynağı) */
 #include <process/cap.h>
 #define WNOHANG 1         /* 19G: waitpid bloklanmadan yokla */

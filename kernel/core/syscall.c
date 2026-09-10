@@ -14,6 +14,7 @@
 #include <process/fork.h>
 #include <process/cap.h>
 #include <process/sandbox.h>
+#include <core/doc.h>
 #include <drivers/input.h>
 #include <drivers/vt.h>
 #include <string.h>
@@ -551,6 +552,33 @@ static uint32_t sys_sb_on_wrap(uint32_t a, uint32_t b, uint32_t c) {
     return 0;
 }
 
+/* 29.4: makine-okunur belgeler (sınırlı yığın tamponu + copy_to_user) */
+static uint32_t sys_docname_wrap(uint32_t nr, uint32_t ubuf, uint32_t max) {
+    const char* s = doc_name(nr);
+    char kbuf[32];
+    int n;
+    if (!s) return (uint32_t)-1;
+    if (!ubuf || max == 0 || max > sizeof(kbuf)) return (uint32_t)-1;
+    if (!is_user_buf_valid(ubuf, max)) return (uint32_t)-1;
+    n = doc_copy(s, kbuf, max);
+    if (n < 0) return (uint32_t)-1;
+    if (copy_to_user(ubuf, kbuf, (uint32_t)n + 1) != 0) return (uint32_t)-1;
+    return (uint32_t)n;
+}
+
+static uint32_t sys_docdesc_wrap(uint32_t nr, uint32_t ubuf, uint32_t max) {
+    const char* s = doc_desc(nr);
+    char kbuf[64];
+    int n;
+    if (!s) return (uint32_t)-1;
+    if (!ubuf || max == 0 || max > sizeof(kbuf)) return (uint32_t)-1;
+    if (!is_user_buf_valid(ubuf, max)) return (uint32_t)-1;
+    n = doc_copy(s, kbuf, max);
+    if (n < 0) return (uint32_t)-1;
+    if (copy_to_user(ubuf, kbuf, (uint32_t)n + 1) != 0) return (uint32_t)-1;
+    return (uint32_t)n;
+}
+
 static uint32_t sys_chmod_wrap(uint32_t path, uint32_t mode, uint32_t c) {
     (void)c;
     const char* p = (const char*)path;
@@ -950,6 +978,8 @@ void syscall_init(void) {
     syscall_table[SYS_SB_ALLOW] = sys_sb_allow_wrap; /* 23.5 */
     syscall_table[SYS_SB_DENY] = sys_sb_deny_wrap;
     syscall_table[SYS_SB_ON] = sys_sb_on_wrap;
+    syscall_table[SYS_DOCNAME] = sys_docname_wrap; /* 29.4 */
+    syscall_table[SYS_DOCDESC] = sys_docdesc_wrap;
     syscall_table[SYS_SYSLOG] = sys_syslog_wrap;
     syscall_table[SYS_UPTIME] = sys_uptime_wrap;
     syscall_table[SYS_TLS_SET] = sys_tls_set;
