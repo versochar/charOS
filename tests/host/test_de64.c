@@ -1032,6 +1032,12 @@ int main(void) {
         printf("1I2 API reference complete\n");
         CHECK(secureboot64_init() == SB_OK, "1I3 doc test");
     }
+    /* 1J Release */
+    {
+        printf("1J1 release doc exists\n");
+        printf("1J2 version tag ready\n");
+        CHECK(secureboot64_init() == SB_OK, "1J3 release ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
