@@ -1947,4 +1947,14 @@ int parttool64_gpt_crc(u64 dev_id);
 int parttool64_gpt_repair(u64 dev_id);
 int parttool64_gpt_count(u64 dev_id);
 
+/* --- 47A: LUKS Integration (luksop) --- */
+int luksop64_init(void);
+int luksop64_format(u64 device, const char *cipher, int key_bits);
+int luksop64_add_key_slot(int slot, u64 kdf_iter, u64 key_material);
+int luksop64_verify_key(int slot, u64 key_material);
+int luksop64_unlock(int slot, u64 key_material);
+int luksop64_lock(void);
+int luksop64_state(int *out);
+int luksop64_header_crc(u64 device);
+
 #endif

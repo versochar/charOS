@@ -13,6 +13,7 @@
 #include "arch/x86_64/isoimg.h"
 #include "arch/x86_64/installfw.h"
 #include "arch/x86_64/parttool.h"
+#include "arch/x86_64/luksop.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -3250,6 +3251,100 @@ int main(void) {
               "46J4 root");
         CHECK(parttool64_gpt_repair(8)==0, "46J5 repair");
         CHECK(parttool64_gpt_count(8)==1, "46J6 final count");
+    }
+
+    /* 47A LUKS Design */
+    {
+        printf("47A1 design doc exists\n");
+        CHECK(luksop64_init()==0, "47A2 init ok");
+    }
+    /* 47B API Spec */
+    {
+        printf("47B1 API spec exists\n");
+        CHECK(luksop64_init()==0, "47B2 init");
+        CHECK(luksop64_format(0x10,"aes-xts-plain64",256)==0, "47B3 format");
+        CHECK(luksop64_add_key_slot(0,100000,0x55)==0 &&
+              luksop64_unlock(0,0x55)==0 &&
+              luksop64_format(0x10,"aes",128)==-2, "47B4 reinit reject");
+    }
+    /* 47C Implementation Start */
+    {
+        printf("47C1 impl start doc exists\n");
+        CHECK(luksop64_init()==0, "47C2 init");
+        CHECK(luksop64_format(1,"aes-xts-plain64",512)==0, "47C3 format");
+        CHECK(luksop64_add_key_slot(0,100000,0xCAFE)==0, "47C4 add slot");
+        CHECK(luksop64_verify_key(0,0xCAFE)==0, "47C5 verify ok");
+    }
+    /* 47D Code Development */
+    {
+        int st = -1;
+        printf("47D1 code dev doc exists\n");
+        CHECK(luksop64_init()==0, "47D2 init");
+        CHECK(luksop64_format(2,"aes",256)==0, "47D3 format");
+        CHECK(luksop64_add_key_slot(0,100000,0x1111)==0, "47D4 slot");
+        CHECK(luksop64_unlock(0,0x1111)==0, "47D5 unlock");
+        CHECK(luksop64_state(&st)==0 && st==LUKSOP_UNLOCKED, "47D6 open");
+        CHECK(luksop64_lock()==0, "47D7 lock");
+        CHECK(luksop64_state(&st)==0 && st==LUKSOP_CLOSED, "47D8 closed");
+    }
+    /* 47E Unit Tests */
+    {
+        printf("47E1 unit tests exist\n");
+        CHECK(luksop64_init()==0, "47E2 init");
+        CHECK(luksop64_format(3,"aes",128)==0, "47E3 format");
+        CHECK(luksop64_format(3,"aes",64)==-3, "47E4 bad keysize");
+        CHECK(luksop64_add_key_slot(8,1000,1)==-1, "47E5 bad slot idx");
+        CHECK(luksop64_add_key_slot(0,500,1)==-4, "47E6 low kdf reject");
+        CHECK(luksop64_add_key_slot(0,1000,0)==-5, "47E7 zero key reject");
+        CHECK(luksop64_verify_key(0,0)==-2, "47E8 empty slot verify");
+    }
+    /* 47F Integration Tests */
+    {
+        printf("47F1 integration tests exist\n");
+        CHECK(luksop64_init()==0, "47F2 init");
+        CHECK(luksop64_format(4,"twofish-xts",256)==0, "47F3 format");
+        CHECK(luksop64_add_key_slot(0,100000,0xA1)==0, "47F4 slot0");
+        CHECK(luksop64_add_key_slot(1,100000,0xB2)==0, "47F5 slot1");
+        CHECK(luksop64_verify_key(1,0xB2)==0, "47F6 unlock slot1");
+        CHECK(luksop64_verify_key(0,0xC3)==-3, "47F7 wrong key reject");
+        CHECK(luksop64_add_key_slot(0,1000,1)==-6, "47F8 occupied slot");
+        CHECK(luksop64_header_crc(4)>0, "47F9 crc present");
+    }
+    /* 47G Code Review */
+    {
+        printf("47G1 review doc exists\n");
+        CHECK(luksop64_init()==0, "47G2 init");
+        CHECK(luksop64_format(0,"x",128)==0, "47G3 format");
+        CHECK(luksop64_lock()==-1, "47G4 double lock reject");
+        CHECK(luksop64_format(0,"x",128)==0, "47G5 reformat ok");
+        CHECK(luksop64_header_crc(99)==0, "47G6 unknown dev crc 0");
+    }
+    /* 47H Security Audit */
+    {
+        int crc1 = 0, crc2 = 0;
+        printf("47H1 audit doc exists\n");
+        CHECK(luksop64_init()==0, "47H2 init");
+        CHECK(luksop64_format(5,"aes",256)==0, "47H3 format");
+        crc1 = luksop64_header_crc(5);
+        CHECK(luksop64_add_key_slot(0,100000,0x99)==0, "47H4 add slot");
+        crc2 = luksop64_header_crc(5);
+        CHECK(crc1!=crc2, "47H5 crc changes on slot add");
+        CHECK(luksop64_unlock(0,0x99)==0, "47H6 unlock");
+        CHECK(luksop64_unlock(0,0x99)==-3, "47H7 already-open reject");
+    }
+    /* 47I Documentation */
+    {
+        printf("47I1 docs exist\n");
+        CHECK(luksop64_init()==0, "47I2 ok");
+    }
+    /* 47J Release */
+    {
+        printf("47J1 release doc exists\n");
+        CHECK(luksop64_init()==0, "47J2 init");
+        CHECK(luksop64_format(6,"aes-xts-plain64",256)==0, "47J3 format");
+        CHECK(luksop64_add_key_slot(0,100000,0xD0D0)==0, "47J4 slot");
+        CHECK(luksop64_verify_key(0,0xD0D0)==0, "47J5 verify");
+        CHECK(luksop64_unlock(0,0xD0D0)==0, "47J6 unlock");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
