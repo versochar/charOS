@@ -1,6 +1,7 @@
 #include <drivers/timer.h>
 #include <process/task.h>
 #include <core/power.h>
+#include <drivers/thermal.h>
 #include <drivers/vga.h>
 #include <drivers/serial.h>
 #include <core/pic.h>
@@ -35,6 +36,7 @@ void timer_handler(struct registers* regs)
         serial_puts(" l=");
         serial_puthex(lapic_tick_get());
         serial_puts("\n");
+        thermal_dynamic_idle(); /* 32.4: 1Hz termal örnekleme + regülatör */
     }
     /* 21A: ağ arayüzünden gelen paketleri al */
     extern void e1000_timer_poll(void);

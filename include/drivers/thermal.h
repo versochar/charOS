@@ -21,4 +21,11 @@ void thermal_dynamic_idle(void);
 /* Self-test: P-state değişimi + idle kontrolü */
 int thermal_selftest(void);
 
+/* 32.2: regülatör (histerezisli) + enjekte sensör + kritik sayacı */
+void thermal_init(void);
+void thermal_set_sensor(uint32_t (*fn)(void)); /* NULL: model tahminci */
+int thermal_tick(uint32_t temp);   /* politika adımı, o anki pstate döner */
+uint32_t thermal_last_temp(void);
+uint32_t thermal_trips(void);      /* kritik eşik aşım sayacı */
+
 #endif

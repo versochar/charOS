@@ -22,6 +22,7 @@
 #include <core/doc.h>
 #include <core/abi.h>
 #include <core/power.h>
+#include <drivers/thermal.h>
 #include <test/selftest.h>
 #include <core/apic.h>
 #include <fs/chfs.h>
@@ -797,6 +798,27 @@ void kernel_main(uint32_t magic, uint32_t mboot_ptr)
         }
     }
     vga_puts("[31] done\n"); serial_puts("[31] done\n");
+
+    /* 32.4: termal regülatör başlar + öztest deftere kaydolur */
+    vga_puts("[32] thermal...\n"); serial_puts("[32] thermal...\n");
+    {
+        int fails = 0;
+        thermal_init();
+        if (selftest_register("thermal", thermal_selftest) != 0) fails++;
+        if (thermal_selftest() != 0) fails++;
+        thermal_init(); /* öztest durumunu sıfırlar, sayaç temiz başlar */
+        serial_puts("[32] pstate "); serial_puthex((uint32_t)thermal_get_pstate());
+        serial_puts(" temp "); serial_puthex(thermal_last_temp());
+        serial_puts("\n");
+        if (fails == 0) {
+            serial_puts("[32] thermal [PASS]\n");
+            vga_puts("[32] thermal [PASS]\n");
+        } else {
+            serial_puts("[32] thermal [FAIL]\n");
+            vga_puts("[32] thermal [FAIL]\n");
+        }
+    }
+    vga_puts("[32] done\n"); serial_puts("[32] done\n");
 
     /* 14G: ACPI + HPET + RTC alarm (güç geçişi YOK, yalnızca hazırlık) */
     vga_puts("[14G] acpi/hpet/rtc-alarm...\n"); serial_puts("[14G] acpi/hpet/rtc-alarm...\n");
