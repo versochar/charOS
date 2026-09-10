@@ -15,6 +15,7 @@
 #include <memory/kheap.h>
 #include <drivers/rtc.h>
 #include <core/syscall.h>
+#include <core/verify.h>
 #include <core/apic.h>
 #include <fs/chfs.h>
 #include <process/signal.h>
@@ -91,6 +92,12 @@ static void task_b(void) {
         timer_wait(70);
     }
     serial_puts("[task_b] done\n");
+}
+/* 24.4: sözleşme ihlalleri syslog + serial'e düşer */
+static void verify_khook(uint32_t code, const char* file, uint32_t line) {
+    (void)file; (void)line;
+    syslog_puts("[VERIFY] contract ihlali");
+    serial_puts("[VERIFY] ihlal kod "); serial_puthex(code); serial_puts("\n");
 }
 void kernel_main(uint32_t magic, uint32_t mboot_ptr)
 {
@@ -626,6 +633,22 @@ void kernel_main(uint32_t magic, uint32_t mboot_ptr)
         }
     }
     vga_puts("[14F] done\n"); serial_puts("[14F] done\n");
+
+    /* 24.4: sözleşme katmanı — kanca syslog'a, öztest açılışta */
+    vga_puts("[24] verify...\n"); serial_puts("[24] verify...\n");
+    {
+        int ok = 1;
+        verify_set_hook(verify_khook);
+        if (verify_selftest() != 0) ok = 0;
+        if (ok) {
+            serial_puts("[24] verify [PASS]\n");
+            vga_puts("[24] verify [PASS]\n");
+        } else {
+            serial_puts("[24] verify [FAIL]\n");
+            vga_puts("[24] verify [FAIL]\n");
+        }
+    }
+    vga_puts("[24] done\n"); serial_puts("[24] done\n");
 
     /* 14G: ACPI + HPET + RTC alarm (güç geçişi YOK, yalnızca hazırlık) */
     vga_puts("[14G] acpi/hpet/rtc-alarm...\n"); serial_puts("[14G] acpi/hpet/rtc-alarm...\n");

@@ -3,6 +3,11 @@
  * Aynı dosya çekirdekte (freestanding) ve host testinde derlenir.
  */
 #include "process/cap.h"
+#include "core/verify.h"
+
+/* 24.4: derleme-zamanı kanıtları (iki derlemede de denetlenir) */
+STATIC_ASSERT((CAP_ALL & 0x1FFFu) == 0x1FFFu);
+STATIC_ASSERT(sizeof(struct cap_audit_entry) == 8);
 
 #define CAP_AUDIT_LEN 16
 
@@ -22,19 +27,21 @@ int cap_has(uint32_t set, uint32_t cap) {
 }
 
 int cap_grant(uint32_t* set, uint32_t cap) {
-    if (!set || !cap_valid(cap)) return -1;
+    if (REQUIRE(set != 0, 0xC101) != 0) return -1; /* 24.4: sözleşme */
+    if (REQUIRE(cap_valid(cap), 0xC102) != 0) return -1;
     *set |= cap;
     return 0;
 }
 
 int cap_revoke(uint32_t* set, uint32_t cap) {
-    if (!set || !cap_valid(cap)) return -1;
+    if (REQUIRE(set != 0, 0xC103) != 0) return -1; /* 24.4: sözleşme */
+    if (REQUIRE(cap_valid(cap), 0xC104) != 0) return -1;
     *set &= ~cap;
     return 0;
 }
 
 int cap_drop_all(uint32_t* set) {
-    if (!set) return -1;
+    if (REQUIRE(set != 0, 0xC105) != 0) return -1; /* 24.4: sözleşme */
     *set = 0;
     return 0;
 }

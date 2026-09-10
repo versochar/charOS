@@ -2,6 +2,10 @@
  * task yapısına bağımlı DEĞİL: aynı dosya çekirdekte ve host testinde derlenir.
  */
 #include "process/sandbox.h"
+#include "core/verify.h"
+
+/* 24.4: derleme-zamanı kanıtı */
+STATIC_ASSERT(SB_MASK_WORDS * 32u == 256u);
 
 void sb_allow_all(uint32_t* mask) {
     if (!mask) return;
@@ -14,13 +18,15 @@ void sb_lockdown(uint32_t* mask) {
 }
 
 int sb_allow(uint32_t* mask, uint32_t nr) {
-    if (!mask || nr >= SB_MAX_NR) return -1;
+    if (REQUIRE(mask != 0, 0xB101) != 0) return -1; /* 24.4: sözleşme */
+    if (REQUIRE(nr < SB_MAX_NR, 0xB102) != 0) return -1;
     mask[nr / 32] |= (1u << (nr % 32));
     return 0;
 }
 
 int sb_deny(uint32_t* mask, uint32_t nr) {
-    if (!mask || nr >= SB_MAX_NR) return -1;
+    if (REQUIRE(mask != 0, 0xB103) != 0) return -1; /* 24.4: sözleşme */
+    if (REQUIRE(nr < SB_MAX_NR, 0xB104) != 0) return -1;
     mask[nr / 32] &= ~(1u << (nr % 32));
     return 0;
 }
