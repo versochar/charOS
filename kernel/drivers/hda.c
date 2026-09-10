@@ -1,4 +1,5 @@
 #include <drivers/hda.h>
+#include <drivers/hdaverb.h>
 #include <drivers/pci.h>
 #include <drivers/vga.h>
 #include <drivers/serial.h>
@@ -50,10 +51,19 @@ int hda_init(void) {
 
 int hda_present(void) { return hda_found ? 1 : 0; }
 
-/* Codec VERB gönderme (polling, skeleton) */
+/* 36.4: codec taşıması (CORB/RIRB kurulunca atanır; yoksa hata) */
+static hda_xport_fn xport_fn = 0;
+
+void hda_set_xport(hda_xport_fn fn) {
+    xport_fn = fn;
+}
+
+/* Codec VERB gönderme: komut kodlanır, taşıma yoksa -1 (eski sahte 0 gitti) */
 int hda_send_verb(uint32_t nid, uint32_t verb, uint32_t param) {
-    (void)nid; (void)verb; (void)param;
-    return 0;
+    uint32_t cmd = hdaverb_build(nid, verb, param);
+    uint32_t resp = 0;
+    if (!xport_fn) return -1;
+    return xport_fn(cmd, &resp);
 }
 
 /* Self-test: HDA tespiti */

@@ -44,6 +44,10 @@ int hda_present(void);
 /* Temel codec komut gönder (polling, tek komut) */
 int hda_send_verb(uint32_t nid, uint32_t verb, uint32_t param);
 
+/* 36.4: taşıma kancası (NULL: codec yok). Dönüş: 0 ok / -1 hata. */
+typedef int (*hda_xport_fn)(uint32_t cmd, uint32_t* resp);
+void hda_set_xport(hda_xport_fn fn);
+
 /* Self-test: controller tespit + basit codec probe */
 int hda_selftest(void);
 
