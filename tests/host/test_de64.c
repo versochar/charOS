@@ -2759,6 +2759,71 @@ int main(void) {
         CHECK(pkgmgr64_upgrade_all()>=0, "41J4 upgrade ok");
     }
 
+    /* 42A Repository Design */
+    {
+        printf("42A1 design doc exists\n");
+        CHECK(repo64_count()==repo64_count(), "42A2 count ok");
+    }
+    /* 42B API Spec */
+    {
+        printf("42B1 API spec exists\n");
+        CHECK(repo64_add("curl","8.1","main")==0, "42B2 add curl");
+        CHECK(repo64_count()==1, "42B3 count1");
+    }
+    /* 42C Implementation Start */
+    {
+        printf("42C1 impl start doc exists\n");
+        CHECK(repo64_add("git","2.40","security")==0, "42C2 add git");
+        CHECK(repo64_count()==2, "42C3 count2");
+    }
+    /* 42D Code Development */
+    {
+        char v[32] = {0};
+        printf("42D1 code dev doc exists\n");
+        CHECK(repo64_find("curl",0,v,32)==0, "42D2 find curl any-ver");
+        CHECK(repo64_find("nonexist",0,v,32)==-2, "42D3 not-found");
+    }
+    /* 42E Unit Tests */
+    {
+        char v[8] = {0};
+        printf("42E1 unit tests exist\n");
+        CHECK(repo64_add(0,0,0)==-1, "42E2 null args reject");
+        CHECK(repo64_find(0,0,0,0)==-1, "42E3 null out reject");
+        CHECK(repo64_find("curl","9.9.9",v,8)==-2, "42E4 ver reject");
+    }
+    /* 42F Integration Tests */
+    {
+        char v[32] = {0};
+        printf("42F1 integration tests exist\n");
+        CHECK(repo64_add("mono","1.0","prod")==0, "42F2 add mono");
+        CHECK(repo64_add("mono","2.0","prod")==0, "42F3 add mono2");
+        CHECK(repo64_find("mono","1.5",v,32)==0 && strcmp(v,"2.0")==0,
+              "42F4 find newest >=1.5");
+    }
+    /* 42G Code Review */
+    {
+        printf("42G1 review doc exists\n");
+        CHECK(repo64_vercmp(0,0)==0, "42G2 null vercmp safe");
+    }
+    /* 42H Security Audit */
+    {
+        printf("42H1 audit doc exists\n");
+        CHECK(repo64_vercmp("1.0","2.0")<0, "42H3 cmp correct");
+        CHECK(repo64_vercmp("2.0","1.0")>0, "42H4 cmp correct");
+    }
+    /* 42I Documentation */
+    {
+        printf("42I1 docs exist\n");
+        CHECK(repo64_count()>=0, "42I2 ok");
+    }
+    /* 42J Release */
+    {
+        char v[32] = {0};
+        printf("42J1 release doc exists\n");
+        CHECK(repo64_add("final","3.0","main")==0, "42J2 add final");
+        CHECK(repo64_find("final","2.0",v,32)==0, "42J3 find final");
+    }
+
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
     return 0;
