@@ -1853,4 +1853,10 @@ int netadv64_add(u64 prefix, u64 mask, u64 gw, u64 *out_route);
 int netadv64_del(u64 route);
 int netadv64_lookup(u64 addr, u64 *out_gw);
 
+/* --- 21A: Security Framework (davranis modeli) --- */
+int secfw64_init(void);
+int secfw64_add(int hook, u64 subj, u64 obj, int action, u64 *out_rule);
+int secfw64_del(u64 rule);
+int secfw64_check(int hook, u64 subj, u64 obj);
+
 #endif

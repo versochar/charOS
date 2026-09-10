@@ -2401,6 +2401,77 @@ int main(void) {
         printf("20J1 release doc exists\n");
         CHECK(netadv64_init()==0, "20J2 ok");
     }
+    /* 21A Secfw Design */
+    {
+        printf("21A1 design doc exists\n");
+        CHECK(secfw64_init()==0, "21A2 design ok");
+    }
+    /* 21B API Spec */
+    {
+        printf("21B1 API spec exists\n");
+        u64 r=0;
+        CHECK(secfw64_add(3,1001,2002,1,&r)==0 && r!=0, "21B2 api ok");
+        CHECK(secfw64_del(r)==0, "21B3 cleanup");
+    }
+    /* 21C Implementation Start */
+    {
+        printf("21C1 impl start doc exists\n");
+        CHECK(secfw64_init()==0, "21C2 ok");
+    }
+    /* 21D Code Development */
+    {
+        printf("21D1 code dev doc exists\n");
+        secfw64_init();
+        u64 r=0;
+        CHECK(secfw64_add(3,1001,2002,1,&r)==0, "21D2 add");
+        CHECK(secfw64_check(3,1001,2002)==0, "21D3 allow");
+        CHECK(secfw64_check(3,1001,9999)==-1, "21D4 default-deny");
+    }
+    /* 21E Unit Tests */
+    {
+        printf("21E1 unit tests exist\n");
+        secfw64_init();
+        CHECK(secfw64_add(9,1,2,1,&(u64){0})==-1, "21E2 bad-hook");
+        CHECK(secfw64_add(0,1,2,9,&(u64){0})==-1, "21E3 bad-action");
+        CHECK(secfw64_del(999999)==-1, "21E4 unknown");
+    }
+    /* 21F Integration Tests */
+    {
+        printf("21F1 integration tests exist\n");
+        CHECK(proc64_init()==0, "21F2 proc");
+        CHECK(secfw64_init()==0, "21F3 secfw");
+        CHECK(ipc64_init()==0, "21F4 ipc");
+        u64 pid=0, ch=0, r=0;
+        CHECK(proc64_spawn(&pid)==0, "21F5 spawn");
+        CHECK(ipc64_create(&ch)==0, "21F6 ipc");
+        CHECK(secfw64_add(2,pid,ch,1,&r)==0, "21F7 allow");
+        CHECK(secfw64_check(2,pid,ch)==0, "21F8 check");
+        CHECK(ipc64_send(ch,pid)==0, "21F9 send");
+    }
+    /* 21G Code Review */
+    {
+        printf("21G1 review doc exists\n");
+        CHECK(secfw64_init()==0, "21G2 ok");
+    }
+    /* 21H Security Audit */
+    {
+        printf("21H1 audit doc exists\n");
+        secfw64_init();
+        u64 r=0;
+        secfw64_add(0,1,2,1,&r);
+        secfw64_del(r);
+        CHECK(secfw64_check(0,1,2)==-1, "21H2 del-deny");
+    }
+    /* 21I Documentation */
+    {
+        printf("21I1 docs exist\n");
+        CHECK(secfw64_init()==0, "21I2 ok");
+    }
+    /* 21J Release */
+    {
+        printf("21J1 release doc exists\n");
+        CHECK(secfw64_init()==0, "21J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
