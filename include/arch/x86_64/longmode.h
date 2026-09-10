@@ -2028,4 +2028,16 @@ int landlk64_handled(int rs_id, u32 *out);
 int landlk64_rule_count(int rs_id, int *out);
 int landlk64_is_restricted(int rs_id, int *out);
 
+/* --- 54A: AppArmor/SELinux birlesik politika (secpol) --- */
+#define SECPOL_OP_READ  0x1u
+#define SECPOL_OP_WRITE 0x2u
+#define SECPOL_OP_EXEC  0x4u
+int secpol64_init(void);
+int secpol64_add_apparmor(const char *name, const char *path_prefix, int enforce);
+int secpol64_add_rule(const char *profile, const char *path, u32 ops, int selinux, u32 *rule_id);
+int secpol64_check(const char *profile, const char *path, u32 op);
+int secpol64_set_mode(const char *profile, int enforce);
+int secpol64_count(void);
+int secpol64_profile_count(void);
+
 #endif

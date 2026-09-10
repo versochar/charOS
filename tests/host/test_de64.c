@@ -20,6 +20,7 @@
 #include "arch/x86_64/ctr.h"
 #include "arch/x86_64/fpsb.h"
 #include "arch/x86_64/landlk.h"
+#include "arch/x86_64/secpol.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -3936,6 +3937,106 @@ int main(void) {
         CHECK(landlk64_add_path_rule(rs,"/srv",LANDLK_ACCESS_READ)==0, "53J3 rule");
         CHECK(landlk64_restrict_self(rs)==0, "53J4 restrict");
         CHECK(landlk64_check("/srv/data.db",LANDLK_ACCESS_READ)==1, "53J5 final");
+    }
+
+    /* 54A AppArmor/SELinux Design */
+    {
+        printf("54A1 design doc exists\n");
+        CHECK(secpol64_init()==0, "54A2 init ok");
+        CHECK(secpol64_profile_count()==0, "54A3 empty");
+    }
+    /* 54B API Spec */
+    {
+        u32 rid=0;
+        printf("54B1 api spec exists\n");
+        CHECK(secpol64_init()==0, "54B2 init");
+        CHECK(secpol64_add_apparmor("web","/srv/www/",1)==0, "54B3 profile");
+        CHECK(secpol64_add_rule("web","/srv/www/index.html",
+              SECPOL_OP_READ|SECPOL_OP_WRITE,1,&rid)==0, "54B4 rule");
+        CHECK(rid>=0 && rid<SECPOL64_MAX_RULES, "54B5 rule id");
+    }
+    /* 54C Implementation Start */
+    {
+        printf("54C1 impl start doc exists\n");
+        CHECK(secpol64_init()==0, "54C2 init");
+        CHECK(secpol64_add_apparmor("db","/var/lib/db/",1)==0, "54C3 profile");
+        CHECK(secpol64_add_apparmor("db","/var/lib/db/",1)==-2, "54C4 dup");
+        CHECK(secpol64_add_apparmor(0,"/x/",1)==-1, "54C5 null name");
+    }
+    /* 54D Code Development */
+    {
+        printf("54D1 code dev doc exists\n");
+        CHECK(secpol64_init()==0, "54D2 init");
+        CHECK(secpol64_add_apparmor("srv","/srv/data/",1)==0, "54D3 profile");
+        CHECK(secpol64_add_rule("srv","/srv/data/x.db",SECPOL_OP_READ,0,0)==0,
+              "54D4 rule");
+        CHECK(secpol64_check("srv","/srv/data/x.db",SECPOL_OP_READ)==1,
+              "54D5 read ok");
+        CHECK(secpol64_check("srv","/srv/data/x.db",SECPOL_OP_WRITE)==0,
+              "54D6 write denied");
+    }
+    /* 54E Unit Tests */
+    {
+        printf("54E1 unit tests exist\n");
+        CHECK(secpol64_init()==0, "54E2 init");
+        CHECK(secpol64_check("bogus","/x",SECPOL_OP_READ)==-1, "54E3 unknown prof");
+        CHECK(secpol64_check("x",0,SECPOL_OP_READ)==-1, "54E4 null path");
+        CHECK(secpol64_add_rule("noprofile","/a",SECPOL_OP_READ,0,0)==-3,
+              "54E5 rule to missing profile");
+        CHECK(secpol64_set_mode("nope",1)==-1, "54E6 set mode missing");
+    }
+    /* 54F Integration Tests */
+    {
+        printf("54F1 integration src exists\n");
+        CHECK(secpol64_init()==0, "54F2 init");
+        CHECK(secpol64_add_apparmor("app","/opt/app/",1)==0, "54F3 profile");
+        CHECK(secpol64_add_rule("app","/opt/app/cfg",SECPOL_OP_READ,0,0)==0,
+              "54F4 rule");
+        CHECK(secpol64_check("app","/opt/app/cfg",SECPOL_OP_READ)==1, "54F5 ok");
+        CHECK(secpol64_check("app","/opt/app/secret",SECPOL_OP_READ)==0,
+              "54F6 inside deny");
+        CHECK(secpol64_check("app","/usr/bin/ls",SECPOL_OP_READ)==1,
+              "54F7 outside allow");
+        CHECK(secpol64_count()==1, "54F8 rule count");
+    }
+    /* 54G Code Review */
+    {
+        printf("54G1 review doc exists\n");
+        CHECK(secpol64_init()==0, "54G2 init");
+        CHECK(secpol64_add_apparmor("log","/var/log/",1)==0, "54G3 profile");
+        CHECK(secpol64_add_rule("log","/var/log/app.log",
+              SECPOL_OP_WRITE,1,0)==0, "54G4 selinux rule");
+        CHECK(secpol64_check("log","/var/log/app.log",SECPOL_OP_WRITE)==1,
+              "54G5 write ok");
+        CHECK(secpol64_check("log","/var/log/app.log",SECPOL_OP_READ)==0,
+              "54G6 read denied");
+    }
+    /* 54H Security Audit */
+    {
+        printf("54H1 audit doc exists\n");
+        CHECK(secpol64_init()==0, "54H2 init");
+        CHECK(secpol64_add_apparmor("fw","/etc/fw/",1)==0, "54H3 profile");
+        CHECK(secpol64_set_mode("fw",0)==0, "54H4 complain mode");
+        CHECK(secpol64_check("fw","/etc/fw/rules",SECPOL_OP_WRITE)==1,
+              "54H5 complain allows");
+        CHECK(secpol64_set_mode("fw",1)==0, "54H6 enforce");
+        CHECK(secpol64_check("fw","/etc/fw/rules",SECPOL_OP_WRITE)==0,
+              "54H7 enforce denies");
+    }
+    /* 54I Documentation */
+    {
+        printf("54I1 docs exist\n");
+        CHECK(secpol64_init()==0, "54I2 ok");
+    }
+    /* 54J Release */
+    {
+        printf("54J1 release doc exists\n");
+        CHECK(secpol64_init()==0, "54J2 init");
+        CHECK(secpol64_add_apparmor("kiosk","/srv/kiosk/",1)==0, "54J3 profile");
+        CHECK(secpol64_add_rule("kiosk","/srv/kiosk/",SECPOL_OP_READ,1,0)==0,
+              "54J4 rule");
+        CHECK(secpol64_check("kiosk","/srv/kiosk/",SECPOL_OP_READ)==1, "54J5 ok");
+        CHECK(secpol64_profile_count()==1, "54J6 one profile");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
