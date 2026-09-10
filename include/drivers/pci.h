@@ -31,6 +31,10 @@ void pci_enable_io_bm(uint8_t bus, uint8_t slot, uint8_t func);
 /* BAR oku: addr + io flag döner (0 = MMIO) */
 uint32_t pci_read_bar(uint8_t bus, uint8_t slot, uint8_t func, int bar, int* is_io);
 
+/* 34.4: 64-bit BAR oku (64-bit BAR'da üst dword dahil; pcibar_decode kullanır) */
+uint64_t pci_read_bar64(uint8_t bus, uint8_t slot, uint8_t func, int bar,
+                        int* is_io, int* is64);
+
 /* Boot'ta tüm cihazları listele (13G tanılama) */
 void pci_init(void);
 

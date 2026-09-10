@@ -24,6 +24,8 @@
 #include <core/power.h>
 #include <drivers/thermal.h>
 #include <drivers/usbdesc.h>
+#include <drivers/pci.h>
+#include <drivers/pcibar.h>
 #include <test/selftest.h>
 #include <core/apic.h>
 #include <fs/chfs.h>
@@ -836,6 +838,35 @@ void kernel_main(uint32_t magic, uint32_t mboot_ptr)
         }
     }
     vga_puts("[33] done\n"); serial_puts("[33] done\n");
+
+    /* 34.4: BAR altyapısı öztesti + e1000 BAR0 gerçek okuma (varsa) */
+    vga_puts("[34] pcibar...\n"); serial_puts("[34] pcibar...\n");
+    {
+        int fails = 0;
+        if (selftest_register("pcibar", pcibar_selftest) != 0) fails++;
+        if (pcibar_selftest() != 0) fails++;
+        {
+            uint8_t b = 0, s = 0, f = 0;
+            if (pci_find_device(0x8086, 0x100E, &b, &s, &f) == 0) {
+                int io = 0, s64 = 0;
+                uint64_t base = pci_read_bar64(b, s, f, 0, &io, &s64);
+                serial_puts("[34] e1000 BAR0 ");
+                serial_puthex((uint32_t)(base >> 32));
+                serial_puthex((uint32_t)base);
+                serial_puts(io ? " IO\n" : " MEM\n");
+            } else {
+                serial_puts("[34] e1000 yok (bilgilendirici)\n");
+            }
+        }
+        if (fails == 0) {
+            serial_puts("[34] pcibar [PASS]\n");
+            vga_puts("[34] pcibar [PASS]\n");
+        } else {
+            serial_puts("[34] pcibar [FAIL]\n");
+            vga_puts("[34] pcibar [FAIL]\n");
+        }
+    }
+    vga_puts("[34] done\n"); serial_puts("[34] done\n");
 
     /* 14G: ACPI + HPET + RTC alarm (güç geçişi YOK, yalnızca hazırlık) */
     vga_puts("[14G] acpi/hpet/rtc-alarm...\n"); serial_puts("[14G] acpi/hpet/rtc-alarm...\n");

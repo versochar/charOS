@@ -1,4 +1,5 @@
 #include <drivers/pci.h>
+#include <drivers/pcibar.h>
 #include <drivers/vga.h>
 #include <drivers/serial.h>
 
@@ -74,6 +75,21 @@ uint32_t pci_read_bar(uint8_t bus, uint8_t slot, uint8_t func, int bar, int* is_
     }
     if (is_io) *is_io = 0;
     return v & ~0xFu;
+}
+
+/* 34.4: 64-bit BAR'da üst dword'u da okur (eski fn alt 32 bitte kalırdı) */
+uint64_t pci_read_bar64(uint8_t bus, uint8_t slot, uint8_t func, int bar,
+                        int* is_io, int* is64) {
+    uint32_t lo = pci_config_read32(bus, slot, func, 0x10 + bar * 4);
+    uint32_t hi = 0;
+    uint64_t base = 0;
+    int io = 0, s64 = 0, pf = 0;
+    if (!(lo & 1u) && ((lo >> 1) & 3u) == 2u)
+        hi = pci_config_read32(bus, slot, func, 0x10 + (bar + 1) * 4);
+    if (pcibar_decode(lo, hi, &base, &io, &s64, &pf) != 0) return 0;
+    if (is_io) *is_io = io;
+    if (is64) *is64 = s64;
+    return base;
 }
 
 void pci_init(void) {
