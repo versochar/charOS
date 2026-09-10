@@ -1809,4 +1809,11 @@ int jrnl64_commit(u64 tx);
 int jrnl64_abort(u64 tx);
 int jrnl64_replay(u64 *out_count);
 
+/* --- 15A: Filesystem Encryption (davranis modeli) --- */
+int fscrypt64_init(void);
+int fscrypt64_setkey(u64 key);
+int fscrypt64_encrypt(u64 plain, u64 *out_cipher);
+int fscrypt64_decrypt(u64 cipher, u64 *out_plain);
+int fscrypt64_wipe(void);
+
 #endif

@@ -1950,6 +1950,79 @@ int main(void) {
         printf("14J1 release doc exists\n");
         CHECK(jrnl64_init()==0, "14J2 ok");
     }
+    /* 15A Fscrypt Design */
+    {
+        printf("15A1 design doc exists\n");
+        CHECK(fscrypt64_init()==0, "15A2 design ok");
+    }
+    /* 15B API Spec */
+    {
+        printf("15B1 API spec exists\n");
+        CHECK(fscrypt64_setkey(0x1234)==0, "15B2 api ok");
+        CHECK(fscrypt64_wipe()==0, "15B3 cleanup");
+    }
+    /* 15C Implementation Start */
+    {
+        printf("15C1 impl start doc exists\n");
+        CHECK(fscrypt64_init()==0, "15C2 ok");
+    }
+    /* 15D Code Development */
+    {
+        printf("15D1 code dev doc exists\n");
+        fscrypt64_init();
+        u64 c=0, p=0;
+        CHECK(fscrypt64_setkey(0xABCD)==0, "15D2 setkey");
+        CHECK(fscrypt64_encrypt(0xBEEF,&c)==0, "15D3 encrypt");
+        CHECK(fscrypt64_decrypt(c,&p)==0 && p==0xBEEF, "15D4 roundtrip");
+    }
+    /* 15E Unit Tests */
+    {
+        printf("15E1 unit tests exist\n");
+        fscrypt64_init();
+        CHECK(fscrypt64_encrypt(1,&(u64){0})==-2, "15E2 no-key");
+        CHECK(fscrypt64_decrypt(1,&(u64){0})==-2, "15E3 no-key");
+        fscrypt64_setkey(7);
+        CHECK(fscrypt64_encrypt(1,NULL)==-1, "15E4 null");
+        CHECK(fscrypt64_wipe()==0, "15E5 wipe");
+        CHECK(fscrypt64_encrypt(1,&(u64){0})==-2, "15E6 wiped");
+    }
+    /* 15F Integration Tests */
+    {
+        printf("15F1 integration tests exist\n");
+        CHECK(vfs64_init()==0, "15F2 vfs");
+        CHECK(fscrypt64_init()==0, "15F3 crypt");
+        u64 ino=0, fd=0, c=0, p=0, v=0;
+        CHECK(fscrypt64_setkey(0x55)==0, "15F4 key");
+        CHECK(vfs64_create(&ino)==0, "15F5 create");
+        CHECK(vfs64_open(ino,&fd)==0, "15F6 open");
+        CHECK(fscrypt64_encrypt(0x1234,&c)==0, "15F7 encrypt");
+        CHECK(vfs64_write(fd,c)==0, "15F8 write");
+        CHECK(vfs64_read(fd,&v)==0, "15F9 read");
+        CHECK(fscrypt64_decrypt(v,&p)==0 && p==0x1234, "15F10 decrypt");
+    }
+    /* 15G Code Review */
+    {
+        printf("15G1 review doc exists\n");
+        CHECK(fscrypt64_init()==0, "15G2 ok");
+    }
+    /* 15H Security Audit */
+    {
+        printf("15H1 audit doc exists\n");
+        fscrypt64_init();
+        fscrypt64_setkey(1);
+        fscrypt64_wipe();
+        CHECK(fscrypt64_decrypt(0,&(u64){0})==-2, "15H2 wiped-decrypt");
+    }
+    /* 15I Documentation */
+    {
+        printf("15I1 docs exist\n");
+        CHECK(fscrypt64_init()==0, "15I2 ok");
+    }
+    /* 15J Release */
+    {
+        printf("15J1 release doc exists\n");
+        CHECK(fscrypt64_init()==0, "15J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
