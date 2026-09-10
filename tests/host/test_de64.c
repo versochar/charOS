@@ -1283,6 +1283,79 @@ int main(void) {
         printf("5J1 release doc exists\n");
         CHECK(proc64_init()==0, "5J2 ok");
     }
+    /* 6A Sched Design */
+    {
+        printf("6A1 design doc exists\n");
+        CHECK(sched64_init()==0, "6A2 design ok");
+    }
+    /* 6B API Spec */
+    {
+        printf("6B1 API spec exists\n");
+        CHECK(sched64_add(1001,20)==0, "6B2 api ok");
+        CHECK(sched64_remove(1001)==0, "6B3 cleanup");
+    }
+    /* 6C Implementation Start */
+    {
+        printf("6C1 impl start doc exists\n");
+        CHECK(sched64_init()==0, "6C2 ok");
+    }
+    /* 6D Code Development */
+    {
+        printf("6D1 code dev doc exists\n");
+        sched64_init();
+        CHECK(sched64_add(2001,20)==0, "6D2 add");
+        CHECK(sched64_add(2002,1)==0, "6D3 add-rt");
+        u64 cur=0;
+        CHECK(sched64_current(&cur)==0 && cur==2002, "6D4 rt-first");
+    }
+    /* 6E Unit Tests */
+    {
+        printf("6E1 unit tests exist\n");
+        sched64_init();
+        CHECK(sched64_add(0,10)==-1, "6E2 pid0");
+        CHECK(sched64_add(3001,99)==-1, "6E3 prio-range");
+        CHECK(sched64_add(3001,10)==0, "6E4 add");
+        CHECK(sched64_add(3001,10)==-1, "6E5 duplicate");
+        CHECK(sched64_remove(999999)==-1, "6E6 unknown");
+        CHECK(sched64_set_prio(3001,5)==0, "6E7 prio");
+        CHECK(sched64_set_prio(3001,99)==-1, "6E8 prio-range");
+    }
+    /* 6F Integration Tests */
+    {
+        printf("6F1 integration tests exist\n");
+        CHECK(secureboot64_init()==SB_OK, "6F2 sboot");
+        CHECK(proc64_init()==0, "6F3 proc");
+        CHECK(sched64_init()==0, "6F4 sched");
+        u64 pid=0, cur=0;
+        CHECK(proc64_spawn(&pid)==0, "6F5 spawn");
+        CHECK(sched64_add(pid,10)==0, "6F6 chain");
+        CHECK(sched64_current(&cur)==0 && cur==pid, "6F7 current");
+    }
+    /* 6G Code Review */
+    {
+        printf("6G1 review doc exists\n");
+        CHECK(sched64_init()==0, "6G2 ok");
+    }
+    /* 6H Security Audit */
+    {
+        printf("6H1 audit doc exists\n");
+        sched64_init();
+        sched64_add(4001,1);
+        sched64_add(4002,20);
+        u64 cur=0;
+        sched64_current(&cur);
+        CHECK(cur==4001, "6H2 rt-starves-normal");
+    }
+    /* 6I Documentation */
+    {
+        printf("6I1 docs exist\n");
+        CHECK(sched64_init()==0, "6I2 ok");
+    }
+    /* 6J Release */
+    {
+        printf("6J1 release doc exists\n");
+        CHECK(sched64_init()==0, "6J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");

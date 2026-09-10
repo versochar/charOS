@@ -1737,4 +1737,13 @@ int proc64_exit(u64 pid, int code);
 int proc64_wait(u64 pid, int *out_code);
 int proc64_state(u64 pid, int *out_state);
 
+/* --- 6A: Scheduling & Real-Time (davranis modeli) --- */
+int sched64_init(void);
+int sched64_add(u64 pid, int prio);
+int sched64_remove(u64 pid);
+int sched64_set_prio(u64 pid, int prio);
+int sched64_current(u64 *out_pid);
+int sched64_yield(void);
+int sched64_tick(void);
+
 #endif
