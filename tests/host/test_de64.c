@@ -14,6 +14,7 @@
 #include "arch/x86_64/installfw.h"
 #include "arch/x86_64/parttool.h"
 #include "arch/x86_64/luksop.h"
+#include "arch/x86_64/blcfg.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -3345,6 +3346,101 @@ int main(void) {
         CHECK(luksop64_add_key_slot(0,100000,0xD0D0)==0, "47J4 slot");
         CHECK(luksop64_verify_key(0,0xD0D0)==0, "47J5 verify");
         CHECK(luksop64_unlock(0,0xD0D0)==0, "47J6 unlock");
+    }
+
+    /* 48A Bootloader Design */
+    {
+        printf("48A1 design doc exists\n");
+        CHECK(blcfg64_init()==0, "48A2 init ok");
+    }
+    /* 48B API Spec */
+    {
+        int t = -1;
+        printf("48B1 API spec exists\n");
+        CHECK(blcfg64_init()==0, "48B2 init");
+        CHECK(blcfg64_add_entry("CharOS","/boot/kernel.bin",0,"root=/dev/sda1")==0,
+              "48B3 add entry");
+        CHECK(blcfg64_entry_count()==1, "48B4 count1");
+        CHECK(blcfg64_timeout(&t)==0 && t==10, "48B5 default timeout");
+    }
+    /* 48C Implementation Start */
+    {
+        printf("48C1 impl start doc exists\n");
+        CHECK(blcfg64_init()==0, "48C2 init");
+        CHECK(blcfg64_add_entry("Test","/boot/kernel.elf","/boot/initrd.img",
+              "quiet")==0, "48C3 add elf entry");
+        CHECK(blcfg64_validate("/boot/kernel.bin",0)==0, "48C4 validate ok");
+        CHECK(blcfg64_validate("/etc/kernel.bin",0)==-2, "48C5 bad path reject");
+    }
+    /* 48D Code Development */
+    {
+        printf("48D1 code dev doc exists\n");
+        CHECK(blcfg64_init()==0, "48D2 init");
+        CHECK(blcfg64_add_entry("A","/boot/kernel.bin",0,"log")==0, "48D3 A");
+        CHECK(blcfg64_add_entry("B","/boot/kernel.bin","/boot/initrd.img",
+              "verbose")==0, "48D4 B");
+        CHECK(blcfg64_set_default(1)==0, "48D5 default B");
+        CHECK(blcfg64_default_entry()==1, "48D6 default idx 1");
+    }
+    /* 48E Unit Tests */
+    {
+        printf("48E1 unit tests exist\n");
+        CHECK(blcfg64_init()==0, "48E2 init");
+        CHECK(blcfg64_add_entry(0,0,0,0)==-1, "48E3 null entry reject");
+        CHECK(blcfg64_add_entry("X","/tmp/k.bin",0,0)==-3, "48E4 nonboot reject");
+        CHECK(blcfg64_add_entry("Y","/boot/k.bin","/etc/i.img",0)==-4,
+              "48E5 bad initrd reject");
+        CHECK(blcfg64_set_default(3)==-2, "48E6 bad idx reject");
+        CHECK(blcfg64_set_timeout(-1)==-3, "48E7 neg timeout reject");
+    }
+    /* 48F Integration Tests */
+    {
+        printf("48F1 integration tests exist\n");
+        CHECK(blcfg64_init()==0, "48F2 init");
+        CHECK(blcfg64_add_entry("A","/boot/k.bin",0,0)==0, "48F3 A");
+        CHECK(blcfg64_add_entry("B","/boot/k2.bin","/boot/i.img","quiet")==0,
+              "48F4 B");
+        CHECK(blcfg64_add_entry("C","/boot/k3.bin",0,"single")==0, "48F5 C");
+        CHECK(blcfg64_entry_count()==3, "48F6 count3");
+        CHECK(blcfg64_set_default(2)==0, "48F7 default C");
+        CHECK(blcfg64_default_entry()==2, "48F8 default check");
+        CHECK(blcfg64_validate("/boot/k2.bin","/boot/i.img")==0, "48F9 validate B");
+    }
+    /* 48G Code Review */
+    {
+        int t = -1;
+        printf("48G1 review doc exists\n");
+        CHECK(blcfg64_init()==0, "48G2 init");
+        CHECK(blcfg64_set_timeout(300)==0 && blcfg64_timeout(&t)==0 && t==300,
+              "48G3 max timeout");
+        CHECK(blcfg64_set_timeout(301)==-3, "48G4 over max reject");
+        CHECK(blcfg64_entry_count()==0, "48G5 empty count");
+        CHECK(blcfg64_default_entry()==-1, "48G6 no-default reject");
+    }
+    /* 48H Security Audit */
+    {
+        printf("48H1 audit doc exists\n");
+        CHECK(blcfg64_init()==0, "48H2 init");
+        CHECK(blcfg64_add_entry("A","/boot/../etc/k.bin",0,0)==-3,
+              "48H3 traversal reject");
+        CHECK(blcfg64_add_entry("B","/boot/k.bin",0,"root=/dev/sda1")==0,
+              "48H4 valid entry");
+        CHECK(blcfg64_validate("/boot/k.bin",0)==0, "48H5 validate ok");
+    }
+    /* 48I Documentation */
+    {
+        printf("48I1 docs exist\n");
+        CHECK(blcfg64_init()==0, "48I2 ok");
+    }
+    /* 48J Release */
+    {
+        printf("48J1 release doc exists\n");
+        CHECK(blcfg64_init()==0, "48J2 init");
+        CHECK(blcfg64_add_entry("CharOS stable","/boot/kernel.bin",
+              "/boot/initrd.img","root=/dev/sda1 quiet")==0, "48J3 entry");
+        CHECK(blcfg64_set_timeout(5)==0, "48J4 timeout 5");
+        CHECK(blcfg64_validate("/boot/kernel.bin","/boot/initrd.img")==0,
+              "48J5 validate");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }

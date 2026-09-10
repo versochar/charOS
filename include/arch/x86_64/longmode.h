@@ -1957,4 +1957,15 @@ int luksop64_lock(void);
 int luksop64_state(int *out);
 int luksop64_header_crc(u64 device);
 
+/* --- 48A: Bootloader Integration (blcfg) --- */
+int blcfg64_init(void);
+int blcfg64_set_default(int index);
+int blcfg64_set_timeout(int seconds);
+int blcfg64_add_entry(const char *label, const char *kernel_path,
+                      const char *initrd_path, const char *options);
+int blcfg64_default_entry(void);
+int blcfg64_validate(const char *kernel_path, const char *initrd_path);
+int blcfg64_entry_count(void);
+int blcfg64_timeout(int *out);
+
 #endif
