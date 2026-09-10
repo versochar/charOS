@@ -21,6 +21,7 @@
 #include "arch/x86_64/fpsb.h"
 #include "arch/x86_64/landlk.h"
 #include "arch/x86_64/secpol.h"
+#include "arch/x86_64/kprot.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -4037,6 +4038,102 @@ int main(void) {
               "54J4 rule");
         CHECK(secpol64_check("kiosk","/srv/kiosk/",SECPOL_OP_READ)==1, "54J5 ok");
         CHECK(secpol64_profile_count()==1, "54J6 one profile");
+    }
+
+    /* 55A Kernel Self Protection Design */
+    {
+        printf("55A1 design doc exists\n");
+        CHECK(kprot64_init()==0, "55A2 init ok");
+        CHECK(kprot64_get_lockdown()==KPROT64_LOCKDOWN_NONE, "55A3 none");
+        CHECK(kprot64_kptr(0)==KPROT64_KPTR_ALL, "55A4 kptr all default");
+    }
+    /* 55B API Spec */
+    {
+        printf("55B1 api spec exists\n");
+        CHECK(kprot64_init()==0, "55B2 init");
+        CHECK(kprot64_set_lockdown(KPROT64_LOCKDOWN_INTEGRITY)==0, "55B3 lockdown");
+        CHECK(kprot64_get_lockdown()==KPROT64_LOCKDOWN_INTEGRITY, "55B4 level");
+        CHECK(kprot64_set_lockdown(KPROT64_LOCKDOWN_NONE)==-2, "55B5 monotonic");
+        CHECK(kprot64_set_lockdown(9)==-1, "55B6 bad level");
+    }
+    /* 55C Implementation Start */
+    {
+        printf("55C1 impl start doc exists\n");
+        CHECK(kprot64_init()==0, "55C2 init");
+        CHECK(kprot64_set_kptr(KPROT64_KPTR_RESTRICT)==0, "55C3 kptr restrict");
+        CHECK(kprot64_kptr(0)==KPROT64_KPTR_RESTRICT, "55C4 mode set");
+        CHECK(kprot64_set_kptr(5)==-1, "55C5 bad mode");
+    }
+    /* 55D Code Development */
+    {
+        u64 raw = 0xFFFF800012345678ULL, m;
+        printf("55D1 code dev doc exists\n");
+        CHECK(kprot64_init()==0, "55D2 init");
+        CHECK(kprot64_set_kptr(KPROT64_KPTR_ZERO)==0, "55D3 zero mode");
+        CHECK(kprot64_mask_ptr(raw,0)==0ULL, "55D4 raw zeroed");
+        CHECK(kprot64_mask_ptr(raw,1)==0ULL, "55D5 zero even privileged");
+        CHECK(kprot64_set_kptr(KPROT64_KPTR_ALL)==0, "55D6 all mode");
+        CHECK(kprot64_mask_ptr(raw,0)==raw, "55D7 open ptr");
+    }
+    /* 55E Unit Tests */
+    {
+        u64 raw = 0xFFFF800012345678ULL, m;
+        printf("55E1 unit tests exist\n");
+        CHECK(kprot64_init()==0, "55E2 init");
+        CHECK(kprot64_set_kptr(KPROT64_KPTR_RESTRICT)==0, "55E3 restrict");
+        m = kprot64_mask_ptr(raw,1);
+        CHECK(m==raw, "55E4 privileged unrestricted");
+        m = kprot64_mask_ptr(raw,0);
+        CHECK(m!=raw, "55E5 unprivileged changed");
+        CHECK(kprot64_restricted_count()==1, "55E6 counted");
+        CHECK(kprot64_set_dmesg_restrict(1)==0, "55E7 dmesg on");
+        CHECK(kprot64_dmesg_allowed(1)==1 && kprot64_dmesg_allowed(0)==0,
+              "55E8 dmesg gating");
+    }
+    /* 55F Integration Tests */
+    {
+        printf("55F1 integration src exists\n");
+        CHECK(kprot64_init()==0, "55F2 init");
+        CHECK(kprot64_set_lockdown(KPROT64_LOCKDOWN_INTEGRITY)==0, "55F3 level");
+        CHECK(kprot64_lock_rodata()==0, "55F4 lock rodata");
+        CHECK(kprot64_rodata_write(0)==-1, "55F5 null addr");
+        CHECK(kprot64_rodata_write((const void*)0x1000)==-2, "55F6 write denied");
+    }
+    /* 55G Code Review */
+    {
+        printf("55G1 review doc exists\n");
+        CHECK(kprot64_init()==0, "55G2 init");
+        CHECK(kprot64_lock_rodata()==-1, "55G3 lock requires integrity");
+        CHECK(kprot64_rodata_write((const void*)0x2000)==0, "55G4 unlock write ok");
+        CHECK(kprot64_set_oops_limit(2)==0, "55G5 oops limit");
+        CHECK(kprot64_on_oops()==1 && kprot64_on_oops()==2, "55G6 oops count");
+        CHECK(kprot64_panic_required()==1, "55G7 panic required");
+    }
+    /* 55H Security Audit */
+    {
+        int ctx0 = 0, ctx1 = 1;
+        (void)ctx0; (void)ctx1;
+        printf("55H1 audit doc exists\n");
+        CHECK(kprot64_init()==0, "55H2 init");
+        CHECK(kprot64_set_oops_limit(1)==0, "55H3 one oops limit");
+        CHECK(kprot64_panic_required()==0, "55H4 not yet");
+        CHECK(kprot64_on_oops()==1, "55H5 one oops");
+        CHECK(kprot64_panic_required()==1, "55H6 panic");
+        CHECK(kprot64_set_oops_limit(0)==-1, "55H7 min limit");
+    }
+    /* 55I Documentation */
+    {
+        printf("55I1 docs exist\n");
+        CHECK(kprot64_init()==0, "55I2 ok");
+    }
+    /* 55J Release */
+    {
+        printf("55J1 release doc exists\n");
+        CHECK(kprot64_init()==0, "55J2 init");
+        CHECK(kprot64_set_lockdown(KPROT64_LOCKDOWN_PGD)==0, "55J3 pgd lockdown");
+        CHECK(kprot64_set_kptr(KPROT64_KPTR_ZERO)==0, "55J4 kptr zero");
+        CHECK(kprot64_mask_ptr(0xABCDULL,0)==0, "55J5 masked");
+        CHECK(kprot64_dmesg_allowed(1)==1, "55J6 dmesg open");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }

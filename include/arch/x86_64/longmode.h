@@ -2040,4 +2040,21 @@ int secpol64_set_mode(const char *profile, int enforce);
 int secpol64_count(void);
 int secpol64_profile_count(void);
 
+/* --- 55A: Kernel Self Protection (kprot) --- */
+int kprot64_init(void);
+int kprot64_set_lockdown(int level);
+int kprot64_get_lockdown(void);
+int kprot64_set_kptr(int mode);
+int kprot64_kptr(int privileged);
+u64 kprot64_mask_ptr(u64 raw, int privileged);
+int kprot64_set_dmesg_restrict(int on);
+int kprot64_dmesg_allowed(int privileged);
+int kprot64_lock_rodata(void);
+int kprot64_rodata_write(const void *addr);
+int kprot64_set_oops_limit(int limit);
+int kprot64_oops_count(void);
+int kprot64_on_oops(void);
+int kprot64_panic_required(void);
+int kprot64_restricted_count(void);
+
 #endif
