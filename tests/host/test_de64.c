@@ -1141,6 +1141,16 @@ int main(void) {
         printf("3H1 audit doc exists\n");
         CHECK(secureboot64_init()==SB_OK, "3H2 ok");
     }
+    /* 3I Documentation */
+    {
+        printf("3I1 docs exist\n");
+        CHECK(secureboot64_init()==SB_OK, "3I2 ok");
+    }
+    /* 3J Release */
+    {
+        printf("3J1 release doc exists\n");
+        CHECK(secureboot64_init()==SB_OK, "3J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
