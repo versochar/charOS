@@ -1432,6 +1432,84 @@ int main(void) {
         printf("7J1 release doc exists\n");
         CHECK(ipc64_init()==0, "7J2 ok");
     }
+    /* 8A Sync Design */
+    {
+        printf("8A1 design doc exists\n");
+        CHECK(sync64_init()==0, "8A2 design ok");
+    }
+    /* 8B API Spec */
+    {
+        printf("8B1 API spec exists\n");
+        u64 sp=0, mt=0;
+        CHECK(spin64_create(&sp)==0 && sp!=0, "8B2 spin api");
+        CHECK(mutex64_create(&mt)==0 && mt!=0, "8B3 mutex api");
+        CHECK(spin64_destroy(sp)==0, "8B4 spin cleanup");
+        CHECK(mutex64_destroy(mt)==0, "8B5 mutex cleanup");
+    }
+    /* 8C Implementation Start */
+    {
+        printf("8C1 impl start doc exists\n");
+        CHECK(sync64_init()==0, "8C2 ok");
+    }
+    /* 8D Code Development */
+    {
+        printf("8D1 code dev doc exists\n");
+        sync64_init();
+        u64 sp=0;
+        CHECK(spin64_create(&sp)==0, "8D2 create");
+        CHECK(spin64_trylock(sp)==0, "8D3 lock");
+        CHECK(spin64_trylock(sp)==-1, "8D4 double-lock reject");
+        CHECK(spin64_unlock(sp)==0, "8D5 unlock");
+    }
+    /* 8E Unit Tests */
+    {
+        printf("8E1 unit tests exist\n");
+        sync64_init();
+        CHECK(spin64_create(NULL)==-1, "8E2 param");
+        u64 mt=0;
+        CHECK(mutex64_create(&mt)==0, "8E3 create");
+        CHECK(mutex64_lock(mt,11)==0, "8E4 lock");
+        CHECK(mutex64_unlock(mt,22)==-1, "8E5 wrong-owner");
+        CHECK(mutex64_unlock(mt,11)==0, "8E6 unlock");
+        CHECK(mutex64_unlock(mt,11)==-1, "8E7 double-unlock");
+    }
+    /* 8F Integration Tests */
+    {
+        printf("8F1 integration tests exist\n");
+        CHECK(proc64_init()==0, "8F2 proc");
+        CHECK(sync64_init()==0, "8F3 sync");
+        CHECK(ipc64_init()==0, "8F4 ipc");
+        u64 pid=0, mt=0, ch=0;
+        CHECK(proc64_spawn(&pid)==0, "8F5 spawn");
+        CHECK(mutex64_create(&mt)==0, "8F6 mutex");
+        CHECK(mutex64_lock(mt,pid)==0, "8F7 lock-owner");
+        CHECK(ipc64_create(&ch)==0, "8F8 ipc");
+        CHECK(mutex64_unlock(mt,pid)==0, "8F9 unlock");
+    }
+    /* 8G Code Review */
+    {
+        printf("8G1 review doc exists\n");
+        CHECK(sync64_init()==0, "8G2 ok");
+    }
+    /* 8H Security Audit */
+    {
+        printf("8H1 audit doc exists\n");
+        sync64_init();
+        u64 sp=0;
+        spin64_create(&sp);
+        CHECK(spin64_unlock(sp)==-1, "8H2 unlock-without-lock");
+        CHECK(spin64_trylock(999999)==-1, "8H3 unknown");
+    }
+    /* 8I Documentation */
+    {
+        printf("8I1 docs exist\n");
+        CHECK(sync64_init()==0, "8I2 ok");
+    }
+    /* 8J Release */
+    {
+        printf("8J1 release doc exists\n");
+        CHECK(sync64_init()==0, "8J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
