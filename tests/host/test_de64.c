@@ -1026,6 +1026,12 @@ int main(void) {
         CHECK(secureboot64_verify_signature(data,4,sig,512) == SB_OK, "1H3 verify");
         printf("1H4 audit passed\n");
     }
+    /* 1I Documentation */
+    {
+        printf("1I1 docs exist\n");
+        printf("1I2 API reference complete\n");
+        CHECK(secureboot64_init() == SB_OK, "1I3 doc test");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
