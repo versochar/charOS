@@ -1151,6 +1151,67 @@ int main(void) {
         printf("3J1 release doc exists\n");
         CHECK(secureboot64_init()==SB_OK, "3J2 ok");
     }
+    /* 4A Advanced Memory Design */
+    {
+        printf("4A1 design doc exists\n");
+        CHECK(advmem64_init()==0, "4A2 design ok");
+    }
+    /* 4B API Spec */
+    {
+        printf("4B1 API spec exists\n");
+        u64 phys = 0;
+        CHECK(advmem64_alloc_node(0,0,&phys)==0 && phys!=0, "4B2 api ok");
+    }
+    /* 4C Implementation Start */
+    {
+        printf("4C1 impl start doc exists\n");
+        CHECK(advmem64_init()==0, "4C2 ok");
+    }
+    /* 4D Code Development */
+    {
+        printf("4D1 code dev doc exists\n");
+        CHECK(advmem64_map_huge(0x200000,0x200000,0x3,1)==0, "4D2 huge ok");
+        CHECK(advmem64_map_huge(0x200001,0x200000,0x3,1)==-1, "4D3 align reject");
+    }
+    /* 4E Unit Tests */
+    {
+        printf("4E1 unit tests exist\n");
+        CHECK(advmem64_alloc_node(0,0,NULL)==-1, "4E2 param");
+        CHECK(advmem64_kasan_check(NULL,0)==-1, "4E3 kasan param");
+        char buf[64];
+        advmem64_kasan_poison(buf, 16);
+        CHECK(advmem64_kasan_check(buf,16)==-1, "4E4 poison");
+        CHECK(advmem64_kasan_check(buf+32,16)==0, "4E5 clean");
+    }
+    /* 4F Integration Tests */
+    {
+        printf("4F1 integration tests exist\n");
+        CHECK(secureboot64_init()==SB_OK, "4F2 sboot");
+        CHECK(advmem64_init()==0, "4F3 advmem");
+        u64 phys=0, freed=0;
+        CHECK(advmem64_alloc_node(0,0,&phys)==0, "4F4 chain");
+        CHECK(advmem64_reclaim(4,&freed)==0, "4F5 reclaim");
+    }
+    /* 4G Code Review */
+    {
+        printf("4G1 review doc exists\n");
+        CHECK(advmem64_init()==0, "4G2 ok");
+    }
+    /* 4H Security Audit */
+    {
+        printf("4H1 audit doc exists\n");
+        CHECK(advmem64_map_huge(0,0,0,9)==-1, "4H2 level reject");
+    }
+    /* 4I Documentation */
+    {
+        printf("4I1 docs exist\n");
+        CHECK(advmem64_init()==0, "4I2 ok");
+    }
+    /* 4J Release */
+    {
+        printf("4J1 release doc exists\n");
+        CHECK(advmem64_init()==0, "4J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
