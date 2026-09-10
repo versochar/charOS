@@ -17,6 +17,7 @@
 #include <core/syscall.h>
 #include <core/verify.h>
 #include <core/trace.h>
+#include <core/prof.h>
 #include <core/apic.h>
 #include <fs/chfs.h>
 #include <process/signal.h>
@@ -657,6 +658,49 @@ void kernel_main(uint32_t magic, uint32_t mboot_ptr)
         }
     }
     vga_puts("[24] done\n"); serial_puts("[24] done\n");
+
+    /* 26.4: açılış profili — gerçek alt sistemler ölçülür, özet basılır */
+    vga_puts("[26] prof...\n"); serial_puts("[26] prof...\n");
+    {
+        int ok = 1;
+        uint32_t cnt = 0;
+        uint64_t tot = 0, mn = 0, mx = 0;
+        prof_init();
+        prof_set_tick(prof_tick_rdtsc);
+        for (int i = 0; i < 32; i++) { /* slot0: verify öztesti */
+            if (prof_begin(0) != 0) { ok = 0; break; }
+            if (verify_selftest() != 0) { ok = 0; }
+            if (prof_end(0) != 0) { ok = 0; break; }
+        }
+        for (int i = 0; i < 8; i++) { /* slot1: syslog turu */
+            if (prof_begin(1) != 0) { ok = 0; break; }
+            syslog_puts("[26] prob");
+            {
+                char pb[32];
+                syslog_read(pb, sizeof(pb));
+            }
+            if (prof_end(1) != 0) { ok = 0; break; }
+        }
+        if (prof_read(0, &cnt, &tot, &mn, &mx) != 0 || cnt != 32) ok = 0;
+        if (ok && !(mn <= tot / cnt && tot / cnt <= mx)) ok = 0;
+        serial_puts("[26] selftest avg "); serial_puthex((uint32_t)(tot / 32));
+        serial_puts(" ticks\n");
+        vga_puts("[26] selftest avg "); vga_putdec((uint32_t)(tot / 32));
+        vga_puts(" ticks\n");
+        if (prof_read(1, &cnt, &tot, &mn, &mx) != 0 || cnt != 8) ok = 0;
+        serial_puts("[26] syslog avg "); serial_puthex((uint32_t)(tot / 8));
+        serial_puts(" ticks\n");
+        vga_puts("[26] syslog avg "); vga_putdec((uint32_t)(tot / 8));
+        vga_puts(" ticks\n");
+        if (ok) {
+            serial_puts("[26] prof [PASS]\n");
+            vga_puts("[26] prof [PASS]\n");
+        } else {
+            serial_puts("[26] prof [FAIL]\n");
+            vga_puts("[26] prof [FAIL]\n");
+        }
+    }
+    vga_puts("[26] done\n"); serial_puts("[26] done\n");
 
     /* 14G: ACPI + HPET + RTC alarm (güç geçişi YOK, yalnızca hazırlık) */
     vga_puts("[14G] acpi/hpet/rtc-alarm...\n"); serial_puts("[14G] acpi/hpet/rtc-alarm...\n");
