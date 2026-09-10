@@ -119,6 +119,7 @@ KERNEL_SRCS = $(KERNEL_DIR)/kernel.c \
                $(KERNEL_DIR)/core/trace.c \
                $(KERNEL_DIR)/core/prof.c \
                $(KERNEL_DIR)/core/version.c \
+               $(KERNEL_DIR)/test/selftest.c \
                $(KERNEL_DIR)/process/signal.c \
               $(KERNEL_DIR)/fs/proc.c \
               $(KERNEL_DIR)/fs/diskfs.c
@@ -1113,6 +1114,11 @@ test-version27:
 	$(CC) -iquote include -DCHAROS_VERSION_STR='"test-27"' -DCHAROS_VERSION_COMMIT='"abc1234"' kernel/core/version.c tests/host/test_version27.c -o /tmp/test_version27
 	/tmp/test_version27
 
+# 28.5: gercek selftest.c host testi (stub yok)
+test-selftest28:
+	$(CC) -iquote include kernel/core/verify.c kernel/test/selftest.c tests/host/test_selftest28.c -o /tmp/test_selftest28
+	/tmp/test_selftest28
+
 # 56J: host DE testi
 test-de64:
 	$(CC) -iquote include $(K64_DIR)/panel64.c $(K64_DIR)/wmde64.c \
@@ -1123,4 +1129,4 @@ test-de64:
 	/tmp/test_de64
 
 # Phony targets
-.PHONY: all clean rebuild run-iso run-iso-headless run-kernel debug check64 test-mem64 test-smp64 test-uefi64 iso64-check test-swap64 test-heap64 test-sec64 test-auth64 test-vfs64 test-fs64 test-pkg64 test-init64 test-net64 test-wifi64 test-usb64 test-audio64 test-gpu64 test-power64 test-sensor64 test-fsadv64 test-libc64 test-elf64 test-link64 test-user64 test-wserver64 test-de64 test-cap22 test-sandbox23 test-verify24 test-trace25 test-prof26 test-version27
+.PHONY: all clean rebuild run-iso run-iso-headless run-kernel debug check64 test-mem64 test-smp64 test-uefi64 iso64-check test-swap64 test-heap64 test-sec64 test-auth64 test-vfs64 test-fs64 test-pkg64 test-init64 test-net64 test-wifi64 test-usb64 test-audio64 test-gpu64 test-power64 test-sensor64 test-fsadv64 test-libc64 test-elf64 test-link64 test-user64 test-wserver64 test-de64 test-cap22 test-sandbox23 test-verify24 test-trace25 test-prof26 test-version27 test-selftest28

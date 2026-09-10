@@ -19,6 +19,7 @@
 #include <core/trace.h>
 #include <core/prof.h>
 #include <core/version.h>
+#include <test/selftest.h>
 #include <core/apic.h>
 #include <fs/chfs.h>
 #include <process/signal.h>
@@ -708,6 +709,26 @@ void kernel_main(uint32_t magic, uint32_t mboot_ptr)
     vga_puts(" @"); vga_puts(version_commit()); vga_puts("\n");
     serial_puts("[27] "); serial_puts(version_string());
     serial_puts(" @"); serial_puts(version_commit()); serial_puts("\n");
+
+    /* 28.4: kayıtlı öztestler toplu koşar (dağınık çağrılar yerine) */
+    vga_puts("[28] selftests...\n"); serial_puts("[28] selftests...\n");
+    {
+        int fails = 0;
+        selftest_init();
+        if (selftest_register("verify", verify_selftest) != 0) fails++;
+        if (selftest_register("syslog", syslog_selftest) != 0) fails++;
+        fails += selftest_run_all();
+        serial_puts("[28] selftests fail "); serial_puthex((uint32_t)fails);
+        serial_puts("\n");
+        if (fails == 0) {
+            serial_puts("[28] selftests [PASS]\n");
+            vga_puts("[28] selftests [PASS]\n");
+        } else {
+            serial_puts("[28] selftests [FAIL]\n");
+            vga_puts("[28] selftests [FAIL]\n");
+        }
+    }
+    vga_puts("[28] done\n"); serial_puts("[28] done\n");
 
     /* 14G: ACPI + HPET + RTC alarm (güç geçişi YOK, yalnızca hazırlık) */
     vga_puts("[14G] acpi/hpet/rtc-alarm...\n"); serial_puts("[14G] acpi/hpet/rtc-alarm...\n");
