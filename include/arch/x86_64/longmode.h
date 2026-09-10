@@ -1847,4 +1847,10 @@ int netsec64_add(u64 addr, u64 port, int action, u64 *out_rule);
 int netsec64_del(u64 rule);
 int netsec64_check(u64 addr, u64 port);
 
+/* --- 20A: Advanced Networking (davranis modeli) --- */
+int netadv64_init(void);
+int netadv64_add(u64 prefix, u64 mask, u64 gw, u64 *out_route);
+int netadv64_del(u64 route);
+int netadv64_lookup(u64 addr, u64 *out_gw);
+
 #endif

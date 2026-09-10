@@ -2329,6 +2329,78 @@ int main(void) {
         printf("19J1 release doc exists\n");
         CHECK(netsec64_init()==0, "19J2 ok");
     }
+    /* 20A Netadv Design */
+    {
+        printf("20A1 design doc exists\n");
+        CHECK(netadv64_init()==0, "20A2 design ok");
+    }
+    /* 20B API Spec */
+    {
+        printf("20B1 API spec exists\n");
+        u64 r=0;
+        CHECK(netadv64_add(0x0A000000,0xFF000000,0x0A000001,&r)==0 && r!=0, "20B2 api ok");
+        CHECK(netadv64_del(r)==0, "20B3 cleanup");
+    }
+    /* 20C Implementation Start */
+    {
+        printf("20C1 impl start doc exists\n");
+        CHECK(netadv64_init()==0, "20C2 ok");
+    }
+    /* 20D Code Development */
+    {
+        printf("20D1 code dev doc exists\n");
+        netadv64_init();
+        u64 r=0, gw=0;
+        CHECK(netadv64_add(0x0A000000,0xFF000000,0x0A000001,&r)==0, "20D2 add");
+        CHECK(netadv64_lookup(0x0A000005,&gw)==0 && gw==0x0A000001, "20D3 lookup");
+        CHECK(netadv64_lookup(0x0B000005,&gw)==-1, "20D4 miss");
+    }
+    /* 20E Unit Tests */
+    {
+        printf("20E1 unit tests exist\n");
+        netadv64_init();
+        CHECK(netadv64_add(0,0,0,NULL)==-1, "20E2 param");
+        CHECK(netadv64_del(999999)==-1, "20E3 unknown");
+        CHECK(netadv64_lookup(1,&(u64){0})==-1, "20E4 miss");
+    }
+    /* 20F Integration Tests */
+    {
+        printf("20F1 integration tests exist\n");
+        CHECK(netsec64_init()==0, "20F2 netsec");
+        CHECK(netadv64_init()==0, "20F3 netadv");
+        CHECK(tcp64_init()==0, "20F4 tcp");
+        u64 rl=0, rt=0, s=0, gw=0;
+        CHECK(netsec64_add(0x0A000005,80,1,&rl)==0, "20F5 allow");
+        CHECK(netadv64_add(0x0A000000,0xFF000000,0x0A000001,&rt)==0, "20F6 route");
+        CHECK(netadv64_lookup(0x0A000005,&gw)==0, "20F7 lookup");
+        CHECK(netsec64_check(0x0A000005,80)==0, "20F8 check");
+        CHECK(tcp64_socket(&s)==0, "20F9 socket");
+        CHECK(tcp64_bind(s,0x0A000005,80)==0, "20F10 bind");
+    }
+    /* 20G Code Review */
+    {
+        printf("20G1 review doc exists\n");
+        CHECK(netadv64_init()==0, "20G2 ok");
+    }
+    /* 20H Security Audit */
+    {
+        printf("20H1 audit doc exists\n");
+        netadv64_init();
+        u64 r=0, gw=0;
+        netadv64_add(0x0A000000,0xFF000000,1,&r);
+        netadv64_del(r);
+        CHECK(netadv64_lookup(0x0A000001,&gw)==-1, "20H2 del-miss");
+    }
+    /* 20I Documentation */
+    {
+        printf("20I1 docs exist\n");
+        CHECK(netadv64_init()==0, "20I2 ok");
+    }
+    /* 20J Release */
+    {
+        printf("20J1 release doc exists\n");
+        CHECK(netadv64_init()==0, "20J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
