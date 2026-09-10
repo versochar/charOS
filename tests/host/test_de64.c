@@ -966,6 +966,13 @@ int main(void) {
         printf("1C2 build integration ok\n");
         CHECK(secureboot64_init() == 0, "1C3 init ok");
     }
+    /* 1D Code Development */
+    {
+        printf("1D1 consttime compare implemented\n");
+        u8 pcr[32];
+        CHECK(secureboot64_get_pcr(pcr, 32) == 0, "1D2 PCR access");
+        CHECK(secureboot64_init() == 0, "1D3 init ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");

@@ -1710,6 +1710,7 @@ typedef enum {
     SB_ERR_CRYPTO = -3,
 } secureboot_err_t;
 int secureboot64_init(void);
+int secureboot64_get_pcr(u8 *out, u64 len);
 int secureboot64_verify_signature(const u8 *data, u64 len, const u8 *sig, u64 sig_len);
 int secureboot64_measure_kernel(const void *kernel, u64 size);
 void secureboot64_log_event(const char *event);
