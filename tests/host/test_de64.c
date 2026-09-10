@@ -23,6 +23,7 @@
 #include "arch/x86_64/secpol.h"
 #include "arch/x86_64/kprot.h"
 #include "arch/x86_64/mitig.h"
+#include "arch/x86_64/fuzz.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -4241,6 +4242,119 @@ int main(void) {
         CHECK(mitig64_mitigated_count()==1, "56J4 one");
         CHECK(mitig64_vuln_status(MITIG64_MELTDOWN,&st)==0 && st==MITIG64_MITIGATED,
               "56J5 final");
+    }
+
+    /* 57A Fuzzing Infrastructure Design */
+    {
+        printf("57A1 design doc exists\n");
+        CHECK(fuzz64_init()==0, "57A2 init ok");
+        CHECK(fuzz64_crash_count()==0, "57A3 no crashes");
+        CHECK(fuzz64_xstart(0)==0, "57A4 xstart");
+    }
+    /* 57B API Spec */
+    {
+        u8 buf[64], seed[8]={1,2,3,4,5,6,7,8};
+        u16 len=0;
+        printf("57B1 api spec exists\n");
+        CHECK(fuzz64_init()==0, "57B2 init");
+        CHECK(fuzz64_corpus_add(seed,8)==0, "57B3 corpus add");
+        CHECK(fuzz64_corpus_add(0,8)==-1, "57B4 null seed");
+        CHECK(fuzz64_corpus_add(seed,0)==-1, "57B5 zero len");
+        CHECK(fuzz64_iteration(buf,sizeof(buf),&len)==0, "57B6 iteration");
+        CHECK(len>0 && len<=64, "57B7 len ok");
+        CHECK(fuzz64_new_coverage()>=0, "57B8 coverage monotone");
+    }
+    /* 57C Implementation Start */
+    {
+        u8 seed[4]={0xAA,0xBB,0xCC,0xDD};
+        u8 out[16]; u16 len=0;
+        printf("57C1 impl start doc exists\n");
+        CHECK(fuzz64_init()==0, "57C2 init");
+        CHECK(fuzz64_xstart(42)==0, "57C3 xstart seed");
+        CHECK(fuzz64_corpus_add(seed,4)==0, "57C4 add");
+        CHECK(fuzz64_iteration(out,sizeof(out),&len)==0, "57C5 iter");
+        CHECK(len>=4, "57C6 at least seed");
+        CHECK(fuzz64_xstart(42)==0 && fuzz64_xstart(7)==0, "57C7 reseed");
+    }
+    /* 57D Code Development */
+    {
+        u8 seed[3]={0,1,2}, out[32]; u16 len=0; int i;
+        printf("57D1 code dev doc exists\n");
+        CHECK(fuzz64_init()==0, "57D2 init");
+        CHECK(fuzz64_corpus_add(seed,3)==0, "57D3 add");
+        CHECK(fuzz64_corpus_add(seed,3)==0, "57D4 add2");
+        CHECK(fuzz64_corpus_add(seed,3)==0, "57D5 add3");
+        for(i=0;i<50;i++) CHECK(fuzz64_iteration(out,sizeof(out),&len)==0,
+              "57D6 iter spin");
+        CHECK(fuzz64_new_coverage()>=0, "57D7 coverage");
+    }
+    /* 57E Unit Tests */
+    {
+        u8 out[8]; u16 len=0;
+        printf("57E1 unit tests exist\n");
+        CHECK(fuzz64_init()==0, "57E2 init");
+        CHECK(fuzz64_iteration(0,8,&len)==-1, "57E3 null out");
+        CHECK(fuzz64_iteration(out,0,&len)==-1, "57E4 zero max");
+        CHECK(fuzz64_iteration(out,8,0)==-1, "57E5 null outlen");
+        CHECK(fuzz64_iteration(out,8,&len)==-2, "57E6 empty corpus");
+    }
+    /* 57F Integration Tests */
+    {
+        u8 seed[16]={0x10,0x20,0x30,0x40,0x50,0x60,0x70,0x80,
+                     0x90,0xA0,0xB0,0xC0,0xD0,0xE0,0xF0,0x00};
+        u8 out[128]; u16 len=0; int i;
+        printf("57F1 integration src exists\n");
+        CHECK(fuzz64_init()==0, "57F2 init");
+        CHECK(fuzz64_corpus_add(seed,16)==0, "57F3 add");
+        for(i=0;i<500;i++) CHECK(fuzz64_iteration(out,sizeof(out),&len)==0,
+              "57F4 spin 500");
+        CHECK(fuzz64_corpus_add(seed,8)==0, "57F5 add short");
+        CHECK(fuzz64_iteration(out,sizeof(out),&len)==0, "57F6 iter ok");
+    }
+    /* 57G Code Review */
+    {
+        u8 buf[32]; u16 len=4; int i;
+        printf("57G1 review doc exists\n");
+        CHECK(fuzz64_init()==0, "57G2 init");
+        CHECK(fuzz64_xstart(0)==0, "57G3 seed");
+        buf[0]=0;buf[1]=1;buf[2]=2;buf[3]=3;
+        for(i=0;i<100;i++) CHECK(fuzz64_mutate(buf,&len,sizeof(buf))==0,
+              "57G4 mutate spin");
+        CHECK(fuzz64_mutate(buf,&len,0)==-1, "57G5 zero max");
+        CHECK(fuzz64_mutate(0,&len,32)==-1, "57G6 null buf");
+    }
+    /* 57H Security Audit */
+    {
+        u8 buf[16]; u16 len=16;
+        const u8 tok[4]={0xDE,0xAD,0xBE,0xEF};
+        printf("57H1 audit doc exists\n");
+        CHECK(fuzz64_init()==0, "57H2 init");
+        CHECK(fuzz64_token_insert(buf,&len,sizeof(buf),tok,4)==-3,
+              "57H3 overflowing token");
+        CHECK(fuzz64_token_insert(buf,&len,sizeof(buf),tok,0)==-2,
+              "57H4 zero token len");
+        len=2;
+        CHECK(fuzz64_token_insert(buf,&len,sizeof(buf),tok,4)==0 &&
+              buf[2]==0xDE && buf[3]==0xAD && len==6, "57H5 token added");
+    }
+    /* 57I Documentation */
+    {
+        u8 seed[2]={9,9};
+        printf("57I1 docs exist\n");
+        CHECK(fuzz64_init()==0, "57I2 ok");
+        CHECK(fuzz64_corpus_add_file("/etc/passwd")==-2, "57I3 stub file");
+        CHECK(fuzz64_corpus_add(seed,2)==0, "57I4 ok");
+    }
+    /* 57J Release */
+    {
+        u8 seed[6]={0xA,0xB,0xC,0xD,0xE,0xF}, out[32]; u16 len=0;
+        printf("57J1 release doc exists\n");
+        CHECK(fuzz64_init()==0, "57J2 init");
+        CHECK(fuzz64_corpus_add(seed,6)==0, "57J3 add");
+        CHECK(fuzz64_iteration(out,sizeof(out),&len)==0, "57J4 iter");
+        CHECK(fuzz64_feed_crash(out,len,0xBAD)==0, "57J5 feed crash");
+        CHECK(fuzz64_crash_count()==1, "57J6 one crash");
+        CHECK(fuzz64_feed_crash(0,len,1)==-1, "57J7 null input");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }

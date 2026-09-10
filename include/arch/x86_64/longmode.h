@@ -2076,4 +2076,17 @@ int mitig64_auto_verify(u32 reported_tech_bits);
 int mitig64_cpu_trustworthy(void);
 int mitig64_report(u32 tech_mask, char *buf, int max);
 
+/* --- 57A: Fuzzing Infrastructure (fuzz) --- */
+int fuzz64_init(void);
+int fuzz64_corpus_add(const u8 *seed, u16 len);
+int fuzz64_corpus_add_file(const char *path);
+int fuzz64_iteration(u8 *out, u16 max_out, u16 *out_len);
+int fuzz64_feed_crash(const u8 *input, u16 len, u32 reason);
+int fuzz64_crash_count(void);
+int fuzz64_new_coverage(void);
+int fuzz64_xstart(u32 seed);
+u32 fuzz64_xnext(void);
+int fuzz64_mutate(u8 *buf, u16 *len, u16 max_len);
+int fuzz64_token_insert(u8 *buf, u16 *len, u16 max_len, const u8 *token, u16 tlen);
+
 #endif
