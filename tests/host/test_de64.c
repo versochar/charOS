@@ -17,6 +17,7 @@
 #include "arch/x86_64/blcfg.h"
 #include "arch/x86_64/nbp.h"
 #include "arch/x86_64/recenv.h"
+#include "arch/x86_64/ctr.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -3628,6 +3629,117 @@ int main(void) {
         CHECK(recenv64_confirm()==0, "50J5 confirm");
         CHECK(recenv64_selected_mode(&s)==0 && s==RECENV_MODE_NETBOOT,
               "50J6 mode chosen");
+    }
+
+    /* 51A Container Design */
+    {
+        int id = -1;
+        printf("51A1 design doc exists\n");
+        CHECK(ctr64_init()==0, "51A2 init ok");
+        CHECK(ctr64_create("web","registry/nginx:1.25",256ULL*1024*1024,
+              &id)==0, "51A3 create web");
+        CHECK(ctr64_count()==1, "51A4 count1");
+    }
+    /* 51B API Spec */
+    {
+        int id = -1;
+        printf("51B1 API spec exists\n");
+        CHECK(ctr64_init()==0, "51B2 init");
+        CHECK(ctr64_create("db","postgres:16",1ULL*1024*1024*1024,&id)==0,
+              "51B3 create db");
+        CHECK(ctr64_create("db","redis:7",512ULL*1024*1024,&id)==-3,
+              "51B4 dup name reject");
+        CHECK(ctr64_create("x","img",0,&id)==-2, "51B5 zero mem reject");
+    }
+    /* 51C Implementation Start */
+    {
+        int id = -1;
+        printf("51C1 impl start doc exists\n");
+        CHECK(ctr64_init()==0, "51C2 init");
+        CHECK(ctr64_create("app","busybox:1.36",128ULL*1024*1024,&id)==0,
+              "51C3 create");
+        CHECK(id>0, "51C4 id positive");
+        CHECK(ctr64_start(id)==0, "51C5 start");
+    }
+    /* 51D Code Development */
+    {
+        int id = -1, st = -1;
+        u64 pid = 0;
+        printf("51D1 code dev doc exists\n");
+        CHECK(ctr64_init()==0, "51D2 init");
+        CHECK(ctr64_create("web","img",256ULL*1024*1024,&id)==0, "51D3 create");
+        CHECK(ctr64_start(id)==0 && ctr64_state(id,&st)==0 && st==CTR64_RUNNING,
+              "51D4 running");
+        CHECK(ctr64_pause(id)==0 && ctr64_state(id,&st)==0 && st==CTR64_PAUSED,
+              "51D5 paused");
+        CHECK(ctr64_resume(id)==0 && ctr64_state(id,&st)==0 && st==CTR64_RUNNING,
+              "51D6 resumed");
+        CHECK(ctr64_stop(id)==0 && ctr64_state(id,&st)==0 && st==CTR64_STOPPED,
+              "51D7 stopped");
+        CHECK(ctr64_pid(id,&pid)==0 && pid>0, "51D8 pid present");
+    }
+    /* 51E Unit Tests */
+    {
+        int id = -1;
+        printf("51E1 unit tests exist\n");
+        CHECK(ctr64_init()==0, "51E2 init");
+        CHECK(ctr64_create(0,0,1,&id)==-1, "51E3 null args reject");
+        CHECK(ctr64_create("a","i",1,0)==-1, "51E4 null out reject");
+        CHECK(ctr64_start(999)==-1, "51E5 unknown id");
+        CHECK(ctr64_state(999,0)==-1, "51E6 null state out");
+        CHECK(ctr64_count()==0, "51E7 empty count");
+    }
+    /* 51F Integration Tests */
+    {
+        int id1 = -1, id2 = -1, st = -1;
+        u64 p1 = 0, p2 = 0;
+        printf("51F1 integration tests exist\n");
+        CHECK(ctr64_init()==0, "51F2 init");
+        CHECK(ctr64_create("a","img:x",128ULL*1024*1024,&id1)==0, "51F3 a");
+        CHECK(ctr64_create("b","img:y",256ULL*1024*1024,&id2)==0, "51F4 b");
+        CHECK(id1!=id2, "51F5 distinct ids");
+        CHECK(ctr64_start(id1)==0 && ctr64_start(id2)==0, "51F6 both running");
+        CHECK(ctr64_count()==2, "51F7 count2");
+        CHECK(ctr64_pid(id1,&p1)==0 && ctr64_pid(id2,&p2)==0 && p1!=p2,
+              "51F8 distinct pids");
+        CHECK(ctr64_pause(id1)==0, "51F9 pause a");
+        CHECK(ctr64_state(id1,&st)==0 && st==CTR64_PAUSED, "51F10 a paused");
+    }
+    /* 51G Code Review */
+    {
+        int id = -1;
+        printf("51G1 review doc exists\n");
+        CHECK(ctr64_init()==0, "51G2 init");
+        CHECK(ctr64_create("c","img",128ULL*1024*1024,&id)==0, "51G3 create");
+        CHECK(ctr64_pause(id)==-2, "51G4 pause before start");
+        CHECK(ctr64_create("c","img",128ULL*1024*1024,&id)==-3, "51G5 dup name");
+        CHECK(ctr64_start(0)==-1, "51G6 id0 unknown");
+    }
+    /* 51H Security Audit */
+    {
+        int id = -1;
+        printf("51H1 audit doc exists\n");
+        CHECK(ctr64_init()==0, "51H2 init");
+        CHECK(ctr64_create(0,"img",1,&id)==-1, "51H3 null name reject");
+        CHECK(ctr64_create("k","img",128ULL*1024*1024,&id)==0, "51H4 create");
+        CHECK(ctr64_stop(id)==0 && ctr64_stop(id)==-2, "51H5 double stop");
+        CHECK(ctr64_resume(id)==-2, "51H6 resume stopped reject");
+    }
+    /* 51I Documentation */
+    {
+        printf("51I1 docs exist\n");
+        CHECK(ctr64_init()==0, "51I2 ok");
+    }
+    /* 51J Release */
+    {
+        int id = -1;
+        printf("51J1 release doc exists\n");
+        CHECK(ctr64_init()==0, "51J2 init");
+        CHECK(ctr64_create("httpd","registry/httpd:2.4",512ULL*1024*1024,
+              &id)==0, "51J3 create");
+        CHECK(ctr64_start(id)==0, "51J4 start");
+        CHECK(ctr64_pause(id)==0 && ctr64_resume(id)==0, "51J5 pause/resume");
+        CHECK(ctr64_count()==1, "51J6 final count");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }

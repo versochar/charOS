@@ -1990,4 +1990,16 @@ int recenv64_countdown(int *seconds_left);
 int recenv64_state(int *out);
 int recenv64_selected_mode(int *out);
 
+/* --- 51A: Container Runtime (ctr) --- */
+int ctr64_init(void);
+int ctr64_create(const char *name, const char *image, u64 mem_limit_bytes,
+                 int *out_id);
+int ctr64_start(int id);
+int ctr64_pause(int id);
+int ctr64_resume(int id);
+int ctr64_stop(int id);
+int ctr64_state(int id, int *out);
+int ctr64_count(void);
+int ctr64_pid(int id, u64 *out_pid);
+
 #endif
