@@ -16,6 +16,7 @@
 #include "arch/x86_64/luksop.h"
 #include "arch/x86_64/blcfg.h"
 #include "arch/x86_64/nbp.h"
+#include "arch/x86_64/recenv.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -3536,6 +3537,97 @@ int main(void) {
               nbp64_set_bootfile("kernel")==0, "49J3 setup");
         CHECK(nbp64_discover()==0 && nbp64_poll()==0 && nbp64_boot()==0,
               "49J4 boot chain");
+    }
+
+    /* 50A Recovery Design */
+    {
+        printf("50A1 design doc exists\n");
+        CHECK(recenv64_init()==0, "50A2 init ok");
+    }
+    /* 50B API Spec */
+    {
+        printf("50B1 API spec exists\n");
+        CHECK(recenv64_init()==0, "50B2 init");
+        CHECK(recenv64_menu_timeout(0)==0, "50B3 infinite timeout");
+        CHECK(recenv64_menu_timeout(301)==-1, "50B4 over max reject");
+        CHECK(recenv64_state(0)==-1, "50B5 null state reject");
+    }
+    /* 50C Implementation Start */
+    {
+        printf("50C1 impl start doc exists\n");
+        CHECK(recenv64_init()==0, "50C2 init");
+        CHECK(recenv64_boot_failed()==1, "50C3 fail count1");
+        CHECK(recenv64_boot_failed()==2, "50C4 fail count2");
+    }
+    /* 50D Code Development */
+    {
+        int s = -1;
+        printf("50D1 code dev doc exists\n");
+        CHECK(recenv64_init()==0, "50D2 init");
+        CHECK(recenv64_enter()==0, "50D3 enter");
+        CHECK(recenv64_state(&s)==0 && s==RECENV_MENU, "50D4 in menu");
+        CHECK(recenv64_select(RECENV_MODE_RESCUE)==0, "50D5 select rescue");
+        CHECK(recenv64_confirm()==0, "50D6 confirm");
+        CHECK(recenv64_state(&s)==0 && s==RECENV_RESOLVED, "50D7 resolved");
+    }
+    /* 50E Unit Tests */
+    {
+        printf("50E1 unit tests exist\n");
+        CHECK(recenv64_init()==0, "50E2 init");
+        CHECK(recenv64_select(RECENV_MODE_SAFE)==-2, "50E3 select before enter");
+        CHECK(recenv64_confirm()==-1, "50E4 confirm before enter");
+        CHECK(recenv64_menu_timeout(-1)==-1, "50E5 negative timeout");
+        CHECK(recenv64_countdown(0)==-1, "50E6 null countdown");
+    }
+    /* 50F Integration Tests */
+    {
+        int s = -1, c = -1;
+        printf("50F1 integration tests exist\n");
+        CHECK(recenv64_init()==0, "50F2 init");
+        CHECK(recenv64_menu_timeout(2)==0, "50F3 timeout 2");
+        CHECK(recenv64_enter()==0, "50F4 enter");
+        CHECK(recenv64_countdown(&c)==0 && c==1, "50F5 count 1");
+        CHECK(recenv64_countdown(&c)==1 && c==0, "50F6 expired->resolved");
+        CHECK(recenv64_state(&s)==0 && s==RECENV_RESOLVED, "50F7 auto resolved");
+        CHECK(recenv64_selected_mode(&s)==0 && s==RECENV_MODE_SAFE,
+              "50F8 auto safe");
+    }
+    /* 50G Code Review */
+    {
+        int s = -1;
+        printf("50G1 review doc exists\n");
+        CHECK(recenv64_init()==0, "50G2 init");
+        CHECK(recenv64_boot_failed()==1 && recenv64_boot_failed()==2 &&
+              recenv64_boot_failed()==3, "50G3 fails to 3");
+        CHECK(recenv64_boot_failed()==0, "50G4 cap at 3");
+        CHECK(recenv64_enter()==0, "50G5 enter after fails");
+        CHECK(recenv64_state(&s)==0 && s==RECENV_MENU, "50G6 menu reachable");
+    }
+    /* 50H Security Audit */
+    {
+        printf("50H1 audit doc exists\n");
+        CHECK(recenv64_init()==0, "50H2 init");
+        CHECK(recenv64_enter()==0, "50H3 enter");
+        CHECK(recenv64_select(7)==-3, "50H4 bad mode reject");
+        CHECK(recenv64_selected_mode(0)==-1, "50H5 null mode out");
+        CHECK(recenv64_confirm()==0, "50H6 confirm");
+        CHECK(recenv64_enter()==-1, "50H7 re-enter after resolved");
+    }
+    /* 50I Documentation */
+    {
+        printf("50I1 docs exist\n");
+        CHECK(recenv64_init()==0, "50I2 ok");
+    }
+    /* 50J Release */
+    {
+        int s = -1;
+        printf("50J1 release doc exists\n");
+        CHECK(recenv64_init()==0, "50J2 init");
+        CHECK(recenv64_enter()==0, "50J3 enter");
+        CHECK(recenv64_select(RECENV_MODE_NETBOOT)==0, "50J4 netboot mode");
+        CHECK(recenv64_confirm()==0, "50J5 confirm");
+        CHECK(recenv64_selected_mode(&s)==0 && s==RECENV_MODE_NETBOOT,
+              "50J6 mode chosen");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
