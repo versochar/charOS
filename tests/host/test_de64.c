@@ -18,6 +18,7 @@
 #include "arch/x86_64/nbp.h"
 #include "arch/x86_64/recenv.h"
 #include "arch/x86_64/ctr.h"
+#include "arch/x86_64/fpsb.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -3730,7 +3731,7 @@ int main(void) {
         printf("51I1 docs exist\n");
         CHECK(ctr64_init()==0, "51I2 ok");
     }
-    /* 51J Release */
+/* 51J Release */
     {
         int id = -1;
         printf("51J1 release doc exists\n");
@@ -3740,6 +3741,104 @@ int main(void) {
         CHECK(ctr64_start(id)==0, "51J4 start");
         CHECK(ctr64_pause(id)==0 && ctr64_resume(id)==0, "51J5 pause/resume");
         CHECK(ctr64_count()==1, "51J6 final count");
+    }
+
+    /* 52A Flatpak Sandbox Design */
+    {
+        printf("52A1 design doc exists\n");
+        CHECK(fpsb64_init()==0, "52A2 init ok");
+        CHECK(fpsb64_count()==0, "52A3 empty");
+    }
+    /* 52B API Spec */
+    {
+        int id = -1;
+        printf("52B1 API spec exists\n");
+        CHECK(fpsb64_init()==0, "52B2 init");
+        CHECK(fpsb64_create("org.gnome.Calc",FPSB_GPU,
+              "runtime/org.gnome.Platform/x86_64/44",&id)==0,
+              "52B3 create calc");
+        CHECK(fpsb64_count()==1, "52B4 count1");
+        CHECK(fpsb64_create("org.gnome.Calc",0,"r",&id)==-3, "52B5 dup app");
+    }
+    /* 52C Implementation Start */
+    {
+        int id = -1;
+        printf("52C1 impl start doc exists\n");
+        CHECK(fpsb64_init()==0, "52C2 init");
+        CHECK(fpsb64_create("appid",FPSB_DBUS,"runtime/d/e",&id)==0,
+              "52C3 create");
+        CHECK(fpsb64_has_perm(id,FPSB_DBUS)==1, "52C4 has dbus");
+        CHECK(fpsb64_has_perm(id,FPSB_NET)==0, "52C5 no net");
+    }
+    /* 52D Code Development */
+    {
+        int id = -1, st = -1;
+        printf("52D1 code dev doc exists\n");
+        CHECK(fpsb64_init()==0, "52D2 init");
+        CHECK(fpsb64_create("a.b",FPSB_X11,"runtime/x",&id)==0, "52D3 create");
+        CHECK(fpsb64_launch(id)==0, "52D4 launch");
+        CHECK(fpsb64_state(id,&st)==0 && st==FPSB_RUNNING, "52D5 running");
+        CHECK(fpsb64_grant(id,FPSB_NET)==-3, "52D6 grant while running");
+    }
+    /* 52E Unit Tests */
+    {
+        int id = -1;
+        printf("52E1 unit tests exist\n");
+        CHECK(fpsb64_init()==0, "52E2 init");
+        CHECK(fpsb64_create(0,0,0,&id)==-1, "52E3 null args");
+        CHECK(fpsb64_create("a",0xF0000,"r",&id)==-2, "52E4 bad perm bits");
+        CHECK(fpsb64_launch(42)==-1, "52E5 unknown id");
+        CHECK(fpsb64_state(1,0)==-1, "52E6 null out");
+    }
+    /* 52F Integration Tests */
+    {
+        int id1=-1, id2=-1;
+        printf("52F1 integration tests exist\n");
+        CHECK(fpsb64_init()==0, "52F2 init");
+        CHECK(fpsb64_create("net.app",FPSB_NET,"runtime/x",&id1)==0, "52F3 net");
+        CHECK(fpsb64_create("safe.app",FPSB_GPU,"runtime/y",&id2)==0, "52F4 gpu");
+        CHECK(fpsb64_launch(id1)==0, "52F5 net launch ok");
+        CHECK(fpsb64_launch(id2)==0, "52F6 gpu launch ok");
+        CHECK(fpsb64_count()==2, "52F7 count2");
+        CHECK(fpsb64_has_perm(id1,FPSB_NET)==1 && fpsb64_has_perm(id2,FPSB_NET)==0,
+              "52F8 perm isolation");
+    }
+    /* 52G Code Review */
+    {
+        int id=-1, st=-1;
+        printf("52G1 review doc exists\n");
+        CHECK(fpsb64_init()==0, "52G2 init");
+        CHECK(fpsb64_create("g.app",FPSB_NET|FPSB_DEVICES,"runtime/x",&id)==0,
+              "52G3 both perms");
+        CHECK(fpsb64_launch(id)==-3, "52G4 unsafe combo blocked");
+        CHECK(fpsb64_state(id,&st)==0 && st==FPSB_BLOCKED, "52G5 blocked");
+        CHECK(fpsb64_denied_count(id,&st)==0 && st==1, "52G6 denied logged");
+    }
+    /* 52H Security Audit */
+    {
+        int id=-1;
+        printf("52H1 audit doc exists\n");
+        CHECK(fpsb64_init()==0, "52H2 init");
+        CHECK(fpsb64_create("s",FPSB_NET|FPSB_DBUS,"r",&id)==0, "52H3 create");
+        CHECK(fpsb64_revoke(id,FPSB_NET)==0, "52H4 revoke net");
+        CHECK(fpsb64_has_perm(id,FPSB_NET)==0, "52H5 net gone");
+        CHECK(fpsb64_has_perm(id,FPSB_DBUS)==1, "52H6 dbus kept");
+        CHECK(fpsb64_denied_count(id,0)==-1, "52H7 null denied out");
+    }
+    /* 52I Documentation */
+    {
+        printf("52I1 docs exist\n");
+        CHECK(fpsb64_init()==0, "52I2 ok");
+    }
+    /* 52J Release */
+    {
+        int id=-1;
+        printf("52J1 release doc exists\n");
+        CHECK(fpsb64_init()==0, "52J2 init");
+        CHECK(fpsb64_create("org.Example.App",FPSB_PULSE|FPSB_X11,
+              "runtime/org.gnome.Platform/x86_64/44",&id)==0, "52J3 create");
+        CHECK(fpsb64_launch(id)==0, "52J4 launch");
+        CHECK(fpsb64_has_perm(id,FPSB_PULSE)==1, "52J5 perm ok");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }

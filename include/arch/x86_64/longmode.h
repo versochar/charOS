@@ -2002,4 +2002,16 @@ int ctr64_state(int id, int *out);
 int ctr64_count(void);
 int ctr64_pid(int id, u64 *out_pid);
 
+/* --- 52A: Flatpak Sandbox (fpsb) --- */
+int fpsb64_init(void);
+int fpsb64_create(const char *app_id, u32 perms, const char *runtime_ref,
+                  int *out_id);
+int fpsb64_launch(int id);
+int fpsb64_grant(int id, u32 bits);
+int fpsb64_revoke(int id, u32 bits);
+int fpsb64_has_perm(int id, u32 bits);
+int fpsb64_state(int id, int *out);
+int fpsb64_denied_count(int id, int *out);
+int fpsb64_count(void);
+
 #endif
