@@ -20,6 +20,7 @@
 #include <core/prof.h>
 #include <core/version.h>
 #include <core/doc.h>
+#include <core/abi.h>
 #include <test/selftest.h>
 #include <core/apic.h>
 #include <fs/chfs.h>
@@ -750,6 +751,28 @@ void kernel_main(uint32_t magic, uint32_t mboot_ptr)
         }
     }
     vga_puts("[29] done\n"); serial_puts("[29] done\n");
+
+    /* 30.4: ABI kararlılık kapısı (mühür + tablo-belge kapsaması) */
+    vga_puts("[30] abi...\n"); serial_puts("[30] abi...\n");
+    {
+        int fails = 0;
+        if (selftest_register("abi", abi_selftest) != 0) fails++;
+        if (abi_selftest() != 0) fails++;
+        {
+            int missing = syscall_abi_check();
+            serial_puts("[30] belgesiz syscall "); serial_puthex((uint32_t)missing);
+            serial_puts("\n");
+            if (missing != 0) fails++;
+        }
+        if (fails == 0) {
+            serial_puts("[30] abi [PASS]\n");
+            vga_puts("[30] abi [PASS]\n");
+        } else {
+            serial_puts("[30] abi [FAIL]\n");
+            vga_puts("[30] abi [FAIL]\n");
+        }
+    }
+    vga_puts("[30] done\n"); serial_puts("[30] done\n");
 
     /* 14G: ACPI + HPET + RTC alarm (güç geçişi YOK, yalnızca hazırlık) */
     vga_puts("[14G] acpi/hpet/rtc-alarm...\n"); serial_puts("[14G] acpi/hpet/rtc-alarm...\n");

@@ -15,6 +15,7 @@
 #include <process/cap.h>
 #include <process/sandbox.h>
 #include <core/doc.h>
+#include <core/abi.h>
 #include <drivers/input.h>
 #include <drivers/vt.h>
 #include <string.h>
@@ -550,6 +551,15 @@ static uint32_t sys_sb_on_wrap(uint32_t a, uint32_t b, uint32_t c) {
     if (!t) return (uint32_t)-1;
     t->sb_on = 1;
     return 0;
+}
+
+/* 30.4: kayıtlı ama belgesiz syscall sayacı (0=ABI temiz) */
+int syscall_abi_check(void) {
+    int missing = 0;
+    for (uint32_t i = 0; i < 256; i++) {
+        if (syscall_table[i] && !doc_name(i)) missing++;
+    }
+    return missing;
 }
 
 /* 29.4: makine-okunur belgeler (sınırlı yığın tamponu + copy_to_user) */
