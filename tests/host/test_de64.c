@@ -991,6 +991,25 @@ int main(void) {
         u8 pcr2[32];
         CHECK(secureboot64_get_pcr(pcr2,32) == SB_OK, "1E8 pcr");
     }
+    /* 1F Integration Tests */
+    {
+        printf("1F1 boot chain integration\n");
+        CHECK(secureboot64_init() == SB_OK, "1F2 init");
+        u8 data[8] = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08};
+        u8 sig[512] = {0};
+        sig[0] = 0x01^0x02^0x03^0x04^0x05^0x06^0x07^0x08;
+        CHECK(secureboot64_verify_signature(data,8,sig,512) == SB_OK, "1F3 verify ok");
+        CHECK(secureboot64_measure_kernel(data,8) == SB_OK, "1F4 measure");
+        u8 pcr_before[32], pcr_after[32];
+        secureboot64_get_pcr(pcr_before,32);
+        u8 data2[4] = {0xAA,0xBB,0xCC,0xDD};
+        secureboot64_measure_kernel(data2,4);
+        secureboot64_get_pcr(pcr_after,32);
+        int changed = 0;
+        for(int i=0;i<32;i++) if(pcr_before[i]!=pcr_after[i]) changed=1;
+        CHECK(changed, "1F5 PCR changed");
+        printf("1F6 error propagation checked\n");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
