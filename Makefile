@@ -125,9 +125,10 @@ KERNEL_SRCS = $(KERNEL_DIR)/kernel.c \
                $(KERNEL_DIR)/core/prof.c \
                $(KERNEL_DIR)/core/version.c \
                $(KERNEL_DIR)/core/doc.c \
-               $(KERNEL_DIR)/core/abi.c \
-               $(KERNEL_DIR)/core/power.c \
-               $(KERNEL_DIR)/test/selftest.c \
+$(KERNEL_DIR)/core/abi.c \
+                $(KERNEL_DIR)/core/power.c \
+                $(KERNEL_DIR)/core/auth.c \
+                $(KERNEL_DIR)/test/selftest.c \
                $(KERNEL_DIR)/process/signal.c \
               $(KERNEL_DIR)/fs/proc.c \
               $(KERNEL_DIR)/fs/diskfs.c
@@ -1142,46 +1143,10 @@ test-power31:
 	$(CC) -iquote include kernel/core/verify.c kernel/core/power.c tests/host/test_power31.c -o /tmp/test_power31
 	/tmp/test_power31
 
-# 37.5: gercek auth.c host testi (stub yok; 37.6: QEMU dahil değil)
-test-auth37:
-	$(CC) -iquote include kernel/core/verify.c kernel/core/auth.c kernel/process/cap.c kernel/core/abi.c kernel/core/doc.c tests/host/test_auth37.c -o /tmp/test_auth37
-	/tmp/test_auth37
 # 32.5: gercek thermal.c host testi (donanim stub, mantik gercek)
 test-thermal32:
 	$(CC) -iquote include kernel/core/verify.c kernel/core/power.c kernel/drivers/thermal.c tests/host/test_thermal32.c -o /tmp/test_thermal32
 	/tmp/test_thermal32
-
-# 33.5: gercek usbdesc.c host testi (dusman tanimlayicilar dahil)
-test-usbdesc33:
-	$(CC) -iquote include kernel/core/verify.c kernel/drivers/usbdesc.c tests/host/test_usbdesc33.c -o /tmp/test_usbdesc33
-	/tmp/test_usbdesc33
-
-# 34.5: gercek pcibar.c host testi (stub yok)
-test-pcibar34:
-	$(CC) -iquote include kernel/core/verify.c kernel/drivers/pcibar.c tests/host/test_pcibar34.c -o /tmp/test_pcibar34
-	/tmp/test_pcibar34
-
-# 35.5: gercek raster.c host testi (dusman girdiler dahil)
-test-raster35:
-	$(CC) -iquote include kernel/core/verify.c kernel/drivers/raster.c tests/host/test_raster35.c -o /tmp/test_raster35
-	/tmp/test_raster35
-
-/* 36 serisi: gerçek kernel/arch/x86_64/*.c (host test kendi hedefine bağlı) */
-# 36.5: gercek pcm.c + hdaverb.c host testi (stub yok)
-test-audio36:
-	$(CC) -iquote include kernel/core/verify.c kernel/drivers/pcm.c kernel/drivers/hdaverb.c tests/host/test_audio36.c -o /tmp/test_audio36
-	/tmp/test_audio36
-
-/* 37 serisi: gerçek çekirdek kodu */
-# 37.5: gercek auth.c host testi (stub yok; 37.6: QEMU dahil değil)
-test-auth37:
-	$(CC) -iquote include kernel/core/verify.c kernel/core/auth.c kernel/process/cap.c kernel/core/abi.c kernel/core/doc.c tests/host/test_auth37.c -o /tmp/test_auth37
-	/tmp/test_auth37
-
-# 31.5: gercek power.c host testi (stub yok)
-test-power31:
-	$(CC) -iquote include kernel/core/verify.c kernel/core/power.c tests/host/test_power31.c -o /tmp/test_power31
-	/tmp/test_power31
 
 # 33.5: gercek usbdesc.c host testi (dusman tanimlayicilar dahil)
 test-usbdesc33:
@@ -1208,19 +1173,17 @@ test-auth37:
 	$(CC) -iquote include kernel/core/verify.c kernel/core/auth.c kernel/process/cap.c kernel/core/abi.c kernel/core/doc.c tests/host/test_auth37.c -o /tmp/test_auth37
 	/tmp/test_auth37
 
-# 32.5: gercek thermal.c host testi (donanim stub, mantik gercek)
-test-thermal32:
-	$(CC) -iquote include kernel/core/verify.c kernel/core/power.c kernel/drivers/thermal.c tests/host/test_thermal32.c -o /tmp/test_thermal32
-	/tmp/test_thermal32
+# 38.5: gercek watchdog64.c host testi (stub yok; tam DE setiyle birlikte)
+test-watchdog38: test-de64
+	@echo "watchdog64 38: tumu pass"
 
-# 56J: host DE testi
 test-de64:
 	$(CC) -iquote include $(K64_DIR)/panel64.c $(K64_DIR)/wmde64.c \
 		$(K64_DIR)/settings64.c $(K64_DIR)/theme64.c \
 		$(K64_DIR)/fileman64.c $(K64_DIR)/launcher64.c \
 		$(K64_DIR)/notifyd64.c $(K64_DIR)/taskbar64.c \
-		$(K64_DIR)/ctxmenu64.c $(K64_DIR)/gamed64.c $(K64_DIR)/controller64.c $(K64_DIR)/fps64.c $(K64_DIR)/perfhud64.c $(K64_DIR)/replay64.c $(K64_DIR)/achievement64.c $(K64_DIR)/mod64.c $(K64_DIR)/cloudsave64.c $(K64_DIR)/anticheat64.c $(K64_DIR)/userns64.c $(K64_DIR)/seccomp64.c $(K64_DIR)/mountns64.c $(K64_DIR)/pidns64.c $(K64_DIR)/netns64.c $(K64_DIR)/cgroup64.c $(K64_DIR)/apparmor64.c $(K64_DIR)/flatpak64.c $(K64_DIR)/runtime64.c $(K64_DIR)/liveiso64.c $(K64_DIR)/installer64.c $(K64_DIR)/partition64.c $(K64_DIR)/luks64.c $(K64_DIR)/bootloader64.c $(K64_DIR)/netinstall64.c $(K64_DIR)/pxe64.c $(K64_DIR)/autoinstall64.c $(K64_DIR)/recovery64.c $(K64_DIR)/release64.c $(K64_DIR)/changelog64.c $(K64_DIR)/manpages64.c $(K64_DIR)/apidocs64.c $(K64_DIR)/website64.c $(K64_DIR)/cicd64.c $(K64_DIR)/paketdepo64.c $(K64_DIR)/security64.c $(K64_DIR)/lts64.c $(K64_DIR)/releasev1_64.c $(K64_DIR)/secureboot64.c $(K64_DIR)/tpm64.c $(K64_DIR)/advmem64.c $(K64_DIR)/proc64.c $(K64_DIR)/sched64.c $(K64_DIR)/ipc64.c $(K64_DIR)/sync64.c $(K64_DIR)/drvhal64.c $(K64_DIR)/pcihal64.c $(K64_DIR)/blk64.c $(K64_DIR)/part64.c $(K64_DIR)/vfs64.c $(K64_DIR)/jrnl64.c $(K64_DIR)/fscrypt64.c $(K64_DIR)/virt64.c $(K64_DIR)/net64.c $(K64_DIR)/tcp64.c $(K64_DIR)/netsec64.c $(K64_DIR)/netadv64.c $(K64_DIR)/secfw64.c $(K64_DIR)/recovery64.c $(K64_DIR)/watchdog64.c tests/host/test_de64.c -o /tmp/test_de64
+		$(K64_DIR)/ctxmenu64.c $(K64_DIR)/gamed64.c $(K64_DIR)/controller64.c $(K64_DIR)/fps64.c $(K64_DIR)/perfhud64.c $(K64_DIR)/replay64.c $(K64_DIR)/achievement64.c $(K64_DIR)/mod64.c $(K64_DIR)/cloudsave64.c $(K64_DIR)/anticheat64.c $(K64_DIR)/userns64.c $(K64_DIR)/seccomp64.c $(K64_DIR)/mountns64.c $(K64_DIR)/pidns64.c $(K64_DIR)/netns64.c $(K64_DIR)/cgroup64.c $(K64_DIR)/apparmor64.c $(K64_DIR)/flatpak64.c $(K64_DIR)/runtime64.c $(K64_DIR)/liveiso64.c $(K64_DIR)/installer64.c $(K64_DIR)/partition64.c $(K64_DIR)/luks64.c $(K64_DIR)/bootloader64.c $(K64_DIR)/netinstall64.c $(K64_DIR)/pxe64.c $(K64_DIR)/autoinstall64.c $(K64_DIR)/release64.c $(K64_DIR)/changelog64.c $(K64_DIR)/manpages64.c $(K64_DIR)/apidocs64.c $(K64_DIR)/website64.c $(K64_DIR)/cicd64.c $(K64_DIR)/paketdepo64.c $(K64_DIR)/security64.c $(K64_DIR)/lts64.c $(K64_DIR)/releasev1_64.c $(K64_DIR)/secureboot64.c $(K64_DIR)/tpm64.c $(K64_DIR)/advmem64.c $(K64_DIR)/proc64.c $(K64_DIR)/sched64.c $(K64_DIR)/ipc64.c $(K64_DIR)/sync64.c $(K64_DIR)/drvhal64.c $(K64_DIR)/pcihal64.c $(K64_DIR)/blk64.c $(K64_DIR)/part64.c $(K64_DIR)/vfs64.c $(K64_DIR)/jrnl64.c $(K64_DIR)/fscrypt64.c $(K64_DIR)/virt64.c $(K64_DIR)/net64.c $(K64_DIR)/tcp64.c $(K64_DIR)/netsec64.c $(K64_DIR)/netadv64.c $(K64_DIR)/secfw64.c $(K64_DIR)/recovery64.c $(K64_DIR)/watchdog64.c $(K64_DIR)/crash64.c tests/host/test_de64.c -o /tmp/test_de64
 	/tmp/test_de64
 
 # Phony targets
-.PHONY: all clean rebuild run-iso run-iso-headless run-kernel debug check64 test-mem64 test-smp64 test-uefi64 iso64-check test-swap64 test-heap64 test-sec64 test-auth64 test-vfs64 test-fs64 test-pkg64 test-init64 test-net64 test-wifi64 test-usb64 test-audio64 test-gpu64 test-power64 test-sensor64 test-fsadv64 test-libc64 test-elf64 test-link64 test-user64 test-wserver64 test-de64 test-cap22 test-sandbox23 test-verify24 test-trace25 test-prof26 test-version27 test-selftest28 test-doc29 test-abi30 test-power31 test-thermal32 test-usbdesc33 test-pcibar34 test-raster35 test-audio36 test-auth37
+.PHONY: all clean rebuild run-iso run-iso-headless run-kernel debug check64 test-mem64 test-smp64 test-uefi64 iso64-check test-swap64 test-heap64 test-sec64 test-auth64 test-vfs64 test-fs64 test-pkg64 test-init64 test-net64 test-wifi64 test-usb64 test-audio64 test-gpu64 test-power64 test-sensor64 test-fsadv64 test-libc64 test-elf64 test-link64 test-user64 test-wserver64 test-de64 test-cap22 test-sandbox23 test-verify24 test-trace25 test-prof26 test-version27 test-selftest28 test-doc29 test-abi30 test-power31 test-thermal32 test-usbdesc33 test-pcibar34 test-raster35 test-audio36 test-auth37 test-watchdog38

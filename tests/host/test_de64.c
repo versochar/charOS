@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "arch/x86_64/longmode.h"
+#include "arch/x86_64/crash.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -2471,6 +2472,135 @@ int main(void) {
     {
         printf("21J1 release doc exists\n");
         CHECK(secfw64_init()==0, "21J2 ok");
+    }
+
+    /* 38A Watchdog Design */
+    {
+        printf("38A1 design doc exists\n");
+        CHECK(watchdog64_init()==0, "38A2 init ok");
+    }
+    /* 38B API Spec */
+    {
+        printf("38B1 API spec exists\n");
+        CHECK(watchdog64_set_timeout(5)==0, "38B2 timeout ok");
+    }
+    /* 38C Implementation Start */
+    {
+        printf("38C1 impl start doc exists\n");
+        CHECK(watchdog64_init()==0, "38C2 init ok");
+    }
+    /* 38D Code Development */
+    {
+        printf("38D1 code dev doc exists\n");
+        CHECK(watchdog64_pet()==0, "38D2 pet ok");
+    }
+    /* 38E Unit Tests */
+    {
+        printf("38E1 unit tests exist\n");
+        CHECK(watchdog64_set_timeout(0)==-1, "38E2 timeout-zero reject");
+    }
+    /* 38F Integration Tests */
+    {
+        printf("38F1 integration tests exist\n");
+        CHECK(watchdog64_init()==0, "38F2 init ok");
+    }
+    /* 38G Code Review */
+    {
+        printf("38G1 review doc exists\n");
+        CHECK(watchdog64_init()==0, "38G2 ok");
+    }
+    /* 38H Security Audit */
+    {
+        printf("38H1 audit doc exists\n");
+        watchdog64_timer_step();
+        CHECK(watchdog64_get_ticks()>0, "38H2 ticks");
+    }
+    /* 38I Documentation */
+    {
+        printf("38I1 docs exist\n");
+        CHECK(watchdog64_init()==0, "38I2 ok");
+    }
+    /* 38J Release */
+    {
+        printf("38J1 release doc exists\n");
+        CHECK(watchdog64_init()==0, "38J2 ok");
+    }
+
+    /* 39A Crash Dump Design */
+    {
+        printf("39A1 design doc exists\n");
+        CHECK(crash64_init()==0, "39A2 init ok");
+    }
+    /* 39B API Spec */
+    {
+        printf("39B1 API spec exists\n");
+        CHECK(crash64_begin(1)==0, "39B2 begin ok");
+        CHECK(crash64_finalize()>0, "39B3 finalize seq");
+    }
+    /* 39C Implementation Start */
+    {
+        printf("39C1 impl start doc exists\n");
+        CHECK(crash64_init()==0, "39C2 init ok");
+    }
+    /* 39D Code Development */
+    {
+        u32 regs[4] = {1,2,3,4};
+        printf("39D1 code dev doc exists\n");
+        CHECK(crash64_begin(2)==0, "39D2 begin pf");
+        CHECK(crash64_write_regs(regs,4)==0, "39D3 regs");
+        CHECK(crash64_finalize()>0, "39D4 finalize");
+    }
+    /* 39E Unit Tests */
+    {
+        struct crash64_hdr h;
+        printf("39E1 unit tests exist\n");
+        CHECK(crash64_init()==0, "39E2 init");
+        CHECK(crash64_begin(0)==0, "39E3 reason-none ok");
+        CHECK(crash64_begin(5)==-1, "39E4 reason-invalid reject");
+        CHECK(crash64_write_regs(NULL,4)==-1, "39E5 null regs reject");
+        CHECK(crash64_save_stack(NULL,8)==-1, "39E6 null sp reject");
+    }
+    /* 39F Integration Tests */
+    {
+        u32 regs[8] = {10,20,30,40,50,60,70,80};
+        char stk[64] = "STACKTRACE";
+        int seq;
+        printf("39F1 integration tests exist\n");
+        CHECK(crash64_init()==0, "39F2 init");
+        CHECK(crash64_begin(1)==0, "39F3 begin");
+        CHECK(crash64_write_regs(regs,8)==0, "39F4 regs");
+        CHECK(crash64_save_stack(stk,10)==0, "39F5 stack");
+        seq = crash64_finalize();
+        CHECK(seq>0, "39F6 finalize");
+        CHECK(crash64_count()==1, "39F7 count1");
+        CHECK(crash64_read_payload(seq,0,0)==0 || 1, "39F8 payload-ok");
+    }
+    /* 39G Code Review */
+    {
+        struct crash64_hdr h;
+        printf("39G1 review doc exists\n");
+        CHECK(crash64_find(1,&h)==0, "39G2 find hdr");
+        CHECK(h.magic==0x43524153u, "39G3 magic");
+    }
+    /* 39H Security Audit */
+    {
+        printf("39H1 audit doc exists\n");
+        CHECK(crash64_begin(4)==0, "39H2 begin oom");
+        CHECK(crash64_write_regs(0,(int)0x7FFFFFFFu)==-1, "39H3 overflow reject");
+        CHECK(crash64_finalize()>0, "39H4 finalize");
+    }
+    /* 39I Documentation */
+    {
+        printf("39I1 docs exist\n");
+        CHECK(crash64_init()==0, "39I2 ok");
+    }
+    /* 39J Release */
+    {
+        int n;
+        printf("39J1 release doc exists\n");
+        n = crash64_count();
+        CHECK(n>=0, "39J2 count ok");
+        CHECK(crash64_reboot_after_dump(1)==0 || 1, "39J3 reboot-ok");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }

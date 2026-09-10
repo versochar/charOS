@@ -1864,7 +1864,19 @@ int watchdog64_init(void);
 int watchdog64_set_timeout(u8 ticks);
 int watchdog64_pet(void);
 int watchdog64_get_state(int* out_state);
-uint32_t watchdog64_get_ticks(void);
+u32 watchdog64_get_ticks(void);
 void watchdog64_timer_step(void);
+
+/* --- 39A: Crash Dump & Recovery (davranis modeli) --- */
+struct crash64_hdr;
+int crash64_init(void);
+int crash64_begin(u8 reason);
+int crash64_write_regs(const u32 *regs, int nregs);
+int crash64_save_stack(const void *sp, u32 bytes);
+int crash64_finalize(void);
+int crash64_find(int seq, struct crash64_hdr *out_hdr);
+int crash64_read_payload(int seq, void *out, u32 maxbytes);
+int crash64_reboot_after_dump(int seq);
+int crash64_count(void);
 
 #endif
