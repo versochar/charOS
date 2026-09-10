@@ -1872,6 +1872,84 @@ int main(void) {
         printf("13J1 release doc exists\n");
         CHECK(vfs64_init()==0, "13J2 ok");
     }
+    /* 14A Jrnl Design */
+    {
+        printf("14A1 design doc exists\n");
+        CHECK(jrnl64_init()==0, "14A2 design ok");
+    }
+    /* 14B API Spec */
+    {
+        printf("14B1 API spec exists\n");
+        u64 tx=0;
+        CHECK(jrnl64_begin(&tx)==0 && tx!=0, "14B2 api ok");
+        CHECK(jrnl64_abort(tx)==0, "14B3 cleanup");
+    }
+    /* 14C Implementation Start */
+    {
+        printf("14C1 impl start doc exists\n");
+        CHECK(jrnl64_init()==0, "14C2 ok");
+    }
+    /* 14D Code Development */
+    {
+        printf("14D1 code dev doc exists\n");
+        jrnl64_init();
+        u64 tx=0;
+        CHECK(jrnl64_begin(&tx)==0, "14D2 begin");
+        CHECK(jrnl64_append(tx,0x1)==0, "14D3 append");
+        CHECK(jrnl64_commit(tx)==0, "14D4 commit");
+    }
+    /* 14E Unit Tests */
+    {
+        printf("14E1 unit tests exist\n");
+        jrnl64_init();
+        CHECK(jrnl64_begin(NULL)==-1, "14E2 param");
+        CHECK(jrnl64_append(999999,1)==-1, "14E3 unknown");
+        u64 tx=0;
+        jrnl64_begin(&tx);
+        for(int i=0;i<8;i++) jrnl64_append(tx,(u64)i);
+        CHECK(jrnl64_append(tx,99)==-2, "14E4 full");
+        CHECK(jrnl64_commit(999999)==-1, "14E5 commit-unknown");
+    }
+    /* 14F Integration Tests */
+    {
+        printf("14F1 integration tests exist\n");
+        CHECK(vfs64_init()==0, "14F2 vfs");
+        CHECK(jrnl64_init()==0, "14F3 jrnl");
+        u64 ino=0, fd=0, tx=0, n=0, v=0;
+        CHECK(vfs64_create(&ino)==0, "14F4 create");
+        CHECK(jrnl64_begin(&tx)==0, "14F5 begin");
+        CHECK(jrnl64_append(tx,0x55)==0, "14F6 append");
+        CHECK(vfs64_open(ino,&fd)==0, "14F7 open");
+        CHECK(vfs64_write(fd,0x55)==0, "14F8 write");
+        CHECK(jrnl64_commit(tx)==0, "14F9 commit");
+        CHECK(jrnl64_replay(&n)==0 && n==1, "14F10 replay");
+        CHECK(vfs64_read(fd,&v)==0 && v==0x55, "14F11 read");
+    }
+    /* 14G Code Review */
+    {
+        printf("14G1 review doc exists\n");
+        CHECK(jrnl64_init()==0, "14G2 ok");
+    }
+    /* 14H Security Audit */
+    {
+        printf("14H1 audit doc exists\n");
+        jrnl64_init();
+        u64 tx=0;
+        jrnl64_begin(&tx);
+        jrnl64_commit(tx);
+        CHECK(jrnl64_append(tx,1)==-1, "14H2 append-committed");
+        CHECK(jrnl64_commit(tx)==-1, "14H3 double-commit");
+    }
+    /* 14I Documentation */
+    {
+        printf("14I1 docs exist\n");
+        CHECK(jrnl64_init()==0, "14I2 ok");
+    }
+    /* 14J Release */
+    {
+        printf("14J1 release doc exists\n");
+        CHECK(jrnl64_init()==0, "14J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");

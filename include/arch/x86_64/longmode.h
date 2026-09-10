@@ -1801,4 +1801,12 @@ int vfs64_close(u64 fd);
 int vfs64_write(u64 fd, u64 val);
 int vfs64_read(u64 fd, u64 *out_val);
 
+/* --- 14A: Journaling (davranis modeli) --- */
+int jrnl64_init(void);
+int jrnl64_begin(u64 *out_tx);
+int jrnl64_append(u64 tx, u64 val);
+int jrnl64_commit(u64 tx);
+int jrnl64_abort(u64 tx);
+int jrnl64_replay(u64 *out_count);
+
 #endif
