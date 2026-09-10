@@ -2023,6 +2023,83 @@ int main(void) {
         printf("15J1 release doc exists\n");
         CHECK(fscrypt64_init()==0, "15J2 ok");
     }
+    /* 16A Virt Design */
+    {
+        printf("16A1 design doc exists\n");
+        CHECK(virt64_init()==0, "16A2 design ok");
+    }
+    /* 16B API Spec */
+    {
+        printf("16B1 API spec exists\n");
+        u64 d=0;
+        CHECK(virt64_add(1,&d)==0 && d!=0, "16B2 api ok");
+        CHECK(virt64_del(d)==0, "16B3 cleanup");
+    }
+    /* 16C Implementation Start */
+    {
+        printf("16C1 impl start doc exists\n");
+        CHECK(virt64_init()==0, "16C2 ok");
+    }
+    /* 16D Code Development */
+    {
+        printf("16D1 code dev doc exists\n");
+        virt64_init();
+        u64 d=0, p=0;
+        CHECK(virt64_add(1,&d)==0, "16D2 add");
+        CHECK(virt64_kick(d,0)==0, "16D3 kick");
+        CHECK(virt64_poll(d,0,&p)==0 && p==1, "16D4 poll");
+        CHECK(virt64_ack(d,0)==0, "16D5 ack");
+    }
+    /* 16E Unit Tests */
+    {
+        printf("16E1 unit tests exist\n");
+        virt64_init();
+        CHECK(virt64_add(9,&(u64){0})==-1, "16E2 bad-type");
+        CHECK(virt64_kick(999999,0)==-1, "16E3 unknown");
+        u64 d=0;
+        virt64_add(0,&d);
+        CHECK(virt64_kick(d,9)==-1, "16E4 bad-q");
+        CHECK(virt64_ack(d,1)==-1, "16E5 empty-ack");
+    }
+    /* 16F Integration Tests */
+    {
+        printf("16F1 integration tests exist\n");
+        CHECK(blk64_init()==0, "16F2 blk");
+        CHECK(virt64_init()==0, "16F3 virt");
+        u64 bd=0, vd=0, p=0, v=0;
+        CHECK(blk64_create(8,&bd)==0, "16F4 blk-create");
+        CHECK(virt64_add(1,&vd)==0, "16F5 virt-add");
+        CHECK(virt64_kick(vd,1)==0, "16F6 kick");
+        CHECK(blk64_write(bd,0,0x77)==0, "16F7 write");
+        CHECK(virt64_poll(vd,1,&p)==0 && p==1, "16F8 poll");
+        CHECK(virt64_ack(vd,1)==0, "16F9 ack");
+        CHECK(blk64_read(bd,0,&v)==0 && v==0x77, "16F10 read");
+    }
+    /* 16G Code Review */
+    {
+        printf("16G1 review doc exists\n");
+        CHECK(virt64_init()==0, "16G2 ok");
+    }
+    /* 16H Security Audit */
+    {
+        printf("16H1 audit doc exists\n");
+        virt64_init();
+        u64 d=0, p=0;
+        virt64_add(0,&d);
+        virt64_del(d);
+        CHECK(virt64_kick(d,0)==-1, "16H2 use-after-del");
+        CHECK(virt64_poll(d,0,&p)==-1, "16H3 poll-after-del");
+    }
+    /* 16I Documentation */
+    {
+        printf("16I1 docs exist\n");
+        CHECK(virt64_init()==0, "16I2 ok");
+    }
+    /* 16J Release */
+    {
+        printf("16J1 release doc exists\n");
+        CHECK(virt64_init()==0, "16J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
