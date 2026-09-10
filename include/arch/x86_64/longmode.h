@@ -1890,4 +1890,14 @@ int update64_commit(void);
 int update64_state(int *out);
 int update64_staged_count(void);
 
+/* --- 41A: Package Manager (davranis modeli) --- */
+int pkgmgr64_init(void);
+int pkgmgr64_install(const char *name, const char *version);
+int pkgmgr64_remove(const char *name);
+int pkgmgr64_query(const char *name, char *version, int max);
+int pkgmgr64_upgrade_all(void);
+int pkgmgr64_list_names(char *out[], int max);
+int pkgmgr64_installed_count(void);
+int pkgmgr64_state(int *out);
+
 #endif

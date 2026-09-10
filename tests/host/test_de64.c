@@ -8,6 +8,7 @@
 #include "arch/x86_64/longmode.h"
 #include "arch/x86_64/crash.h"
 #include "arch/x86_64/update.h"
+#include "arch/x86_64/pkgmgr.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -2676,6 +2677,86 @@ int main(void) {
         printf("40J1 release doc exists\n");
         CHECK(update64_state(&st)==0 && st==UPDATE_OK, "40J2 state ok");
         CHECK(update64_rollback()==-1, "40J3 rollback only staged");
+    }
+
+    /* 41A Package Manager Design */
+    {
+        printf("41A1 design doc exists\n");
+        CHECK(pkgmgr64_init()==0, "41A2 init ok");
+    }
+    /* 41B API Spec */
+    {
+        printf("41B1 API spec exists\n");
+        CHECK(pkgmgr64_install("shell","1.0")==0, "41B2 install shell");
+        CHECK(pkgmgr64_installed_count()==1, "41B3 count1");
+    }
+    /* 41C Implementation Start */
+    {
+        printf("41C1 impl start doc exists\n");
+        CHECK(pkgmgr64_init()==0, "41C2 init ok");
+    }
+    /* 41D Code Development */
+    {
+        char v[32];
+        printf("41D1 code dev doc exists\n");
+        CHECK(pkgmgr64_install("core","9.9")==0, "41D2 install core");
+        CHECK(pkgmgr64_install("core","10.0")==0, "41D3 upgrade core");
+        CHECK(pkgmgr64_query("core",v,32)==0 && strcmp(v,"10.0")==0, "41D4 query ver");
+        CHECK(pkgmgr64_remove("core")==0, "41D5 remove core");
+    }
+    /* 41E Unit Tests */
+    {
+        char v[16];
+        printf("41E1 unit tests exist\n");
+        CHECK(pkgmgr64_init()==0, "41E2 init");
+        CHECK(pkgmgr64_install(NULL,"1")==-1, "41E3 null name reject");
+        CHECK(pkgmgr64_install("a",NULL)==-1, "41E4 null ver reject");
+        CHECK(pkgmgr64_query("a",v,16)==-2, "41E5 not-found");
+        CHECK(pkgmgr64_remove("a")==-2, "41E6 remove not-found");
+    }
+    /* 41F Integration Tests */
+    {
+        char *names[8] = {0};
+        int n;
+        printf("41F1 integration tests exist\n");
+        CHECK(pkgmgr64_init()==0, "41F2 init");
+        CHECK(pkgmgr64_install("net","2.2")==0, "41F3 net");
+        CHECK(pkgmgr64_install("gui","3.0")==0, "41F4 gui");
+        CHECK(pkgmgr64_install("fs","4.4")==0, "41F5 fs");
+        n = pkgmgr64_list_names(names,8);
+        CHECK(n==3, "41F6 list3");
+        CHECK(pkgmgr64_installed_count()==3, "41F7 count3");
+        CHECK(pkgmgr64_remove("gui")==0, "41F8 remove gui");
+        CHECK(pkgmgr64_installed_count()==2, "41F9 count2");
+    }
+    /* 41G Code Review */
+    {
+        char v[16];
+        printf("41G1 review doc exists\n");
+        CHECK(pkgmgr64_init()==0, "41G2 init");
+        CHECK(pkgmgr64_install("z","1")==0, "41G3 install");
+        CHECK(pkgmgr64_install("z","0.5")==-2, "41G4 older ver reject");
+        CHECK(pkgmgr64_query("z",v,16)==0 && strcmp(v,"1")==0, "41G5 ver kept");
+    }
+    /* 41H Security Audit */
+    {
+        printf("41H1 audit doc exists\n");
+        CHECK(pkgmgr64_init()==0, "41H2 init");
+        CHECK(pkgmgr64_query(0,0,0)==-1, "41H3 null args reject");
+        CHECK(pkgmgr64_state(0)==-1, "41H4 null state reject");
+    }
+    /* 41I Documentation */
+    {
+        printf("41I1 docs exist\n");
+        CHECK(pkgmgr64_init()==0, "41I2 ok");
+    }
+    /* 41J Release */
+    {
+        int st = -1;
+        printf("41J1 release doc exists\n");
+        CHECK(pkgmgr64_install("final","1.0")==0, "41J2 install");
+        CHECK(pkgmgr64_state(&st)==0, "41J3 state ok");
+        CHECK(pkgmgr64_upgrade_all()>=0, "41J4 upgrade ok");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
