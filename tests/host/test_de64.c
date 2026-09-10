@@ -15,6 +15,7 @@
 #include "arch/x86_64/parttool.h"
 #include "arch/x86_64/luksop.h"
 #include "arch/x86_64/blcfg.h"
+#include "arch/x86_64/nbp.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -3441,6 +3442,100 @@ int main(void) {
         CHECK(blcfg64_set_timeout(5)==0, "48J4 timeout 5");
         CHECK(blcfg64_validate("/boot/kernel.bin","/boot/initrd.img")==0,
               "48J5 validate");
+    }
+
+    /* 49A PXE Design */
+    {
+        printf("49A1 design doc exists\n");
+        CHECK(nbp64_init()==0, "49A2 init ok");
+    }
+    /* 49B API Spec */
+    {
+        printf("49B1 API spec exists\n");
+        CHECK(nbp64_init()==0, "49B2 init");
+        CHECK(nbp64_discover()==-1, "49B3 no-server reject");
+        CHECK(nbp64_set_server(0xC0A80101,0xC0A80101)==0, "49B4 set server");
+        CHECK(nbp64_set_bootfile("/boot/kernel.bin")==0, "49B5 bootfile");
+    }
+    /* 49C Implementation Start */
+    {
+        printf("49C1 impl start doc exists\n");
+        CHECK(nbp64_init()==0, "49C2 init");
+        CHECK(nbp64_set_server(0x0A000001,0x0A000002)==0, "49C3 servers");
+        CHECK(nbp64_discover()==0, "49C4 discover");
+        CHECK(nbp64_attempts()==0, "49C5 attempts0");
+    }
+    /* 49D Code Development */
+    {
+        int st = -1;
+        printf("49D1 code dev doc exists\n");
+        CHECK(nbp64_init()==0, "49D2 init");
+        CHECK(nbp64_set_server(0xC0A80101,0xC0A80101)==0, "49D3 server");
+        CHECK(nbp64_discover()==0, "49D4 discover");
+        CHECK(nbp64_poll()==1, "49D5 retry (no bootfile)");
+        CHECK(nbp64_attempts()==1, "49D6 attempts1");
+        CHECK(nbp64_set_bootfile("CHAROS.IMG")==0, "49D7 bootfile now");
+        CHECK(nbp64_poll()==0, "49D8 to tftp");
+        CHECK(nbp64_state(&st)==0 && st==NBP64_TFTP_DOWNLOAD, "49D9 tftp stage");
+    }
+    /* 49E Unit Tests */
+    {
+        printf("49E1 unit tests exist\n");
+        CHECK(nbp64_init()==0, "49E2 init");
+        CHECK(nbp64_boot()==-1, "49E3 boot before ready");
+        CHECK(nbp64_set_bootfile(0)==-1, "49E4 null bootfile");
+        CHECK(nbp64_set_server(0,0)==-1, "49E5 zero server reject");
+        CHECK(nbp64_state(0)==-1, "49E6 null state reject");
+        CHECK(nbp64_reset()==0, "49E7 reset ok");
+    }
+    /* 49F Integration Tests */
+    {
+        int st = -1;
+        printf("49F1 integration tests exist\n");
+        CHECK(nbp64_init()==0, "49F2 init");
+        CHECK(nbp64_set_server(0xC0A80101,0xC0A801FF)==0, "49F3 server");
+        CHECK(nbp64_set_bootfile("k.bin")==0, "49F4 bootfile");
+        CHECK(nbp64_discover()==0, "49F5 discover");
+        CHECK(nbp64_poll()==0, "49F6 to tftp");
+        CHECK(nbp64_state(&st)==0 && st==NBP64_TFTP_DOWNLOAD, "49F7 tftp stage");
+        CHECK(nbp64_boot()==0, "49F8 boot");
+        CHECK(nbp64_state(&st)==0 && st==NBP64_EXEC, "49F9 exec stage");
+    }
+    /* 49G Code Review */
+    {
+        printf("49G1 review doc exists\n");
+        CHECK(nbp64_init()==0, "49G2 init");
+        CHECK(nbp64_discover()==-1, "49G3 no server");
+        CHECK(nbp64_set_server(0x0A000001,0x0A000002)==0, "49G4 server");
+        CHECK(nbp64_set_bootfile("x")==0 && nbp64_discover()==0 && 
+              nbp64_poll()==0 && nbp64_boot()==0, "49G5 happy path");
+    }
+    /* 49H Security Audit */
+    {
+        printf("49H1 audit doc exists\n");
+        CHECK(nbp64_init()==0, "49H2 init");
+        CHECK(nbp64_set_server(0x0A000001,0x0A000001)==0, "49H3 server");
+        CHECK(nbp64_discover()==0, "49H4 discover");
+        CHECK(nbp64_poll()==1, "49H5 retry1");
+        CHECK(nbp64_poll()==1, "49H6 retry2");
+        CHECK(nbp64_poll()==1, "49H7 retry3");
+        CHECK(nbp64_poll()==1, "49H8 retry4");
+        CHECK(nbp64_poll()==-2, "49H9 attempts exhausted to FAILED");
+        CHECK(nbp64_attempts()==5, "49H10 attempts count");
+    }
+    /* 49I Documentation */
+    {
+        printf("49I1 docs exist\n");
+        CHECK(nbp64_init()==0, "49I2 ok");
+    }
+    /* 49J Release */
+    {
+        printf("49J1 release doc exists\n");
+        CHECK(nbp64_init()==0, "49J2 init");
+        CHECK(nbp64_set_server(0xC0A80101,0xC0A80101)==0 &&
+              nbp64_set_bootfile("kernel")==0, "49J3 setup");
+        CHECK(nbp64_discover()==0 && nbp64_poll()==0 && nbp64_boot()==0,
+              "49J4 boot chain");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }

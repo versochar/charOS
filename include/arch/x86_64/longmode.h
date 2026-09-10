@@ -1968,4 +1968,15 @@ int blcfg64_validate(const char *kernel_path, const char *initrd_path);
 int blcfg64_entry_count(void);
 int blcfg64_timeout(int *out);
 
+/* --- 49A: PXE & Network Boot (nbp) --- */
+int nbp64_init(void);
+int nbp64_set_server(u32 ip, u32 tftp_ip);
+int nbp64_set_bootfile(const char *path);
+int nbp64_discover(void);
+int nbp64_poll(void);
+int nbp64_boot(void);
+int nbp64_reset(void);
+int nbp64_state(int *out);
+int nbp64_attempts(void);
+
 #endif
