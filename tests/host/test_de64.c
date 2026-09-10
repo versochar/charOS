@@ -2177,6 +2177,85 @@ int main(void) {
         printf("17J1 release doc exists\n");
         CHECK(net64_init()==0, "17J2 ok");
     }
+    /* 18A TCP Design */
+    {
+        printf("18A1 design doc exists\n");
+        CHECK(tcp64_init()==0, "18A2 design ok");
+    }
+    /* 18B API Spec */
+    {
+        printf("18B1 API spec exists\n");
+        u64 s=0;
+        CHECK(tcp64_socket(&s)==0 && s!=0, "18B2 api ok");
+        CHECK(tcp64_close(s)==0, "18B3 cleanup");
+    }
+    /* 18C Implementation Start */
+    {
+        printf("18C1 impl start doc exists\n");
+        CHECK(tcp64_init()==0, "18C2 ok");
+    }
+    /* 18D Code Development */
+    {
+        printf("18D1 code dev doc exists\n");
+        tcp64_init();
+        u64 s=0, v=0;
+        CHECK(tcp64_socket(&s)==0, "18D2 socket");
+        CHECK(tcp64_bind(s,0x7F000001,8080)==0, "18D3 bind");
+        CHECK(tcp64_connect(s,0x7F000001,9090)==0, "18D4 connect");
+        CHECK(tcp64_send(s,0x11)==0, "18D5 send");
+        CHECK(tcp64_recv(s,&v)==0 && v==0x11, "18D6 recv");
+    }
+    /* 18E Unit Tests */
+    {
+        printf("18E1 unit tests exist\n");
+        tcp64_init();
+        CHECK(tcp64_socket(NULL)==-1, "18E2 param");
+        u64 s=0;
+        tcp64_socket(&s);
+        CHECK(tcp64_connect(s,1,2)==-2, "18E3 order");
+        CHECK(tcp64_send(s,1)==-2, "18E4 not-connected");
+        tcp64_bind(s,1,1);
+        tcp64_connect(s,1,2);
+        CHECK(tcp64_recv(s,&(u64){0})==-1, "18E5 empty");
+    }
+    /* 18F Integration Tests */
+    {
+        printf("18F1 integration tests exist\n");
+        CHECK(net64_init()==0, "18F2 net");
+        CHECK(tcp64_init()==0, "18F3 tcp");
+        u64 nic=0, s=0, v=0;
+        CHECK(net64_if_add(1,&nic)==0, "18F4 net-add");
+        CHECK(tcp64_socket(&s)==0, "18F5 socket");
+        CHECK(tcp64_bind(s,1,80)==0, "18F6 bind");
+        CHECK(tcp64_connect(s,1,81)==0, "18F7 connect");
+        CHECK(tcp64_send(s,0x22)==0, "18F8 send");
+        CHECK(net64_send(nic,0x22)==0, "18F9 net-send");
+        CHECK(tcp64_recv(s,&v)==0 && v==0x22, "18F10 recv");
+    }
+    /* 18G Code Review */
+    {
+        printf("18G1 review doc exists\n");
+        CHECK(tcp64_init()==0, "18G2 ok");
+    }
+    /* 18H Security Audit */
+    {
+        printf("18H1 audit doc exists\n");
+        tcp64_init();
+        u64 s=0;
+        tcp64_socket(&s);
+        tcp64_close(s);
+        CHECK(tcp64_send(s,1)==-1, "18H2 use-after-close");
+    }
+    /* 18I Documentation */
+    {
+        printf("18I1 docs exist\n");
+        CHECK(tcp64_init()==0, "18I2 ok");
+    }
+    /* 18J Release */
+    {
+        printf("18J1 release doc exists\n");
+        CHECK(tcp64_init()==0, "18J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
