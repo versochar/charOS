@@ -13,6 +13,7 @@
 #include <process/pipe.h>
 #include <process/fork.h>
 #include <process/cap.h>
+#include <process/sandbox.h>
 #include <drivers/input.h>
 #include <drivers/vt.h>
 #include <string.h>
@@ -527,6 +528,29 @@ static uint32_t sys_capset_wrap(uint32_t caps, uint32_t b, uint32_t c) {
     return t->caps;
 }
 
+/* 23.5: görev sandbox yönetimi (yalnızca kendi filtresi; geri dönüşsüz sıkılaştırma) */
+static uint32_t sys_sb_allow_wrap(uint32_t nr, uint32_t b, uint32_t c) {
+    (void)b; (void)c;
+    struct task* t = task_current();
+    if (!t) return (uint32_t)-1;
+    return (uint32_t)sb_allow(t->sb_mask, nr);
+}
+
+static uint32_t sys_sb_deny_wrap(uint32_t nr, uint32_t b, uint32_t c) {
+    (void)b; (void)c;
+    struct task* t = task_current();
+    if (!t) return (uint32_t)-1;
+    return (uint32_t)sb_deny(t->sb_mask, nr);
+}
+
+static uint32_t sys_sb_on_wrap(uint32_t a, uint32_t b, uint32_t c) {
+    (void)a; (void)b; (void)c;
+    struct task* t = task_current();
+    if (!t) return (uint32_t)-1;
+    t->sb_on = 1;
+    return 0;
+}
+
 static uint32_t sys_chmod_wrap(uint32_t path, uint32_t mode, uint32_t c) {
     (void)c;
     const char* p = (const char*)path;
@@ -867,6 +891,14 @@ void syscall_handler(struct registers* regs) {
         regs->eax = (uint32_t)-1;
         return;
     }
+    /* 23.5: görev sandbox zoru (varsayılan kapalı; açan görev maskeye uyar) */
+    {
+        struct task* st = task_current();
+        if (st && st->sb_on && !sb_check(st->sb_mask, call_no)) {
+            regs->eax = (uint32_t)-1;
+            return;
+        }
+    }
     regs->eax = syscall_table[call_no](arg1, arg2, arg3);
 }
 
@@ -915,6 +947,9 @@ void syscall_init(void) {
     syscall_table[SYS_SETGROUPS] = sys_setgroups_wrap;
     syscall_table[SYS_CAPGET] = sys_capget_wrap;
     syscall_table[SYS_CAPSET] = sys_capset_wrap;
+    syscall_table[SYS_SB_ALLOW] = sys_sb_allow_wrap; /* 23.5 */
+    syscall_table[SYS_SB_DENY] = sys_sb_deny_wrap;
+    syscall_table[SYS_SB_ON] = sys_sb_on_wrap;
     syscall_table[SYS_SYSLOG] = sys_syslog_wrap;
     syscall_table[SYS_UPTIME] = sys_uptime_wrap;
     syscall_table[SYS_TLS_SET] = sys_tls_set;

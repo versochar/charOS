@@ -63,6 +63,9 @@
 #define SYS_SETGROUPS 160 /* (buf, size) -> tamamlandı; root gerekir */
 #define SYS_CAPGET 161    /* (pid) -> o anki task capability bitmask */
 #define SYS_CAPSET 162    /* (caps) -> ayarla; root serbest, diğerleri kendininkinin alt kümesi */
+#define SYS_SB_ALLOW 163  /* 23.5: sandbox'ta nr serbest bırak (nr) -> 0 / -1 */
+#define SYS_SB_DENY 164   /* 23.5: sandbox'ta nr engelle (nr) -> 0 / -1 */
+#define SYS_SB_ON 165     /* 23.5: sandbox zorlamayı aç (geri dönüşsüz) -> 0 */
 /* 22.2: capability bitleri process/cap.h'e taşındı (tek doğruluk kaynağı) */
 #include <process/cap.h>
 #define WNOHANG 1         /* 19G: waitpid bloklanmadan yokla */

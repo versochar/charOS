@@ -2,6 +2,7 @@
 #define CHAROS_PROCESS_TASK_H
 
 #include <stdint.h>
+#include <process/sandbox.h>
 #include <memory/paging.h>
 #include <fs/fd.h>
 #include <core/spinlock.h>
@@ -81,6 +82,10 @@ struct task {
     int groups[TASK_NGROUPS];
     int ngroups;
     uint32_t caps;
+
+    /* 23.4: görev sandbox filtresi (varsayılan: kapalı = her şey serbest) */
+    uint32_t sb_mask[SB_MASK_WORDS];
+    int sb_on;
 
     /* 13E: exit status, thread/process mode, process group */
     int exit_status;

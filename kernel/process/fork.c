@@ -68,6 +68,9 @@ struct task* fork_task(struct registers* regs) {
     child->uid = parent->uid; /* 14E: kimlik miras */
     child->gid = parent->gid;
     child->caps = parent->caps; /* 22.4: yetki mirası (önceden memset ile sıfırlanıyordu) */
+    for (int i = 0; i < SB_MASK_WORDS; i++) /* 23.4: sandbox mirası */
+        child->sb_mask[i] = parent->sb_mask[i];
+    child->sb_on = parent->sb_on;
     child->brk_base = parent->brk_base; /* 14A: heap miras (sayfalar CoW) */
     child->brk_cur = parent->brk_cur;
     child->user_tls = parent->user_tls; /* 15C: TLS tabanı miras */

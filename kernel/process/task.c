@@ -1,5 +1,6 @@
 #include <process/task.h>
 #include <process/cap.h>
+#include <process/sandbox.h>
 #include <memory/kheap.h>
 #include <memory/paging.h>
 #include <core/spinlock.h>
@@ -131,6 +132,8 @@ static void fd_table_init(struct task* t) {
     t->gid = 0;
     t->caps = CAP_ALL; /* 22.4: root bootstrap tam yetki; fork yolu fork.c'de ezer */
     t->ngroups = 0;
+    sb_allow_all(t->sb_mask); /* 23.4: sandbox varsayılanı serbest */
+    t->sb_on = 0;
     t->priority = 2; // 13D: default normal (0 idle, 1 high, 2 normal, 3 low)
     t->ticks_left = 10;
     t->exit_status = 0;
