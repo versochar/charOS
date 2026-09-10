@@ -2057,4 +2057,23 @@ int kprot64_on_oops(void);
 int kprot64_panic_required(void);
 int kprot64_restricted_count(void);
 
+/* --- 56A: Hardening & Mitigations (mitig) --- */
+#define MITIG64_TECH_RETPOLINE    0x001u
+#define MITIG64_TECH_IBRS         0x002u
+#define MITIG64_TECH_IBPB         0x004u
+#define MITIG64_TECH_SSBD         0x008u
+#define MITIG64_TECH_MSR_CLR      0x010u
+#define MITIG64_TECH_PTI          0x020u
+#define MITIG64_TECH_SRDS         0x040u
+#define MITIG64_TECH_TAA          0x080u
+#define MITIG64_TECH_SPECRCTRL    0x100u
+int mitig64_init(void);
+int mitig64_vuln_apply(int vuln_id, u32 tech_bits);
+int mitig64_vuln_status(int vuln_id, int *out_status);
+int mitig64_mitigated_count(void);
+int mitig64_unmitigated_count(void);
+int mitig64_auto_verify(u32 reported_tech_bits);
+int mitig64_cpu_trustworthy(void);
+int mitig64_report(u32 tech_mask, char *buf, int max);
+
 #endif

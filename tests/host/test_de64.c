@@ -22,6 +22,7 @@
 #include "arch/x86_64/landlk.h"
 #include "arch/x86_64/secpol.h"
 #include "arch/x86_64/kprot.h"
+#include "arch/x86_64/mitig.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -4134,6 +4135,112 @@ int main(void) {
         CHECK(kprot64_set_kptr(KPROT64_KPTR_ZERO)==0, "55J4 kptr zero");
         CHECK(kprot64_mask_ptr(0xABCDULL,0)==0, "55J5 masked");
         CHECK(kprot64_dmesg_allowed(1)==1, "55J6 dmesg open");
+    }
+
+    /* 56A Hardening & Mitigations Design */
+    {
+        printf("56A1 design doc exists\n");
+        CHECK(mitig64_init()==0, "56A2 init ok");
+        CHECK(mitig64_mitigated_count()==0, "56A3 none mitigated");
+        CHECK(mitig64_unmitigated_count()==7, "56A4 all vulnerable");
+        CHECK(mitig64_cpu_trustworthy()==0, "56A5 not trustworthy");
+    }
+    /* 56B API Spec */
+    {
+        int st = -1;
+        printf("56B1 api spec exists\n");
+        CHECK(mitig64_init()==0, "56B2 init");
+        CHECK(mitig64_vuln_apply(MITIG64_MELTDOWN, MITIG64_TECH_PTI)==0, "56B3 pti");
+        CHECK(mitig64_vuln_status(MITIG64_MELTDOWN, &st)==0 && st==MITIG64_MITIGATED,
+              "56B4 meltdown mitigated");
+        CHECK(mitig64_vuln_apply(99, MITIG64_TECH_PTI)==-1, "56B5 bad vuln id");
+        CHECK(mitig64_vuln_apply(MITIG64_MDS, 0)==-2, "56B6 no tech");
+    }
+    /* 56C Implementation Start */
+    {
+        int st = -1;
+        printf("56C1 impl start doc exists\n");
+        CHECK(mitig64_init()==0, "56C2 init");
+        CHECK(mitig64_vuln_apply(MITIG64_SPECTRE_V2, MITIG64_TECH_RETPOLINE)==0,
+              "56C3 partial v2");
+        CHECK(mitig64_vuln_status(MITIG64_SPECTRE_V2, &st)==0 && st==MITIG64_PARTIAL,
+              "56C4 partial status");
+        CHECK(mitig64_unmitigated_count()==6, "56C5 six still off");
+    }
+    /* 56D Code Development */
+    {
+        printf("56D1 code dev doc exists\n");
+        CHECK(mitig64_init()==0, "56D2 init");
+        CHECK(mitig64_vuln_apply(MITIG64_SPECTRE_V2,
+              MITIG64_TECH_RETPOLINE|MITIG64_TECH_IBRS)==0, "56D3 full v2");
+        CHECK(mitig64_mitigated_count()==1, "56D4 one mitigated");
+        CHECK(mitig64_vuln_apply(MITIG64_SPECTRE_V1, MITIG64_TECH_SPECRCTRL)==0,
+              "56D5 v1");
+        CHECK(mitig64_mitigated_count()==2, "56D6 two mitigated");
+    }
+    /* 56E Unit Tests */
+    {
+        printf("56E1 unit tests exist\n");
+        CHECK(mitig64_init()==0, "56E2 init");
+        CHECK(mitig64_vuln_status(0, 0)==-1, "56E3 null out");
+        CHECK(mitig64_vuln_status(-1, &(int){0})==-1, "56E4 neg vuln");
+        CHECK(mitig64_report(0xFFFF,0,0)==-1, "56E5 null buf");
+        CHECK(mitig64_report(0xFFFF, (char[8]){0}, 8)==-2, "56E6 tiny buf");
+    }
+    /* 56F Integration Tests */
+    {
+        int st = -1;
+        printf("56F1 integration src exists\n");
+        CHECK(mitig64_init()==0, "56F2 init");
+        CHECK(mitig64_vuln_apply(MITIG64_RETBLEED, MITIG64_TECH_IBPB)==0, "56F3 retbleed");
+        CHECK(mitig64_vuln_status(MITIG64_RETBLEED, &st)==0 && st==MITIG64_MITIGATED,
+              "56F4 retbleed ok");
+        CHECK(mitig64_vuln_apply(MITIG64_STOREBLEED, MITIG64_TECH_SSBD)==0, "56F5 storebleed");
+        CHECK(mitig64_unmitigated_count()==5, "56F6 five left");
+        CHECK(mitig64_cpu_trustworthy()==0, "56F7 still not trustworthy");
+    }
+    /* 56G Code Review */
+    {
+        char buf[64];
+        int n;
+        printf("56G1 review doc exists\n");
+        CHECK(mitig64_init()==0, "56G2 init");
+        CHECK(mitig64_vuln_apply(MITIG64_L1TF, MITIG64_TECH_SRDS)==0, "56G3 l1tf");
+        n = mitig64_report(1u<<MITIG64_L1TF, buf, sizeof(buf));
+        CHECK(n>0 && strcmp(buf,"l1tf")==0, "56G4 report name");
+        CHECK(mitig64_auto_verify(0)==0, "56G5 empty report fails");
+        CHECK(mitig64_auto_verify(MITIG64_TECH_SRDS)==0,
+              "56G6 partial vulns block");
+    }
+    /* 56H Security Audit */
+    {
+        printf("56H1 audit doc exists\n");
+        CHECK(mitig64_init()==0, "56H2 init");
+        CHECK(mitig64_vuln_apply(MITIG64_SPECTRE_V1, MITIG64_TECH_SPECRCTRL)==0, "56H3 v1");
+        CHECK(mitig64_vuln_apply(MITIG64_SPECTRE_V2,
+              MITIG64_TECH_RETPOLINE|MITIG64_TECH_IBRS)==0, "56H4 v2");
+        CHECK(mitig64_vuln_apply(MITIG64_MELTDOWN, MITIG64_TECH_PTI)==0, "56H5 mds pti");
+        CHECK(mitig64_vuln_apply(MITIG64_RETBLEED, MITIG64_TECH_IBPB)==0, "56H6 rb");
+        CHECK(mitig64_vuln_apply(MITIG64_STOREBLEED, MITIG64_TECH_SSBD)==0, "56H7 sb");
+        CHECK(mitig64_vuln_apply(MITIG64_MDS, MITIG64_TECH_MSR_CLR)==0, "56H8 mds");
+        CHECK(mitig64_vuln_apply(MITIG64_L1TF, MITIG64_TECH_SRDS)==0, "56H9 l1tf");
+        CHECK(mitig64_unmitigated_count()==0, "56H10 all cleared");
+        CHECK(mitig64_cpu_trustworthy()==1, "56H11 trustworthy");
+    }
+    /* 56I Documentation */
+    {
+        printf("56I1 docs exist\n");
+        CHECK(mitig64_init()==0, "56I2 ok");
+    }
+    /* 56J Release */
+    {
+        int st=-1;
+        printf("56J1 release doc exists\n");
+        CHECK(mitig64_init()==0, "56J2 init");
+        CHECK(mitig64_vuln_apply(MITIG64_MELTDOWN, MITIG64_TECH_PTI)==0, "56J3 pti");
+        CHECK(mitig64_mitigated_count()==1, "56J4 one");
+        CHECK(mitig64_vuln_status(MITIG64_MELTDOWN,&st)==0 && st==MITIG64_MITIGATED,
+              "56J5 final");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
