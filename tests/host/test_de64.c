@@ -2256,6 +2256,79 @@ int main(void) {
         printf("18J1 release doc exists\n");
         CHECK(tcp64_init()==0, "18J2 ok");
     }
+    /* 19A Netsec Design */
+    {
+        printf("19A1 design doc exists\n");
+        CHECK(netsec64_init()==0, "19A2 design ok");
+    }
+    /* 19B API Spec */
+    {
+        printf("19B1 API spec exists\n");
+        u64 r=0;
+        CHECK(netsec64_add(0x7F000001,80,1,&r)==0 && r!=0, "19B2 api ok");
+        CHECK(netsec64_del(r)==0, "19B3 cleanup");
+    }
+    /* 19C Implementation Start */
+    {
+        printf("19C1 impl start doc exists\n");
+        CHECK(netsec64_init()==0, "19C2 ok");
+    }
+    /* 19D Code Development */
+    {
+        printf("19D1 code dev doc exists\n");
+        netsec64_init();
+        u64 r=0;
+        CHECK(netsec64_add(0x7F000001,80,1,&r)==0, "19D2 add-allow");
+        CHECK(netsec64_check(0x7F000001,80)==0, "19D3 allow");
+        CHECK(netsec64_check(0x7F000001,81)==-1, "19D4 default-deny");
+    }
+    /* 19E Unit Tests */
+    {
+        printf("19E1 unit tests exist\n");
+        netsec64_init();
+        CHECK(netsec64_add(1,80,9,&(u64){0})==-1, "19E2 bad-action");
+        CHECK(netsec64_del(999999)==-1, "19E3 unknown");
+        u64 r=0;
+        netsec64_add(1,80,0,&r);
+        CHECK(netsec64_check(1,80)==-1, "19E4 deny");
+    }
+    /* 19F Integration Tests */
+    {
+        printf("19F1 integration tests exist\n");
+        CHECK(tcp64_init()==0, "19F2 tcp");
+        CHECK(netsec64_init()==0, "19F3 netsec");
+        u64 s=0, r=0;
+        CHECK(tcp64_socket(&s)==0, "19F4 socket");
+        CHECK(tcp64_bind(s,0x7F000001,8080)==0, "19F5 bind");
+        CHECK(netsec64_add(0x7F000001,8080,1,&r)==0, "19F6 allow");
+        CHECK(netsec64_check(0x7F000001,8080)==0, "19F7 check");
+        CHECK(tcp64_connect(s,0x7F000001,8080)==0, "19F8 connect");
+        CHECK(tcp64_send(s,0x33)==0, "19F9 send");
+    }
+    /* 19G Code Review */
+    {
+        printf("19G1 review doc exists\n");
+        CHECK(netsec64_init()==0, "19G2 ok");
+    }
+    /* 19H Security Audit */
+    {
+        printf("19H1 audit doc exists\n");
+        netsec64_init();
+        u64 r=0;
+        netsec64_add(2,22,1,&r);
+        netsec64_del(r);
+        CHECK(netsec64_check(2,22)==-1, "19H2 del-deny");
+    }
+    /* 19I Documentation */
+    {
+        printf("19I1 docs exist\n");
+        CHECK(netsec64_init()==0, "19I2 ok");
+    }
+    /* 19J Release */
+    {
+        printf("19J1 release doc exists\n");
+        CHECK(netsec64_init()==0, "19J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");

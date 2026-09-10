@@ -1841,4 +1841,10 @@ int tcp64_connect(u64 sock, u64 addr, u64 port);
 int tcp64_send(u64 sock, u64 val);
 int tcp64_recv(u64 sock, u64 *out_val);
 
+/* --- 19A: Network Security (davranis modeli) --- */
+int netsec64_init(void);
+int netsec64_add(u64 addr, u64 port, int action, u64 *out_rule);
+int netsec64_del(u64 rule);
+int netsec64_check(u64 addr, u64 port);
+
 #endif
