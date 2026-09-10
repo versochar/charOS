@@ -26,6 +26,7 @@
 #include <drivers/usbdesc.h>
 #include <drivers/pci.h>
 #include <drivers/pcibar.h>
+#include <drivers/raster.h>
 #include <test/selftest.h>
 #include <core/apic.h>
 #include <fs/chfs.h>
@@ -867,6 +868,22 @@ void kernel_main(uint32_t magic, uint32_t mboot_ptr)
         }
     }
     vga_puts("[34] done\n"); serial_puts("[34] done\n");
+
+    /* 35.4: kırpma çekirdeği öztesti deftere kaydolur */
+    vga_puts("[35] raster...\n"); serial_puts("[35] raster...\n");
+    {
+        int fails = 0;
+        if (selftest_register("raster", raster_selftest) != 0) fails++;
+        if (raster_selftest() != 0) fails++;
+        if (fails == 0) {
+            serial_puts("[35] raster [PASS]\n");
+            vga_puts("[35] raster [PASS]\n");
+        } else {
+            serial_puts("[35] raster [FAIL]\n");
+            vga_puts("[35] raster [FAIL]\n");
+        }
+    }
+    vga_puts("[35] done\n"); serial_puts("[35] done\n");
 
     /* 14G: ACPI + HPET + RTC alarm (güç geçişi YOK, yalnızca hazırlık) */
     vga_puts("[14G] acpi/hpet/rtc-alarm...\n"); serial_puts("[14G] acpi/hpet/rtc-alarm...\n");

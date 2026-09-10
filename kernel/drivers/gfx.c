@@ -1,4 +1,5 @@
 #include <drivers/gfx.h>
+#include <drivers/raster.h>
 #include <drivers/vga.h>
 #include <drivers/serial.h>
 #include <memory/kheap.h>
@@ -145,14 +146,14 @@ void gfx_fill(struct gfx_surface* s, uint32_t color) {
 }
 
 void gfx_fill_rect(struct gfx_surface* s, int x, int y, int w, int h, uint32_t color) {
-    if (!s || !s->pixels || w <= 0 || h <= 0) return;
-    if (x < 0) { w += x; x = 0; }
-    if (y < 0) { h += y; y = 0; }
-    if (x + w > (int)s->w) w = s->w - x;
-    if (y + h > (int)s->h) h = s->h - y;
-    if (w <= 0 || h <= 0) return;
-    for (int yy = y; yy < y + h; yy++)
-        for (int xx = x; xx < x + w; xx++)
+    int cx, cy, cw, ch;
+    if (!s || !s->pixels) return;
+    /* 35.4: kırpma raster çekirdeğinde (taşma-güvenli, testli) */
+    if (s->w > 0x7FFFFFFFu || s->h > 0x7FFFFFFFu) return;
+    if (!raster_clip_rect(x, y, w, h, (int)s->w, (int)s->h, &cx, &cy, &cw, &ch))
+        return;
+    for (int yy = cy; yy < cy + ch; yy++)
+        for (int xx = cx; xx < cx + cw; xx++)
             surf_put(s, xx, yy, color);
 }
 
