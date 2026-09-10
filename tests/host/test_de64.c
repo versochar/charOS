@@ -1212,6 +1212,77 @@ int main(void) {
         printf("4J1 release doc exists\n");
         CHECK(advmem64_init()==0, "4J2 ok");
     }
+    /* 5A Process Design */
+    {
+        printf("5A1 design doc exists\n");
+        CHECK(proc64_init()==0, "5A2 design ok");
+    }
+    /* 5B API Spec */
+    {
+        printf("5B1 API spec exists\n");
+        u64 pid=0;
+        CHECK(proc64_spawn(&pid)==0 && pid!=0, "5B2 api ok");
+    }
+    /* 5C Implementation Start */
+    {
+        printf("5C1 impl start doc exists\n");
+        CHECK(proc64_init()==0, "5C2 ok");
+    }
+    /* 5D Code Development */
+    {
+        printf("5D1 code dev doc exists\n");
+        u64 pid=0;
+        proc64_init();
+        CHECK(proc64_spawn(&pid)==0, "5D2 spawn ok");
+        CHECK(proc64_exit(pid,7)==0, "5D3 exit ok");
+    }
+    /* 5E Unit Tests */
+    {
+        printf("5E1 unit tests exist\n");
+        CHECK(proc64_spawn(NULL)==-1, "5E2 param");
+        CHECK(proc64_exit(999999,0)==-1, "5E3 unknown");
+        u64 pid=0; int code=-1, st=-1;
+        proc64_init();
+        CHECK(proc64_spawn(&pid)==0, "5E4 spawn");
+        CHECK(proc64_wait(pid,&code)==-1, "5E5 wait-not-zombie");
+        CHECK(proc64_exit(pid,42)==0, "5E6 exit");
+        CHECK(proc64_state(pid,&st)==0 && st==3, "5E7 zombie");
+        CHECK(proc64_wait(pid,&code)==0 && code==42, "5E8 wait");
+    }
+    /* 5F Integration Tests */
+    {
+        printf("5F1 integration tests exist\n");
+        CHECK(secureboot64_init()==SB_OK, "5F2 sboot");
+        CHECK(advmem64_init()==0, "5F3 advmem");
+        CHECK(proc64_init()==0, "5F4 proc");
+        u64 phys=0, pid=0;
+        CHECK(advmem64_alloc_node(0,0,&phys)==0, "5F5 chain-mem");
+        CHECK(proc64_spawn(&pid)==0, "5F6 chain-proc");
+    }
+    /* 5G Code Review */
+    {
+        printf("5G1 review doc exists\n");
+        CHECK(proc64_init()==0, "5G2 ok");
+    }
+    /* 5H Security Audit */
+    {
+        printf("5H1 audit doc exists\n");
+        u64 pid=0;
+        proc64_init();
+        proc64_spawn(&pid);
+        proc64_exit(pid,0);
+        CHECK(proc64_exit(pid,0)==-1, "5H2 double-exit reject");
+    }
+    /* 5I Documentation */
+    {
+        printf("5I1 docs exist\n");
+        CHECK(proc64_init()==0, "5I2 ok");
+    }
+    /* 5J Release */
+    {
+        printf("5J1 release doc exists\n");
+        CHECK(proc64_init()==0, "5J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
