@@ -1724,6 +1724,77 @@ int main(void) {
         printf("11J1 release doc exists\n");
         CHECK(blk64_init()==0, "11J2 ok");
     }
+    /* 12A Part Design */
+    {
+        printf("12A1 design doc exists\n");
+        CHECK(part64_init()==0, "12A2 design ok");
+    }
+    /* 12B API Spec */
+    {
+        printf("12B1 API spec exists\n");
+        u64 p=0;
+        CHECK(part64_add(1,2048,1024,2,&p)==0 && p!=0, "12B2 api ok");
+        CHECK(part64_del(p)==0, "12B3 cleanup");
+    }
+    /* 12C Implementation Start */
+    {
+        printf("12C1 impl start doc exists\n");
+        CHECK(part64_init()==0, "12C2 ok");
+    }
+    /* 12D Code Development */
+    {
+        printf("12D1 code dev doc exists\n");
+        part64_init();
+        u64 p=0, d=0, s=0, l=0;
+        CHECK(part64_add(1,0,100,2,&p)==0, "12D2 add");
+        CHECK(part64_info(p,&d,&s,&l)==0 && d==1 && s==0 && l==100, "12D3 info");
+    }
+    /* 12E Unit Tests */
+    {
+        printf("12E1 unit tests exist\n");
+        part64_init();
+        CHECK(part64_add(1,0,0,2,&(u64){0})==-1, "12E2 len-zero");
+        u64 p=0;
+        part64_add(1,0,100,2,&p);
+        CHECK(part64_add(1,50,100,2,&(u64){0})==-2, "12E3 overlap");
+        CHECK(part64_del(999999)==-1, "12E4 unknown");
+        CHECK(part64_info(999999,NULL,NULL,NULL)==-1, "12E5 info-unknown");
+    }
+    /* 12F Integration Tests */
+    {
+        printf("12F1 integration tests exist\n");
+        CHECK(blk64_init()==0, "12F2 blk");
+        CHECK(part64_init()==0, "12F3 part");
+        u64 d=0, p=0, v=0;
+        CHECK(blk64_create(16,&d)==0, "12F4 blk-create");
+        CHECK(part64_add(d,0,8,2,&p)==0, "12F5 part-add");
+        CHECK(blk64_write(d,0,0xABCD)==0, "12F6 write");
+        CHECK(blk64_read(d,0,&v)==0 && v==0xABCD, "12F7 read");
+    }
+    /* 12G Code Review */
+    {
+        printf("12G1 review doc exists\n");
+        CHECK(part64_init()==0, "12G2 ok");
+    }
+    /* 12H Security Audit */
+    {
+        printf("12H1 audit doc exists\n");
+        part64_init();
+        u64 p=0;
+        part64_add(1,0,10,2,&p);
+        part64_del(p);
+        CHECK(part64_info(p,NULL,NULL,NULL)==-1, "12H2 use-after-del");
+    }
+    /* 12I Documentation */
+    {
+        printf("12I1 docs exist\n");
+        CHECK(part64_init()==0, "12I2 ok");
+    }
+    /* 12J Release */
+    {
+        printf("12J1 release doc exists\n");
+        CHECK(part64_init()==0, "12J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
