@@ -125,4 +125,7 @@ extern spinlock_t task_lock;
 void cpu_id_init(void);
 int cpu_id_get(void);
 
+/* 31.4: güç muhasebesi için boşta-görevde miyiz (1=evet) */
+int task_on_idle(void);
+
 #endif

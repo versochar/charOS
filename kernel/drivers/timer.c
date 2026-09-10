@@ -1,5 +1,6 @@
 #include <drivers/timer.h>
 #include <process/task.h>
+#include <core/power.h>
 #include <drivers/vga.h>
 #include <drivers/serial.h>
 #include <core/pic.h>
@@ -19,6 +20,7 @@ void timer_handler(struct registers* regs)
 {
     (void)regs;
     tick++;
+    power_note_tick(task_on_idle()); /* 31.4: güç muhasebesi (ucuz: 2 sayaç) */
     /* Tanılama nabzı (1Hz): PIT + RDTSC + LAPIC. Üç bağımsız saatin
      * birlikte okunması hangi katmanın aksadığını gösterir. */
     if ((tick % 100) == 0) {

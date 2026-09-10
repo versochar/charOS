@@ -21,6 +21,7 @@
 #include <core/version.h>
 #include <core/doc.h>
 #include <core/abi.h>
+#include <core/power.h>
 #include <test/selftest.h>
 #include <core/apic.h>
 #include <fs/chfs.h>
@@ -773,6 +774,29 @@ void kernel_main(uint32_t magic, uint32_t mboot_ptr)
         }
     }
     vga_puts("[30] done\n"); serial_puts("[30] done\n");
+
+    /* 31.4: güç muhasebesi başlar (timer IRQ sayar), politika dengeli */
+    vga_puts("[31] power...\n"); serial_puts("[31] power...\n");
+    {
+        int fails = 0;
+        power_init();
+        if (power_set_policy(POWER_BALANCED) != 0) fails++;
+        if (selftest_register("power", power_selftest) != 0) fails++;
+        if (power_selftest() != 0) fails++;
+        power_init(); /* öztest sayaçları sıfırlar, politika dengeli */
+        power_set_policy(POWER_BALANCED);
+        serial_puts("[31] policy "); serial_puthex((uint32_t)power_get_policy());
+        serial_puts(" idle% "); serial_puthex(power_idle_pct());
+        serial_puts("\n");
+        if (fails == 0) {
+            serial_puts("[31] power [PASS]\n");
+            vga_puts("[31] power [PASS]\n");
+        } else {
+            serial_puts("[31] power [FAIL]\n");
+            vga_puts("[31] power [FAIL]\n");
+        }
+    }
+    vga_puts("[31] done\n"); serial_puts("[31] done\n");
 
     /* 14G: ACPI + HPET + RTC alarm (güç geçişi YOK, yalnızca hazırlık) */
     vga_puts("[14G] acpi/hpet/rtc-alarm...\n"); serial_puts("[14G] acpi/hpet/rtc-alarm...\n");

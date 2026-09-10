@@ -88,6 +88,12 @@ struct task* task_current(void) {
     return current_task;
 }
 
+/* 31.4: o an boşta-görev çalışıyorsa 1 (güç muhasebesi için) */
+int task_on_idle(void) {
+    struct task* cur = task_current();
+    return cur && idle_task && cur == idle_task;
+}
+
 void task_set_user(uint32_t esp, uint32_t eip, uint32_t cs, uint32_t ss) {
     if (!current_task) return;
     current_task->user_esp = esp;
