@@ -27,6 +27,8 @@
 #include <drivers/pci.h>
 #include <drivers/pcibar.h>
 #include <drivers/raster.h>
+#include <drivers/pcm.h>
+#include <drivers/hdaverb.h>
 #include <test/selftest.h>
 #include <core/apic.h>
 #include <fs/chfs.h>
@@ -884,6 +886,27 @@ void kernel_main(uint32_t magic, uint32_t mboot_ptr)
         }
     }
     vga_puts("[35] done\n"); serial_puts("[35] done\n");
+
+    /* 36.4: ses altyapısı öztesti deftere kaydolur */
+    vga_puts("[36] audio...\n"); serial_puts("[36] audio...\n");
+    {
+        int fails = 0;
+        uint32_t cmd;
+        if (selftest_register("pcm", pcm_selftest) != 0) fails++;
+        if (pcm_selftest() != 0) fails++;
+        cmd = hdaverb_build(0x11, 0x707, 0x40);
+        if (hdaverb_nid(cmd) != 0x11 || hdaverb_verb(cmd) != 0x707 ||
+            hdaverb_param(cmd) != 0x40) fails++;
+        serial_puts("[36] verb "); serial_puthex(cmd); serial_puts("\n");
+        if (fails == 0) {
+            serial_puts("[36] audio [PASS]\n");
+            vga_puts("[36] audio [PASS]\n");
+        } else {
+            serial_puts("[36] audio [FAIL]\n");
+            vga_puts("[36] audio [FAIL]\n");
+        }
+    }
+    vga_puts("[36] done\n"); serial_puts("[36] done\n");
 
     /* 14G: ACPI + HPET + RTC alarm (güç geçişi YOK, yalnızca hazırlık) */
     vga_puts("[14G] acpi/hpet/rtc-alarm...\n"); serial_puts("[14G] acpi/hpet/rtc-alarm...\n");
