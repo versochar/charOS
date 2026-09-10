@@ -18,6 +18,7 @@
 #include <core/verify.h>
 #include <core/trace.h>
 #include <core/prof.h>
+#include <core/version.h>
 #include <core/apic.h>
 #include <fs/chfs.h>
 #include <process/signal.h>
@@ -701,6 +702,12 @@ void kernel_main(uint32_t magic, uint32_t mboot_ptr)
         }
     }
     vga_puts("[26] done\n"); serial_puts("[26] done\n");
+
+    /* 27.4: gömülü sürüm bandı (derleme-zamanı, salt-okunur) */
+    vga_puts("[27] "); vga_puts(version_string());
+    vga_puts(" @"); vga_puts(version_commit()); vga_puts("\n");
+    serial_puts("[27] "); serial_puts(version_string());
+    serial_puts(" @"); serial_puts(version_commit()); serial_puts("\n");
 
     /* 14G: ACPI + HPET + RTC alarm (güç geçişi YOK, yalnızca hazırlık) */
     vga_puts("[14G] acpi/hpet/rtc-alarm...\n"); serial_puts("[14G] acpi/hpet/rtc-alarm...\n");
