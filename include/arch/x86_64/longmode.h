@@ -2014,4 +2014,18 @@ int fpsb64_state(int id, int *out);
 int fpsb64_denied_count(int id, int *out);
 int fpsb64_count(void);
 
+/* --- 53A: Landlock LSM (landlk) --- */
+#define LANDLK_ACCESS_EXEC  0x0001u
+#define LANDLK_ACCESS_WRITE 0x0002u
+#define LANDLK_ACCESS_READ  0x0004u
+#define LANDLK_ACCESS_ALL   (LANDLK_ACCESS_EXEC | LANDLK_ACCESS_WRITE | \
+                             LANDLK_ACCESS_READ)
+int landlk64_create_ruleset(u32 handled_access, int *out_id);
+int landlk64_add_path_rule(int rs_id, const char *path, u32 allowed_access);
+int landlk64_restrict_self(int rs_id);
+int landlk64_check(const char *path, u32 access);
+int landlk64_handled(int rs_id, u32 *out);
+int landlk64_rule_count(int rs_id, int *out);
+int landlk64_is_restricted(int rs_id, int *out);
+
 #endif

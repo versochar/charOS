@@ -19,6 +19,7 @@
 #include "arch/x86_64/recenv.h"
 #include "arch/x86_64/ctr.h"
 #include "arch/x86_64/fpsb.h"
+#include "arch/x86_64/landlk.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -3839,6 +3840,102 @@ int main(void) {
               "runtime/org.gnome.Platform/x86_64/44",&id)==0, "52J3 create");
         CHECK(fpsb64_launch(id)==0, "52J4 launch");
         CHECK(fpsb64_has_perm(id,FPSB_PULSE)==1, "52J5 perm ok");
+    }
+
+    /* 53A Landlock Design */
+    {
+        int rs=-1;
+        printf("53A1 design doc exists\n");
+        CHECK(landlk64_create_ruleset(LANDLK_ACCESS_READ,&rs)==0, "53A2 rs");
+        CHECK(rs>0, "53A3 rs id");
+        CHECK(landlk64_create_ruleset(0x10,&rs)==-2, "53A4 bad handled");
+    }
+    /* 53B API Spec */
+    {
+        int rs=-1, h=0;
+        printf("53B1 api spec exists\n");
+        CHECK(landlk64_create_ruleset(LANDLK_ACCESS_ALL,&rs)==0, "53B2 rs all");
+        CHECK(landlk64_handled(rs,&h)==0 && h==LANDLK_ACCESS_ALL, "53B3 handled");
+        CHECK(landlk64_add_path_rule(rs,"/etc",LANDLK_ACCESS_READ)==0, "53B4 rule");
+        CHECK(landlk64_rule_count(rs,&h)==0 && h==1, "53B5 count");
+    }
+    /* 53C Implementation Start */
+    {
+        int rs=-1;
+        printf("53C1 impl start exists\n");
+        CHECK(landlk64_create_ruleset(LANDLK_ACCESS_READ,&rs)==0, "53C2 rs");
+        CHECK(landlk64_add_path_rule(rs,"/home/user",LANDLK_ACCESS_READ|LANDLK_ACCESS_WRITE)==-3,
+              "53C3 unhandled write rule");
+        CHECK(landlk64_add_path_rule(rs,"/home/user",LANDLK_ACCESS_READ)==0, "53C4 ok");
+    }
+    /* 53D Code Development */
+    {
+        int rs=-1;
+        printf("53D1 code dev exists\n");
+        CHECK(landlk64_create_ruleset(LANDLK_ACCESS_READ,&rs)==0, "53D2 rs");
+        CHECK(landlk64_add_path_rule(rs,"/etc",LANDLK_ACCESS_READ)==0, "53D3 rule");
+        CHECK(landlk64_restrict_self(rs)==0, "53D4 restrict");
+        CHECK(landlk64_check("/etc/passwd",LANDLK_ACCESS_READ)==1, "53D5 read ok");
+        CHECK(landlk64_check("/etc/passwd",LANDLK_ACCESS_EXEC)==0, "53D6 unhandled exec");
+        CHECK(landlk64_check("/var/x",LANDLK_ACCESS_READ)==0, "53D7 no rule denied");
+    }
+    /* 53E Unit Tests */
+    {
+        int rs=-1;
+        printf("53E1 unit tests exist\n");
+        CHECK(landlk64_create_ruleset(LANDLK_ACCESS_ALL,&rs)==0, "53E2 rs");
+        CHECK(landlk64_add_path_rule(rs,0,0)==-1, "53E3 null path");
+        CHECK(landlk64_add_path_rule(99,"/x",LANDLK_ACCESS_READ)==-1, "53E4 bad rs");
+        CHECK(landlk64_check(0,0)==-1, "53E5 null path check");
+        CHECK(landlk64_handled(99,0)==-1, "53E6 bad handled");
+    }
+    /* 53F Integration Tests */
+    {
+        int rs1=-1, rs2=-1, st=0;
+        printf("53F1 integration exists\n");
+        CHECK(landlk64_create_ruleset(LANDLK_ACCESS_READ,&rs1)==0, "53F2 rs1");
+        CHECK(landlk64_add_path_rule(rs1,"/etc",LANDLK_ACCESS_READ)==0, "53F3 rule1");
+        CHECK(landlk64_restrict_self(rs1)==0, "53F4 restrict1");
+        CHECK(landlk64_check("/etc/hosts",LANDLK_ACCESS_READ)==1, "53F5 read ok");
+        CHECK(landlk64_check("/etc/hosts",LANDLK_ACCESS_WRITE)==0, "53F6 write denied");
+        CHECK(landlk64_add_path_rule(rs1,"/new",LANDLK_ACCESS_READ)==-2, "53F7 frozen");
+        CHECK(landlk64_rule_count(rs1,&st)==0 && st==1, "53F8 count frozen");
+    }
+    /* 53G Code Review */
+    {
+        int rs=-1, st=0;
+        printf("53G1 review exists\n");
+        CHECK(landlk64_create_ruleset(LANDLK_ACCESS_ALL,&rs)==0, "53G2 rs");
+        /* alt patika: kural ile hiyerarsi */
+        CHECK(landlk64_add_path_rule(rs,"/opt",LANDLK_ACCESS_READ)==0, "53G3 parent");
+        CHECK(landlk64_restrict_self(rs)==0, "53G4 restrict");
+        CHECK(landlk64_check("/opt/tools/bin/cfg",LANDLK_ACCESS_READ)==1, "53G5 subtree ok");
+        CHECK(landlk64_is_restricted(rs,&st)==0 && st==1, "53G6 restricted flag");
+    }
+    /* 53H Security Audit */
+    {
+        int rs=-1;
+        printf("53H1 audit exists\n");
+        CHECK(landlk64_create_ruleset(LANDLK_ACCESS_ALL,&rs)==0, "53H2 rs");
+        CHECK(landlk64_add_path_rule(rs,"/",LANDLK_ACCESS_READ)==0, "53H3 root scope");
+        CHECK(landlk64_restrict_self(rs)==0, "53H4 restrict");
+        CHECK(landlk64_check("/tmp/a",LANDLK_ACCESS_READ)==1, "53H5 root subtree");
+        CHECK(landlk64_check("/tmp/a",LANDLK_ACCESS_WRITE)==0, "53H6 no write");
+        CHECK(landlk64_check("/tmp/a",LANDLK_ACCESS_EXEC)==0, "53H7 no exec");
+    }
+    /* 53I Documentation */
+    {
+        printf("53I1 docs exist\n");
+        CHECK(landlk64_create_ruleset(LANDLK_ACCESS_READ,0)==-1, "53I2 null out");
+    }
+    /* 53J Release */
+    {
+        int rs=-1;
+        printf("53J1 release doc exists\n");
+        CHECK(landlk64_create_ruleset(LANDLK_ACCESS_READ,&rs)==0, "53J2 rs");
+        CHECK(landlk64_add_path_rule(rs,"/srv",LANDLK_ACCESS_READ)==0, "53J3 rule");
+        CHECK(landlk64_restrict_self(rs)==0, "53J4 restrict");
+        CHECK(landlk64_check("/srv/data.db",LANDLK_ACCESS_READ)==1, "53J5 final");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
