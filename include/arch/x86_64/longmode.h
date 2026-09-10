@@ -1913,4 +1913,15 @@ int secupd64_apply_ok(const char *name, const char *ver);
 int secupd64_policy(int *out);
 int secupd64_staged_count(void);
 
+/* --- 44A: Live ISO Build (ISO9660/El Torito yerlesim) --- */
+int isoimg64_init(void);
+int isoimg64_add_file(const char *name, u64 size_bytes);
+int isoimg64_set_boot(const char *kernel_path, int boot_mode);
+int isoimg64_layout(u64 *total_bytes);
+int isoimg64_sector_for(const char *name, u32 *sector);
+int isoimg64_checksum(void);
+int isoimg64_verify(const char *name);
+int isoimg64_file_count(void);
+int isoimg64_boot_mode(int *out);
+
 #endif

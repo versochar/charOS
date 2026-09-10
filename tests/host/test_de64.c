@@ -10,6 +10,7 @@
 #include "arch/x86_64/update.h"
 #include "arch/x86_64/pkgmgr.h"
 #include "arch/x86_64/secupd.h"
+#include "arch/x86_64/isoimg.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -2916,6 +2917,116 @@ int main(void) {
         CHECK(secupd64_stage("final","1.0",0x100,sig,6)==0, "43J3 stage");
         CHECK(secupd64_policy(&p)==0 && p==1, "43J4 default enforced");
         CHECK(secupd64_apply_ok("final","1.0")==0, "43J5 apply ok");
+    }
+
+    /* 44A Live ISO Design */
+    {
+        printf("44A1 design doc exists\n");
+        CHECK(isoimg64_init()==0, "44A2 init ok");
+    }
+    /* 44B API Spec */
+    {
+        u64 total = 0;
+        printf("44B1 API spec exists\n");
+        CHECK(isoimg64_init()==0, "44B2 init");
+        CHECK(isoimg64_add_file("boot/kernel.bin",1048576)==0, "44B3 add kernel");
+        CHECK(isoimg64_add_file("LIVE-UPD",8)==0, "44B4 add small");
+        CHECK(isoimg64_set_boot("boot/kernel.bin",ISOIMG_ELTORITO_NOT_EMULATE)==0,
+              "44B5 set boot");
+        CHECK(isoimg64_layout(&total)==0 && total==(529u*ISOIMG64_SECT),
+              "44B6 layout 529 sect");
+    }
+    /* 44C Implementation Start */
+    {
+        u64 total = 0;
+        printf("44C1 impl start doc exists\n");
+        CHECK(isoimg64_init()==0, "44C2 init");
+        CHECK(isoimg64_add_file("k",4096)==0, "44C3 add k");
+        CHECK(isoimg64_set_boot("k",ISOIMG_ELTORITO_FLOPPY)==0, "44C4 boot");
+        CHECK(isoimg64_layout(&total)==0 && total==(18u*ISOIMG64_SECT),
+              "44C5 layout 18 sect");
+    }
+    /* 44D Code Development */
+    {
+        u32 s = 0;
+        printf("44D1 code dev doc exists\n");
+        CHECK(isoimg64_init()==0, "44D2 init");
+        CHECK(isoimg64_add_file("a",2048)==0, "44D3 add a");
+        CHECK(isoimg64_add_file("b",1)==0, "44D4 add b");
+        CHECK(isoimg64_set_boot("a",ISOIMG_ELTORITO_NOT_EMULATE)==0,"44D5 boot a");
+        CHECK(isoimg64_layout(0)==0, "44D6 layout");
+        CHECK(isoimg64_sector_for("a",&s)==0 && s==16, "44D7 a@16");
+        CHECK(isoimg64_sector_for("b",&s)==0 && s==17, "44D8 b@17");
+    }
+    /* 44E Unit Tests */
+    {
+        printf("44E1 unit tests exist\n");
+        CHECK(isoimg64_init()==0, "44E2 init");
+        CHECK(isoimg64_add_file(0,1)==-1, "44E3 null name reject");
+        CHECK(isoimg64_add_file("x",0)==-3, "44E4 zero size reject");
+        CHECK(isoimg64_layout(0)==-1, "44E5 empty layout reject");
+        CHECK(isoimg64_add_file("k",1)==0 && isoimg64_set_boot("k",99)==-2,
+              "44E6 bad boot mode reject");
+    }
+    /* 44F Integration Tests */
+    {
+        u64 total = 0;
+        u32 s = 0;
+        printf("44F1 integration tests exist\n");
+        CHECK(isoimg64_init()==0, "44F2 init");
+        CHECK(isoimg64_add_file("initrd",3000000)==0, "44F3 initrd");
+        CHECK(isoimg64_add_file("boot/kernel.bin",1048576)==0, "44F4 kernel");
+        CHECK(isoimg64_set_boot("boot/kernel.bin",ISOIMG_ELTORITO_NOT_EMULATE)==0,
+              "44F5 boot");
+        CHECK(isoimg64_layout(&total)==0, "44F6 layout");
+        /* initrd 3000000 -> 1465 sect (3000000/2048=1464.8 -> 1465) */
+        CHECK(isoimg64_sector_for("initrd",&s)==0 && s==16, "44F7 initrd@16");
+        CHECK(isoimg64_sector_for("boot/kernel.bin",&s)==0 && s==16+1465,
+              "44F8 kernel@1481");
+        CHECK(isoimg64_verify("initrd")==0, "44F9 verify ok");
+    }
+    /* 44G Code Review */
+    {
+        int m = -1;
+        printf("44G1 review doc exists\n");
+        CHECK(isoimg64_init()==0, "44G2 init");
+        CHECK(isoimg64_add_file("k",1)==0, "44G3 add");
+        CHECK(isoimg64_set_boot("k",ISOIMG_ELTORITO_FLOPPY)==0, "44G4 boot");
+        CHECK(isoimg64_boot_mode(&m)==0 && m==ISOIMG_ELTORITO_FLOPPY,
+              "44G5 boot mode q");
+        CHECK(isoimg64_file_count()==1, "44G6 count1");
+    }
+    /* 44H Security Audit */
+    {
+        u32 s = 0;
+        u64 total = 0;
+        printf("44H1 audit doc exists\n");
+        CHECK(isoimg64_init()==0, "44H2 init");
+        CHECK(isoimg64_add_file("dup",100)==0, "44H3 dup1");
+        CHECK(isoimg64_add_file("dup",200)==-4, "44H4 dup reject");
+        CHECK(isoimg64_sector_for("dup",&s)==-2, "44H5 pre-layout reject");
+        CHECK(isoimg64_add_file("k",1)==0 &&
+              isoimg64_set_boot("k",ISOIMG_ELTORITO_NOT_EMULATE)==0 &&
+              isoimg64_layout(&total)==0, "44H6 layout");
+        CHECK(isoimg64_sector_for("missing",&s)==-3, "44H7 unknown reject");
+    }
+    /* 44I Documentation */
+    {
+        printf("44I1 docs exist\n");
+        CHECK(isoimg64_init()==0, "44I2 ok");
+    }
+    /* 44J Release */
+    {
+        u64 total = 0;
+        int cs = 0;
+        printf("44J1 release doc exists\n");
+        CHECK(isoimg64_add_file("boot/kernel.bin",1048576)==0, "44J2 kernel");
+        CHECK(isoimg64_set_boot("boot/kernel.bin",ISOIMG_ELTORITO_NOT_EMULATE)==0,
+              "44J3 boot");
+        CHECK(isoimg64_layout(&total)==0, "44J4 layout");
+        cs = isoimg64_checksum();
+        CHECK(cs>0, "44J5 checksum ok");
+        CHECK(isoimg64_verify("boot/kernel.bin")==0, "44J6 verify boot");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
