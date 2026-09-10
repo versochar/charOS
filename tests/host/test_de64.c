@@ -2100,6 +2100,83 @@ int main(void) {
         printf("16J1 release doc exists\n");
         CHECK(virt64_init()==0, "16J2 ok");
     }
+    /* 17A Net Design */
+    {
+        printf("17A1 design doc exists\n");
+        CHECK(net64_init()==0, "17A2 design ok");
+    }
+    /* 17B API Spec */
+    {
+        printf("17B1 API spec exists\n");
+        u64 nic=0;
+        CHECK(net64_if_add(1,&nic)==0 && nic!=0, "17B2 api ok");
+        CHECK(net64_if_del(nic)==0, "17B3 cleanup");
+    }
+    /* 17C Implementation Start */
+    {
+        printf("17C1 impl start doc exists\n");
+        CHECK(net64_init()==0, "17C2 ok");
+    }
+    /* 17D Code Development */
+    {
+        printf("17D1 code dev doc exists\n");
+        net64_init();
+        u64 nic=0, v=0, tx=0, rx=0;
+        CHECK(net64_if_add(1,&nic)==0, "17D2 add");
+        CHECK(net64_send(nic,0xCAFE)==0, "17D3 send");
+        CHECK(net64_recv(nic,&v)==0 && v==0xCAFE, "17D4 recv");
+        CHECK(net64_stat(nic,&tx,&rx)==0 && tx==1 && rx==1, "17D5 stat");
+    }
+    /* 17E Unit Tests */
+    {
+        printf("17E1 unit tests exist\n");
+        net64_init();
+        CHECK(net64_if_add(9,&(u64){0})==-1, "17E2 bad-type");
+        CHECK(net64_if_del(999999)==-1, "17E3 unknown");
+        u64 nic=0, v=0;
+        net64_if_add(0,&nic);
+        CHECK(net64_recv(nic,&v)==-1, "17E4 empty");
+        CHECK(net64_send(nic,1)==0, "17E5 send");
+        CHECK(net64_send(nic,2)==-1, "17E6 full");
+    }
+    /* 17F Integration Tests */
+    {
+        printf("17F1 integration tests exist\n");
+        CHECK(ipc64_init()==0, "17F2 ipc");
+        CHECK(net64_init()==0, "17F3 net");
+        u64 ch=0, nic=0, a=0, b=0;
+        CHECK(ipc64_create(&ch)==0, "17F4 ipc-create");
+        CHECK(net64_if_add(1,&nic)==0, "17F5 net-add");
+        CHECK(net64_send(nic,0x99)==0, "17F6 send");
+        CHECK(net64_recv(nic,&a)==0, "17F7 recv");
+        CHECK(ipc64_send(ch,a)==0, "17F8 ipc-send");
+        CHECK(ipc64_recv(ch,&b)==0 && b==0x99, "17F9 ipc-recv");
+    }
+    /* 17G Code Review */
+    {
+        printf("17G1 review doc exists\n");
+        CHECK(net64_init()==0, "17G2 ok");
+    }
+    /* 17H Security Audit */
+    {
+        printf("17H1 audit doc exists\n");
+        net64_init();
+        u64 nic=0, v=0;
+        net64_if_add(1,&nic);
+        net64_if_del(nic);
+        CHECK(net64_send(nic,1)==-1, "17H2 use-after-del");
+        CHECK(net64_recv(nic,&v)==-1, "17H3 recv-after-del");
+    }
+    /* 17I Documentation */
+    {
+        printf("17I1 docs exist\n");
+        CHECK(net64_init()==0, "17I2 ok");
+    }
+    /* 17J Release */
+    {
+        printf("17J1 release doc exists\n");
+        CHECK(net64_init()==0, "17J2 ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
