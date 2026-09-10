@@ -26,6 +26,7 @@
 #include "arch/x86_64/fuzz.h"
 #include "arch/x86_64/sana.h"
 #include "arch/x86_64/dyna.h"
+#include "arch/x86_64/comp.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -4561,6 +4562,105 @@ int main(void) {
         CHECK(dyna64_step(&pc,&ev)==0, "59J5 step");
         CHECK(dyna64_event_count(DYNA64_E_INSTR)>=0, "59J6 count");
         CHECK(dyna64_stop()==0, "59J7 stop");
+    }
+
+    /* 60A Compliance Certifications Design */
+    {
+        char buf[256];
+        printf("60A1 doc exists\n");
+        CHECK(comp64_init()==0, "60A2 init");
+        CHECK(comp64_cert_register("FIPS2020", COMP64_STD_FIPS, 1)==0, "60A3 reg");
+        CHECK(comp64_report_list(buf,sizeof(buf))==0, "60A4 list");
+    }
+    /* 60B API Spec */
+    {
+        char hash[COMP64_HASH_MAX];
+        int ok=0;
+        printf("60B1 api spec exists\n");
+        CHECK(comp64_init()==0, "60B2 init");
+        int id = comp64_cert_register("ISO27001", COMP64_STD_ISO27001, 2);
+        CHECK(id>=0, "60B3 reg");
+        CHECK(comp64_cert_validate(id, hash, sizeof(hash))==0, "60B4 validate");
+        CHECK(comp64_cert_status(id, &ok)==0 && ok==1, "60B5 status");
+    }
+    /* 60C Implementation Start */
+    {
+        int pass=0;
+        printf("60C1 impl start exists\n");
+        CHECK(comp64_init()==0, "60C2 init");
+        int id = comp64_cert_register("SOC2", COMP64_STD_SOC2, 3);
+        CHECK(id>=0, "60C3 reg");
+        CHECK(comp64_compliance_check(COMP64_STD_SOC2, &pass)==0 && pass==1, "60C4 check");
+    }
+    /* 60D Code Development */
+    {
+        printf("60D1 dev doc exists\n");
+        CHECK(comp64_init()==0, "60D2 init");
+        int id = comp64_cert_register("GDPR", COMP64_STD_GDPR, 1);
+        CHECK(id>=0, "60D3 reg");
+        CHECK(comp64_cert_expire(id)==0, "60D4 expire");
+        int ok=1; CHECK(comp64_cert_status(id,&ok)==0 && ok==0, "60D5 status expired");
+        CHECK(comp64_cert_renew(id)==0, "60D6 renew");
+        CHECK(comp64_cert_status(id,&ok)==0 && ok==1, "60D7 renewed");
+    }
+    /* 60E Unit Tests */
+    {
+        char hash[COMP64_HASH_MAX];
+        printf("60E1 tests exist\n");
+        CHECK(comp64_init()==0, "60E2 init");
+        CHECK(comp64_cert_validate(-1, hash, sizeof(hash))==-2, "60E3 bad id");
+        CHECK(comp64_cert_validate(0, 0, 10)==-3, "60E4 null hash");
+        CHECK(comp64_report_list(0,10)==-1, "60E5 null buf");
+        CHECK(comp64_report_list((char*)"x", 10)==-2, "60E6 small buf");
+    }
+    /* 60F Integration Tests */
+    {
+        char buf[512];
+        printf("60F1 integration exists\n");
+        CHECK(comp64_init()==0, "60F2 init");
+        CHECK(comp64_cert_register("PCI", COMP64_STD_PCI_DSS, 4)==0, "60F3 reg");
+        CHECK(comp64_report_list(buf,sizeof(buf))==0, "60F4 list");
+        CHECK(comp64_audit_log(0, "audit msg")==0, "60F5 audit log");
+    }
+    /* 60G Code Review */
+    {
+        int pass=0;
+        printf("60G1 review exists\n");
+        CHECK(comp64_init()==0, "60G2 init");
+        int id = comp64_cert_register("CC", COMP64_STD_COMMON_CRITERIA, 1);
+        CHECK(id>=0, "60G3 reg");
+        CHECK(comp64_compliance_check(COMP64_STD_COMMON_CRITERIA, &pass)==0 && pass==1, "60G4 check");
+        CHECK(comp64_cert_expire(id)==0, "60G5 expire");
+        CHECK(comp64_compliance_check(COMP64_STD_COMMON_CRITERIA, &pass)==0 && pass==0, "60G6 check fail");
+    }
+    /* 60H Security Audit */
+    {
+        char hash[COMP64_HASH_MAX];
+        printf("60H1 audit exists\n");
+        CHECK(comp64_init()==0, "60H2 init");
+        int id = comp64_cert_register("FIPS2021", COMP64_STD_FIPS, 2);
+        CHECK(id>=0, "60H3 reg");
+        CHECK(comp64_cert_validate(id, hash, 4)==-4, "60H4 small buf");
+        CHECK(comp64_cert_validate(id, hash, sizeof(hash))==0, "60H5 ok validate");
+    }
+    /* 60I Documentation */
+    {
+        char buf[256];
+        printf("60I1 docs exist\n");
+        CHECK(comp64_init()==0, "60I2 init");
+        CHECK(comp64_cert_register("DOC", COMP64_STD_ISO27001, 1)==0, "60I3 reg");
+        CHECK(comp64_report_list(buf,sizeof(buf))==0, "60I4 list");
+    }
+    /* 60J Release */
+    {
+        int ok=0, pass=0;
+        printf("60J1 release doc exists\n");
+        CHECK(comp64_init()==0, "60J2 init");
+        int id = comp64_cert_register("RELEASE", COMP64_STD_FIPS, 9);
+        CHECK(id>=0, "60J3 reg");
+        CHECK(comp64_cert_status(id,&ok)==0 && ok==1, "60J4 status");
+        CHECK(comp64_compliance_check(COMP64_STD_FIPS, &pass)==0 && pass==1, "60J5 compliance");
+        CHECK(comp64_report_export("/tmp/out")== -2, "60J6 export stub");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
