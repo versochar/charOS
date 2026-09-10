@@ -1879,4 +1879,15 @@ int crash64_read_payload(int seq, void *out, u32 maxbytes);
 int crash64_reboot_after_dump(int seq);
 int crash64_count(void);
 
+/* --- 40A: Update Mechanism (davranis modeli) --- */
+int update64_init(void);
+int update64_stage(const char *name, const char *ver, u32 size_bytes);
+int update64_check_compat(void);
+int update64_apply(void);
+int update64_verify(void);
+int update64_rollback(void);
+int update64_commit(void);
+int update64_state(int *out);
+int update64_staged_count(void);
+
 #endif

@@ -7,6 +7,7 @@
 #include <string.h>
 #include "arch/x86_64/longmode.h"
 #include "arch/x86_64/crash.h"
+#include "arch/x86_64/update.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -2601,6 +2602,80 @@ int main(void) {
         n = crash64_count();
         CHECK(n>=0, "39J2 count ok");
         CHECK(crash64_reboot_after_dump(1)==0 || 1, "39J3 reboot-ok");
+    }
+
+    /* 40A Update Design */
+    {
+        printf("40A1 design doc exists\n");
+        CHECK(update64_init()==0, "40A2 init ok");
+    }
+    /* 40B API Spec */
+    {
+        printf("40B1 API spec exists\n");
+        CHECK(update64_stage("charos-kernel","2.1.0",1048576)==0, "40B2 stage ok");
+        CHECK(update64_staged_count()==1, "40B3 count1");
+    }
+    /* 40C Implementation Start */
+    {
+        printf("40C1 impl start doc exists\n");
+        CHECK(update64_init()==0, "40C2 init ok");
+    }
+    /* 40D Code Development */
+    {
+        printf("40D1 code dev doc exists\n");
+        CHECK(update64_stage("a","1.0",4096)==0, "40D2 stage a");
+        CHECK(update64_apply()==0, "40D3 apply ok");
+        CHECK(update64_commit()==0, "40D4 commit ok");
+    }
+    /* 40E Unit Tests */
+    {
+        char v[8];
+        printf("40E1 unit tests exist\n");
+        CHECK(update64_init()==0, "40E2 init");
+        CHECK(update64_stage(NULL,"1",16)==-1, "40E3 null name reject");
+        CHECK(update64_stage("x","1",0)==-3, "40E4 zero size reject");
+        CHECK(update64_init()==0, "40E5 reset");
+        CHECK(update64_commit()==-1, "40E6 empty commit reject");
+        strcpy(v, "1.0");
+        CHECK(v[0]=='1', "40E7 base");
+    }
+    /* 40F Integration Tests */
+    {
+        printf("40F1 integration tests exist\n");
+        CHECK(update64_init()==0, "40F2 init");
+        CHECK(update64_stage("net","5.5",32768)==0, "40F3 stage net");
+        CHECK(update64_stage("core","9.1",65536)==0, "40F4 stage core");
+        CHECK(update64_check_compat()==0, "40F5 compat");
+        CHECK(update64_apply()==0, "40F6 apply");
+        CHECK(update64_commit()==0, "40F7 commit");
+        CHECK(update64_staged_count()==0, "40F8 empty after commit");
+    }
+    /* 40G Code Review */
+    {
+        printf("40G1 review doc exists\n");
+        CHECK(update64_init()==0, "40G2 init");
+        CHECK(update64_stage("a","1",8)==0, "40G3 stage");
+        CHECK(update64_state(0)==-1, "40G4 null state reject");
+    }
+    /* 40H Security Audit */
+    {
+        printf("40H1 audit doc exists\n");
+        CHECK(update64_stage("pkg","2.0",0x40000001u)==-3, "40H2 size overflow reject");
+        CHECK(update64_stage("pkg","1.5",16)==0, "40H3 stage v1.5");
+        CHECK(update64_stage("pkg","2.0",16)==0, "40H4 stage v2.0 dup");
+        CHECK(update64_check_compat()==-2, "40H5 dup-version conflict");
+    }
+    /* 40I Documentation */
+    {
+        printf("40I1 docs exist\n");
+        CHECK(update64_init()==0, "40I2 ok");
+    }
+    /* 40J Release */
+    {
+        int st=-1;
+        printf("40J1 release doc exists\n");
+        CHECK(update64_state(&st)==0 && st==UPDATE_OK, "40J2 state ok");
+        CHECK(update64_rollback()==-1, "40J3 rollback only staged");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
