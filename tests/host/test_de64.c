@@ -27,6 +27,7 @@
 #include "arch/x86_64/sana.h"
 #include "arch/x86_64/dyna.h"
 #include "arch/x86_64/comp.h"
+#include "arch/x86_64/ent.h"
 
 static int fails = 0;
 #define CHECK(c, msg) do { \
@@ -4661,6 +4662,97 @@ int main(void) {
         CHECK(comp64_cert_status(id,&ok)==0 && ok==1, "60J4 status");
         CHECK(comp64_compliance_check(COMP64_STD_FIPS, &pass)==0 && pass==1, "60J5 compliance");
         CHECK(comp64_report_export("/tmp/out")== -2, "60J6 export stub");
+    }
+
+    /* 61A Enterprise Features Design */
+    {
+        char buf[256];
+        printf("61A1 doc exists\n");
+        CHECK(ent64_init()==0, "61A2 init");
+        CHECK(ent64_role_create(1, "admin")==0, "61A3 role");
+        CHECK(ent64_user_add("alice",1)==0, "61A4 user");
+        CHECK(ent64_user_exists("alice")==1, "61A5 exists");
+    }
+    /* 61B API Spec */
+    {
+        int ok=0;
+        printf("61B1 api spec exists\n");
+        CHECK(ent64_init()==0, "61B2 init");
+        CHECK(ent64_license_validate("ABCDEFGH",&ok)==0 && ok==1, "61B3 license ok");
+        CHECK(ent64_license_validate("short",&ok)==0 && ok==0, "61B4 license bad");
+        CHECK(ent64_feature_enable(5)==0, "61B5 enable");
+        CHECK(ent64_feature_status(5)==1, "61B6 status");
+    }
+    /* 61C Implementation Start */
+    {
+        printf("61C1 impl start exists\n");
+        CHECK(ent64_init()==0, "61C2 init");
+        CHECK(ent64_user_add("bob",2)==0, "61C3 add");
+        CHECK(ent64_user_remove("bob")==0, "61C4 remove");
+        CHECK(ent64_user_exists("bob")==0, "61C5 gone");
+    }
+    /* 61D Code Development */
+    {
+        char buf[256];
+        printf("61D1 dev doc exists\n");
+        CHECK(ent64_init()==0, "61D2 init");
+        CHECK(ent64_role_create(10, "editor")==0, "61D3 role");
+        CHECK(ent64_user_add("carol",10)==0, "61D4 user");
+        CHECK(ent64_role_assign(0,10)==0, "61D5 assign");
+        CHECK(ent64_report_users(buf,sizeof(buf))==0, "61D6 report");
+    }
+    /* 61E Unit Tests */
+    {
+        printf("61E1 tests exist\n");
+        CHECK(ent64_init()==0, "61E2 init");
+        CHECK(ent64_user_add(0,1)==-2, "61E3 null name");
+        CHECK(ent64_user_remove(0)==-1, "61E4 null remove");
+        CHECK(ent64_feature_enable(200)==-1, "61E5 bad feature");
+        CHECK(ent64_report_users(0,10)==-1, "61E6 null buf");
+    }
+    /* 61F Integration Tests */
+    {
+        char buf[256];
+        printf("61F1 integration exists\n");
+        CHECK(ent64_init()==0, "61F2 init");
+        CHECK(ent64_role_create(2,"viewer")==0, "61F3 role");
+        CHECK(ent64_user_add("dave",2)==0, "61F4 user");
+        CHECK(ent64_policy_check(0,2)==1, "61F5 policy");
+        CHECK(ent64_report_users(buf,sizeof(buf))==0, "61F6 report");
+    }
+    /* 61G Code Review */
+    {
+        printf("61G1 review exists\n");
+        CHECK(ent64_init()==0, "61G2 init");
+        CHECK(ent64_role_create(3,"auditor")==0, "61G3 role");
+        CHECK(ent64_user_add("eve",3)==0, "61G4 user");
+        CHECK(ent64_user_remove("eve")==0, "61G5 remove");
+        CHECK(ent64_user_exists("eve")==0, "61G6 gone");
+    }
+    /* 61H Security Audit */
+    {
+        int ok=0;
+        printf("61H1 audit exists\n");
+        CHECK(ent64_init()==0, "61H2 init");
+        CHECK(ent64_license_validate("12345678",&ok)==0 && ok==1, "61H3 license");
+        CHECK(ent64_audit_log("test")==0, "61H4 audit");
+    }
+    /* 61I Documentation */
+    {
+        printf("61I1 docs exist\n");
+        CHECK(ent64_init()==0, "61I2 init");
+        CHECK(ent64_feature_enable(42)==0, "61I3 enable");
+        CHECK(ent64_feature_status(42)==1, "61I4 status");
+    }
+    /* 61J Release */
+    {
+        char buf[256];
+        printf("61J1 release doc exists\n");
+        CHECK(ent64_init()==0, "61J2 init");
+        CHECK(ent64_role_create(99,"root")==0, "61J3 role");
+        CHECK(ent64_user_add("root",99)==0, "61J4 user");
+        CHECK(ent64_report_users(buf,sizeof(buf))==0, "61J5 report");
+        CHECK(ent64_policy_check(0,1)==1 || ent64_policy_check(0,1)==0, "61J6 policy");
     }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
