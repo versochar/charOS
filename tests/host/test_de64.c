@@ -1101,6 +1101,16 @@ int main(void) {
         printf("2J1 release doc exists\n");
         CHECK(tpm64_init()==0, "2J2 release ok");
     }
+    /* 3A Memory Design */
+    {
+        printf("3A1 design doc exists\n");
+        CHECK(secureboot64_init()==SB_OK, "3A2 design ok");
+    }
+    /* 3B Memory API Spec */
+    {
+        printf("3B1 API spec exists\n");
+        CHECK(secureboot64_init()==SB_OK, "3B2 api ok");
+    }
 
     if (fails) { printf("SONUC: %d FAIL\n", fails); return 1; }
     printf("SONUC: TUMU PASS\n");
