@@ -1,5 +1,6 @@
 #include <process/fork.h>
 #include <process/task.h>
+#include <process/cap.h>
 #include <process/pipe.h>
 #include <memory/paging.h>
 #include <memory/mmap.h>
@@ -66,6 +67,7 @@ struct task* fork_task(struct registers* regs) {
     child->parent_pid = parent->pid;
     child->uid = parent->uid; /* 14E: kimlik miras */
     child->gid = parent->gid;
+    child->caps = parent->caps; /* 22.4: yetki mirası (önceden memset ile sıfırlanıyordu) */
     child->brk_base = parent->brk_base; /* 14A: heap miras (sayfalar CoW) */
     child->brk_cur = parent->brk_cur;
     child->user_tls = parent->user_tls; /* 15C: TLS tabanı miras */

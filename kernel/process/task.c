@@ -1,4 +1,5 @@
 #include <process/task.h>
+#include <process/cap.h>
 #include <memory/kheap.h>
 #include <memory/paging.h>
 #include <core/spinlock.h>
@@ -128,6 +129,8 @@ static void fd_table_init(struct task* t) {
     t->brk_cur = 0;
     t->uid = 0; /* 14E: varsayılan root */
     t->gid = 0;
+    t->caps = CAP_ALL; /* 22.4: root bootstrap tam yetki; fork yolu fork.c'de ezer */
+    t->ngroups = 0;
     t->priority = 2; // 13D: default normal (0 idle, 1 high, 2 normal, 3 low)
     t->ticks_left = 10;
     t->exit_status = 0;

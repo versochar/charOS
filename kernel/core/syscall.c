@@ -12,6 +12,7 @@
 #include <drivers/blk.h>
 #include <process/pipe.h>
 #include <process/fork.h>
+#include <process/cap.h>
 #include <drivers/input.h>
 #include <drivers/vt.h>
 #include <string.h>
@@ -417,11 +418,20 @@ static uint32_t sys_setuid_wrap(uint32_t uid, uint32_t b, uint32_t c) {
     (void)b; (void)c;
     struct task* t = task_current();
     if (!t) return (uint32_t)-1;
-    if (t->uid == 0 || (int)uid == t->uid) {
-        t->uid = (int)uid;
-        return (uint32_t)t->uid;
+    if ((int)uid == t->uid) return (uint32_t)t->uid; /* değişiklik yok */
+    /* 22.5: uid değişimi CAP_SETUID gerektirir (uid==0 kontrolü yerine) */
+    if (!cap_has(t->caps, CAP_SETUID)) {
+        cap_audit(CAP_SETUID, 0);
+        return (uint32_t)-1;
     }
-    return (uint32_t)-1;
+    int was_root = (t->uid == 0);
+    t->uid = (int)uid;
+    if (was_root && t->uid != 0) {
+        /* 22.5: root bırakılınca yetkiler düşer (yükselme engeli) */
+        cap_drop_all(&t->caps);
+    }
+    cap_audit(CAP_SETUID, 1);
+    return (uint32_t)t->uid;
 }
 
 static uint32_t sys_getgid_wrap(uint32_t a, uint32_t b, uint32_t c) {
@@ -435,11 +445,15 @@ static uint32_t sys_setgid_wrap(uint32_t gid, uint32_t b, uint32_t c) {
     (void)b; (void)c;
     struct task* t = task_current();
     if (!t) return (uint32_t)-1;
-    if (t->uid == 0 || (int)gid == t->gid) {
-        t->gid = (int)gid;
-        return (uint32_t)t->gid;
+    if ((int)gid == t->gid) return (uint32_t)t->gid; /* değişiklik yok */
+    /* 22.5: gid değişimi CAP_SETGID gerektirir */
+    if (!cap_has(t->caps, CAP_SETGID)) {
+        cap_audit(CAP_SETGID, 0);
+        return (uint32_t)-1;
     }
-    return (uint32_t)-1;
+    t->gid = (int)gid;
+    cap_audit(CAP_SETGID, 1);
+    return (uint32_t)t->gid;
 }
 
 /* 20C: ek gruplar (supplementary groups). (buf, size) -> tasarım:
@@ -462,7 +476,7 @@ static uint32_t sys_setgroups_wrap(uint32_t ubuf, uint32_t usize, uint32_t c) {
     (void)c;
     struct task* t = task_current();
     if (!t) return (uint32_t)-1;
-    if (t->uid != 0) return (uint32_t)-1; /* sadece root */
+    if (!cap_has(t->caps, CAP_SETGID)) return (uint32_t)-1; /* 22.5: sadece yetkili */
     if (!ubuf || usize == 0) {
         t->ngroups = 0;
         return 0;
@@ -496,12 +510,20 @@ static uint32_t sys_capset_wrap(uint32_t caps, uint32_t b, uint32_t c) {
     struct task* t = task_current();
     if (!t) return (uint32_t)-1;
     if (t->uid == 0) {
+        /* 22.5: root serbest ama geçersiz bitler reddedilir */
+        if ((caps & ~CAP_VALID_MASK) != 0) return (uint32_t)-1;
         t->caps = caps;
+        cap_audit(caps, 1);
         return t->caps;
     }
-    /* yetkisiz: yalnızca mevcut kerpetenin alt kümesi (cap'leri kısabilir) */
-    if ((caps & ~t->caps) != 0) return (uint32_t)-1;
-    t->caps = caps;
+    /* 22.5: yetkisiz yalnızca alt kümeye inebilir (cap.c tek doğruluk kaynağı) */
+    uint32_t n = cap_allow_only(t->caps, caps);
+    if (n != caps) {
+        cap_audit(caps, 0);
+        return (uint32_t)-1;
+    }
+    t->caps = n;
+    cap_audit(caps, 1);
     return t->caps;
 }
 
@@ -647,6 +669,12 @@ static uint32_t sys_blkread(uint32_t lba, uint32_t ubuf, uint32_t c) {
 }
 static uint32_t sys_blkwrite(uint32_t lba, uint32_t ubuf, uint32_t c) {
     (void)c;
+    /* 22.5: ham disk yazma CAP_SYS_RAWIO gerektirir */
+    struct task* wt = task_current();
+    if (!wt || !cap_has(wt->caps, CAP_SYS_RAWIO)) {
+        cap_audit(CAP_SYS_RAWIO, 0);
+        return (uint32_t)-1;
+    }
     extern int blk_write(uint32_t lba, const void* buf);
     if (!is_user_buf_valid(ubuf, 512)) return (uint32_t)-1;
     if (copy_from_user(ubuf, bounce_buf, 512) != 0) return (uint32_t)-1;

@@ -63,12 +63,8 @@
 #define SYS_SETGROUPS 160 /* (buf, size) -> tamamlandı; root gerekir */
 #define SYS_CAPGET 161    /* (pid) -> o anki task capability bitmask */
 #define SYS_CAPSET 162    /* (caps) -> ayarla; root serbest, diğerleri kendininkinin alt kümesi */
-#define CAP_DAC_OVERRIDE (1u << 1) /* dosya rwx denetimini atla */
-#define CAP_DAC_READ_SEARCH (1u << 2) /* oku/dizin ara */
-#define CAP_FOWNER (1u << 3)  /* sahiplik koşulu olmadan chmod vb. */
-#define CAP_KILL (1u << 5)
-#define CAP_SETUID (1u << 7)
-#define CAP_SETGID (1u << 6)
+/* 22.2: capability bitleri process/cap.h'e taşındı (tek doğruluk kaynağı) */
+#include <process/cap.h>
 #define WNOHANG 1         /* 19G: waitpid bloklanmadan yokla */
 
 void syscall_init(void);
